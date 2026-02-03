@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="gd_Graphic3d_NameOfTexturePlane" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Wrapper for the OpenCASCADE Graphic3d_NameOfTexturePlane enum.
+	</brief_description>
+	<description>
+		This class exposes the Graphic3d_NameOfTexturePlane enum to Godot.
+		Represents the type of the texture projection plane for both S and T texture coordinates.
+
+		Note: This is an enum wrapper only; no instance methods are provided.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+		<constant name="NOTP_XY" value="0" description="Texture projection plane XY." />
+		<constant name="NOTP_YZ" value="1" description="Texture projection plane YZ." />
+		<constant name="NOTP_ZX" value="2" description="Texture projection plane ZX." />
+		<constant name="NOTP_UNKNOWN" value="3" description="Unknown texture projection plane." />
+	</constants>
+</class>

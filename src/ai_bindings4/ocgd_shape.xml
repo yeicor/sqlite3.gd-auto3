@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="ocgd_shape" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		A wrapper for OpenCASCADE TopoDS_Shape objects providing shape manipulation and analysis.
+	</brief_description>
+	<description>
+		The ocgd_shape class wraps OpenCASCADE's TopoDS_Shape, providing comprehensive functionality for CAD shape manipulation, analysis, and conversion. It supports geometric operations, topology exploration, measurements, Boolean operations, and mesh extraction for use in Godot.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="new_shape" qualifiers="static">
+			<return type="ocgd_shape" />
+			<description>
+				Creates a new empty ocgd_shape instance.
+			</description>
+		</method>
+		<method name="has_shape">
+			<return type="bool" />
+			<description>
+				Returns true if this wrapper contains a valid OpenCASCADE shape.
+			</description>
+		</method>
+		<method name="clear_shape">
+			<return type="void" />
+			<description>
+				Clears the contained shape, making this wrapper empty.
+			</description>
+		</method>
+		<method name="get_shape_type">
+			<return type="String" />
+			<description>
+				Returns the type of shape as a string (COMPOUND, SOLID, FACE, EDGE, VERTEX, etc.).
+			</description>
+		</method>
+		<method name="get_num_faces">
+			<return type="int" />
+			<description>
+				Returns the number of faces in the shape.
+			</description>
+		</method>
+		<method name="get_num_edges">
+			<return type="int" />
+			<description>
+				Returns the number of edges in the shape.
+			</description>
+		</method>
+		<method name="get_num_vertices">
+			<return type="int" />
+			<description>
+				Returns the number of vertices in the shape.
+			</description>
+		</method>
+		<method name="get_volume">
+			<return type="float" />
+			<description>
+				Calculates and returns the volume of the shape. Returns 0.0 if the shape has no volume.
+			</description>
+		</method>
+		<method name="get_surface_area">
+			<return type="float" />
+			<description>
+				Calculates and returns the surface area of the shape.
+			</description>
+		</method>
+		<method name="get_center_of_mass">
+			<return type="Vector3" />
+			<description>
+				Calculates and returns the center of mass of the shape.
+			</description>
+		</method>
+		<method name="get_bounding_box">
+			<return type="Array" />
+			<description>
+				Returns the axis-aligned bounding box as an array with two Vector3 elements: [min_point, max_point].
+			</description>
+		</method>
+		<method name="is_valid">
+			<return type="bool" />
+			<description>
+				Returns true if the shape is geometrically valid according to OpenCASCADE analysis.
+			</description>
+		</method>
+		<method name="is_closed">
+			<return type="bool" />
+			<description>
+				Returns true if the shape is closed (no boundary).
+			</description>
+		</method>
+		<method name="is_infinite">
+			<return type="bool" />
+			<description>
+				Returns true if the shape extends to infinity.
+			</description>
+		</method>
+		<method name="copy">
+			<return type="ocgd_shape" />
+			<description>
+				Creates and returns a copy of this shape.
+			</description>
+		</method>
+		<method name="transform_translate">
+			<return type="void" />
+			<param index="0" name="translation" type="Vector3" />
+			<description>
+				Translates the shape by the given vector.
+			</description>
+		</method>
+		<method name="transform_rotate">
+			<return type="void" />
+			<param index="0" name="axis" type="Vector3" />
+			<param index="1" name="angle" type="float" />
+			<description>
+				Rotates the shape around the given axis by the specified angle in radians.
+			</description>
+		</method>
+		<method name="transform_scale">
+			<return type="void" />
+			<param index="0" name="factor" type="float" />
+			<description>
+				Scales the shape uniformly by the given factor.
+			</description>
+		</method>
+		<method name="transform_scale_xyz">
+			<return type="void" />
+			<param index="0" name="scale" type="Vector3" />
+			<description>
+				Attempts to scale the shape non-uniformly. Note: OpenCASCADE has limited support for non-uniform scaling.
+			</description>
+		</method>
+		<method name="get_faces">
+			<return type="Array" />
+			<description>
+				Returns an array of ocgd_shape objects representing all faces in this shape.
+			</description>
+		</method>
+		<method name="get_edges">
+			<return type="Array" />
+			<description>
+				Returns an array of ocgd_shape objects representing all edges in this shape.
+			</description>
+		</method>
+		<method name="get_vertices">
+			<return type="Array" />
+			<description>
+				Returns an array of ocgd_shape objects representing all vertices in this shape.
+			</description>
+		</method>
+		<method name="get_subshapes">
+			<return type="Array" />
+			<param index="0" name="shape_type" type="String" />
+			<description>
+				Returns an array of ocgd_shape objects of the specified type (FACE, EDGE, VERTEX, etc.).
+			</description>
+		</method>
+		<method name="distance_to_shape">
+			<return type="float" />
+			<param index="0" name="other" type="ocgd_shape" />
+			<description>
+				Calculates the minimum distance between this shape and another shape. Returns -1.0 on error.
+			</description>
+		</method>
+		<method name="distance_to_point">
+			<return type="float" />
+			<param index="0" name="point" type="Vector3" />
+			<description>
+				Calculates the minimum distance from this shape to a point. Returns -1.0 on error.
+			</description>
+		</method>
+		<method name="closest_point_to">
+			<return type="Vector3" />
+			<param index="0" name="point" type="Vector3" />
+			<description>
+				Finds the closest point on this shape to the given point.
+			</description>
+		</method>
+		<method name="fuse_with">
+			<return type="ocgd_shape" />
+			<param index="0" name="other" type="ocgd_shape" />
+			<description>
+				Performs a Boolean union operation with another shape and returns the result.
+			</description>
+		</method>
+		<method name="cut_with">
+			<return type="ocgd_shape" />
+			<param index="0" name="other" type="ocgd_shape" />
+			<description>
+				Performs a Boolean difference operation (this - other) and returns the result.
+			</description>
+		</method>
+		<method name="common_with">
+			<return type="ocgd_shape" />
+			<param index="0" name="other" type="ocgd_shape" />
+			<description>
+				Performs a Boolean intersection operation with another shape and returns the result.
+			</description>
+		</method>
+		<method name="export_step">
+			<return type="bool" />
+			<param index="0" name="file_path" type="String" />
+			<description>
+				Exports the shape to a STEP file. Returns true on success.
+			</description>
+		</method>
+		<method name="export_iges">
+			<return type="bool" />
+			<param index="0" name="file_path" type="String" />
+			<description>
+				Exports the shape to an IGES file. Returns true on success.
+			</description>
+		</method>
+		<method name="export_brep">
+			<return type="bool" />
+			<param index="0" name="file_path" type="String" />
+			<description>
+				Exports the shape to a BREP file. Returns true on success.
+			</description>
+		</method>
+		<method name="export_stl">
+			<return type="bool" />
+			<param index="0" name="file_path" type="String" />
+			<description>
+				Exports the shape to an STL file. Returns true on success.
+			</description>
+		</method>
+		<method name="extract_mesh_data">
+			<return type="Dictionary" />
+			<description>
+				Extracts mesh data suitable for creating Godot meshes. Returns a dictionary with "vertices", "indices", and "normals" arrays.
+			</description>
+		</method>
+		<method name="extract_triangulated_mesh">
+			<return type="Array" />
+			<description>
+				Extracts the triangulated mesh as an array of triangles, where each triangle is an array of three Vector3 points.
+			</description>
+		</method>
+		<method name="get_type">
+			<return type="String" />
+			<description>
+				Returns the class type name "ocgd_shape".
+			</description>
+		</method>
+		<method name="is_null">
+			<return type="bool" />
+			<description>
+				Returns true if this wrapper does not contain a valid shape.
+			</description>
+		</method>
+		<method name="get_shape_info">
+			<return type="Dictionary" />
+			<description>
+				Returns a dictionary containing comprehensive information about the shape including type, validity, counts, and geometric properties.
+			</description>
+		</method>
+		<method name="get_hash_code">
+			<return type="int" />
+			<description>
+				Returns a hash code for the shape, useful for comparison and storage in dictionaries.
+			</description>
+		</method>
+		<method name="is_same_as">
+			<return type="bool" />
+			<param index="0" name="other" type="ocgd_shape" />
+			<description>
+				Returns true if this shape is the same object as the other shape (reference equality).
+			</description>
+		</method>
+		<method name="is_equal_to">
+			<return type="bool" />
+			<param index="0" name="other" type="ocgd_shape" />
+			<description>
+				Returns true if this shape is geometrically equal to the other shape.
+			</description>
+		</method>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+	</constants>
+</class>

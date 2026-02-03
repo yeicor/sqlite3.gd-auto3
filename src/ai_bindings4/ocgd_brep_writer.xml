@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="ocgd_brep_writer" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		OpenCASCADE BREP file writer for exporting native CAD geometry.
+	</brief_description>
+	<description>
+		The [ocgd_brep_writer] class provides functionality to write OpenCASCADE shapes to BREP (Boundary Representation) files, which are the native format for OpenCASCADE geometry. BREP files preserve the exact mathematical representation of 3D shapes with full precision.
+
+		This writer supports exporting single shapes, multiple shapes as compounds, and provides extensive configuration options for precision, data inclusion, and format settings. It can write to files or generate string content for embedded applications.
+
+		BREP format is ideal for preserving precise engineering data and ensuring compatibility with other OpenCASCADE-based applications.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="add_export_comment">
+			<return type="void" />
+			<param index="0" name="comment" type="String" />
+			<description>
+				Adds a comment to be included in the exported BREP file for documentation purposes.
+			</description>
+		</method>
+		<method name="can_export_shape_type">
+			<return type="bool" />
+			<param index="0" name="shape_type" type="String" />
+			<description>
+				Checks if the specified shape type can be exported to BREP format. BREP supports all OpenCASCADE shape types.
+			</description>
+		</method>
+		<method name="clear_error">
+			<return type="void" />
+			<description>
+				Clears any stored error message from the last export operation.
+			</description>
+		</method>
+		<method name="clear_export_comments">
+			<return type="void" />
+			<description>
+				Removes all previously added export comments.
+			</description>
+		</method>
+		<method name="get_binary_format" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether binary format is enabled for BREP export. Binary format is more compact but less readable.
+			</description>
+		</method>
+		<method name="get_brep_version" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the BREP format version used for export.
+			</description>
+		</method>
+		<method name="get_compress_output" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether output compression is enabled to reduce file size.
+			</description>
+		</method>
+		<method name="get_export_file_size" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the size of the last exported file in bytes. Only available after a successful export operation.
+			</description>
+		</method>
+		<method name="get_export_info" qualifiers="const">
+			<return type="Dictionary" />
+			<description>
+				Returns comprehensive information about the writer configuration and last export operation.
+			</description>
+		</method>
+		<method name="get_export_metadata" qualifiers="const">
+			<return type="Dictionary" />
+			<description>
+				Returns the metadata dictionary that will be included in exported files.
+			</description>
+		</method>
+		<method name="get_export_progress" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the progress of the current export operation as a value between 0.0 and 1.0.
+			</description>
+		</method>
+		<method name="get_export_statistics" qualifiers="const">
+			<return type="Dictionary" />
+			<description>
+				Returns detailed statistics about the last export operation including timing and performance metrics.
+			</description>
+		</method>
+		<method name="get_exported_shape_count" qualifiers="const">
+			<return type="int" />
+			<description>
+				Returns the number of shapes that were exported in the last operation.
+			</description>
+		</method>
+		<method name="get_fix_shapes_before_export" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether automatic shape fixing is enabled before export to repair invalid geometry.
+			</description>
+		</method>
+		<method name="get_last_error" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the last error message from an export operation, or an empty string if no error occurred.
+			</description>
+		</method>
+		<method name="get_memory_limit" qualifiers="const">
+			<return type="int" />
+			<description>
+				Returns the memory limit in megabytes for export operations. Zero means no limit.
+			</description>
+		</method>
+		<method name="get_merge_vertices" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether nearby vertices are merged before export to reduce geometric complexity.
+			</description>
+		</method>
+		<method name="get_precision_tolerance" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the precision tolerance used for geometric operations during export.
+			</description>
+		</method>
+		<method name="get_progress_callback_enabled" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether progress callbacks are enabled for long-running export operations.
+			</description>
+		</method>
+		<method name="get_recommended_version" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the recommended BREP format version for best compatibility and features.
+			</description>
+		</method>
+		<method name="get_remove_duplicates" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether duplicate geometric elements are removed before export.
+			</description>
+		</method>
+		<method name="get_shape_optimization" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether shape optimization is enabled to improve export performance and file size.
+			</description>
+		</method>
+		<method name="get_shape_quality_report">
+			<return type="Dictionary" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Analyzes the quality of a shape and returns a detailed report including potential issues and recommendations.
+			</description>
+		</method>
+		<method name="get_streaming_mode" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether streaming mode is enabled for memory-efficient export of large shapes.
+			</description>
+		</method>
+		<method name="get_supported_brep_versions" qualifiers="const">
+			<return type="Array" />
+			<description>
+				Returns an array of supported BREP format versions for export.
+			</description>
+		</method>
+		<method name="get_supported_extensions" qualifiers="const">
+			<return type="Array" />
+			<description>
+				Returns an array of supported file extensions for BREP export (typically ["brep", "brp"]).
+			</description>
+		</method>
+		<method name="get_supported_shape_types" qualifiers="const">
+			<return type="Array" />
+			<description>
+				Returns an array of OpenCASCADE shape types that can be exported to BREP format.
+			</description>
+		</method>
+		<method name="get_type" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the type identifier of this writer ("ocgd_brep_writer").
+			</description>
+		</method>
+		<method name="get_write_curves" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether curve information is included in BREP export. Curves are essential for edge representation.
+			</description>
+		</method>
+		<method name="get_write_surfaces" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether surface information is included in BREP export. Surfaces are essential for face representation.
+			</description>
+		</method>
+		<method name="get_write_triangulation" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether triangulation data is included in BREP export. Triangulation improves display performance.
+			</description>
+		</method>
+		<method name="has_error" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns true if an error occurred during the last export operation.
+			</description>
+		</method>
+		<method name="is_null" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether this writer instance is in a null/invalid state.
+			</description>
+		</method>
+		<method name="is_version_compatible" qualifiers="const">
+			<return type="bool" />
+			<param index="0" name="version" type="String" />
+			<description>
+				Checks if the specified BREP format version is supported for export.
+			</description>
+		</method>
+		<method name="new_writer" qualifiers="static">
+			<return type="ocgd_brep_writer" />
+			<description>
+				Creates and returns a new BREP writer instance. This is the preferred way to create a writer since GDExtensions don't support non-empty constructors.
+			</description>
+		</method>
+		<method name="perform_shape_check_before_export">
+			<return type="bool" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Performs comprehensive validation checks on a shape before export. Returns true if the shape is suitable for export.
+			</description>
+		</method>
+		<method name="repair_shape_for_export">
+			<return type="bool" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Attempts to repair a shape to make it suitable for export. Returns true if repairs were successful.
+			</description>
+		</method>
+		<method name="set_binary_format">
+			<return type="void" />
+			<param index="0" name="binary" type="bool" />
+			<description>
+				Enables or disables binary format for BREP export. Binary format is more compact but less human-readable.
+			</description>
+		</method>
+		<method name="set_brep_version">
+			<return type="void" />
+			<param index="0" name="version" type="String" />
+			<description>
+				Sets the BREP format version to use for export. Use get_supported_brep_versions() to see available options.
+			</description>
+		</method>
+		<method name="set_compress_output">
+			<return type="void" />
+			<param index="0" name="compress" type="bool" />
+			<description>
+				Enables or disables output compression to reduce file size at the cost of export time.
+			</description>
+		</method>
+		<method name="set_export_metadata">
+			<return type="void" />
+			<param index="0" name="metadata" type="Dictionary" />
+			<description>
+				Sets metadata information to be included in exported BREP files for documentation and tracking purposes.
+			</description>
+		</method>
+		<method name="set_fix_shapes_before_export">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables automatic shape fixing before export to repair invalid geometry.
+			</description>
+		</method>
+		<method name="set_memory_limit">
+			<return type="void" />
+			<param index="0" name="limit_mb" type="int" />
+			<description>
+				Sets the memory limit in megabytes for export operations. Set to 0 for no limit.
+			</description>
+		</method>
+		<method name="set_merge_vertices">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables merging of nearby vertices before export to reduce geometric complexity.
+			</description>
+		</method>
+		<method name="set_precision_tolerance">
+			<return type="void" />
+			<param index="0" name="tolerance" type="float" />
+			<description>
+				Sets the precision tolerance for geometric operations during export. Smaller values provide higher precision.
+			</description>
+		</method>
+		<method name="set_progress_callback_enabled">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables progress callbacks for long-running export operations.
+			</description>
+		</method>
+		<method name="set_remove_duplicates">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables removal of duplicate geometric elements before export.
+			</description>
+		</method>
+		<method name="set_shape_optimization">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables shape optimization to improve export performance and reduce file size.
+			</description>
+		</method>
+		<method name="set_streaming_mode">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables streaming mode for memory-efficient export of large shapes.
+			</description>
+		</method>
+		<method name="set_write_curves">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables inclusion of curve information in BREP export. Required for precise edge representation.
+			</description>
+		</method>
+		<method name="set_write_surfaces">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables inclusion of surface information in BREP export. Required for precise face representation.
+			</description>
+		</method>
+		<method name="set_write_triangulation">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables inclusion of triangulation data in BREP export. Improves display performance but increases file size.
+			</description>
+		</method>
+		<method name="validate_shape_for_export">
+			<return type="bool" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Validates whether a shape is suitable for BREP export. Returns true if the shape can be exported successfully.
+			</description>
+		</method>
+		<method name="validate_shapes_for_export">
+			<return type="bool" />
+			<param index="0" name="shapes" type="Array" />
+			<description>
+				Validates whether an array of shapes are all suitable for BREP export. Returns true if all shapes can be exported.
+			</description>
+		</method>
+		<method name="write_assembly_as_separate_files">
+			<return type="bool" />
+			<param index="0" name="assembly" type="ocgd_shape" />
+			<param index="1" name="base_path" type="String" />
+			<description>
+				Exports each component of an assembly as separate BREP files with names based on the base path.
+			</description>
+		</method>
+		<method name="write_file">
+			<return type="bool" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="file_path" type="String" />
+			<description>
+				Writes a single shape to a BREP file at the specified path. Returns true on success, false on failure.
+			</description>
+		</method>
+		<method name="write_file_with_options">
+			<return type="bool" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="file_path" type="String" />
+			<param index="2" name="options" type="Dictionary" />
+			<description>
+				Writes a single shape to a BREP file with custom export options. The options dictionary can override default settings.
+			</description>
+		</method>
+		<method name="write_multiple_files">
+			<return type="bool" />
+			<param index="0" name="shapes" type="Array" />
+			<param index="1" name="file_paths" type="Array" />
+			<description>
+				Exports multiple shapes to separate BREP files. The shapes and file_paths arrays must have the same length.
+			</description>
+		</method>
+		<method name="write_shapes">
+			<return type="bool" />
+			<param index="0" name="shapes" type="Array" />
+			<param index="1" name="file_path" type="String" />
+			<description>
+				Writes multiple shapes as a compound to a single BREP file. Returns true on success, false on failure.
+			</description>
+		</method>
+		<method name="write_shapes_to_string">
+			<return type="String" />
+			<param index="0" name="shapes" type="Array" />
+			<description>
+				Converts multiple shapes to BREP format and returns the result as a string. Shapes are combined into a compound.
+			</description>
+		</method>
+		<method name="write_shapes_with_options">
+			<return type="bool" />
+			<param index="0" name="shapes" type="Array" />
+			<param index="1" name="file_path" type="String" />
+			<param index="2" name="options" type="Dictionary" />
+			<description>
+				Writes multiple shapes as a compound to a BREP file with custom export options.
+			</description>
+		</method>
+		<method name="write_to_string">
+			<return type="String" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Converts a shape to BREP format and returns the result as a string instead of writing to a file.
+			</description>
+		</method>
+	</methods>
+</class>

@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="ocgd_glb_exporter" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		OpenCASCADE GLB/glTF exporter for 3D CAD models and assemblies.
+	</brief_description>
+	<description>
+		The [ocgd_glb_exporter] class provides functionality to export OpenCASCADE shapes and assemblies to GLB (binary glTF) format. It supports mesh generation, material export, color handling, and hierarchical assembly structures.
+
+		This exporter can handle single shapes, multiple shapes, and complex assemblies with proper hierarchy and transformations. It provides extensive configuration options for mesh quality, material handling, and export optimization.
+
+		The exporter uses OpenCASCADE's built-in meshing algorithms to generate triangulated meshes suitable for real-time rendering and visualization in game engines and 3D applications.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="add_shape_color">
+			<return type="void" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="color" type="Vector3" />
+			<description>
+				Assigns a color to a specific shape for export. The color should be specified as RGB values in the range 0.0 to 1.0.
+			</description>
+		</method>
+		<method name="add_shape_material">
+			<return type="void" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="material" type="Dictionary" />
+			<description>
+				Assigns material properties to a specific shape for export. The material dictionary can contain properties like "diffuse", "specular", "metallic", "roughness", etc.
+			</description>
+		</method>
+		<method name="clear_error">
+			<return type="void" />
+			<description>
+				Clears any stored error message from the last export operation.
+			</description>
+		</method>
+		<method name="clear_shape_colors">
+			<return type="void" />
+			<description>
+				Removes all assigned shape colors, reverting to default or shape-intrinsic colors.
+			</description>
+		</method>
+		<method name="clear_shape_materials">
+			<return type="void" />
+			<description>
+				Removes all assigned shape materials, reverting to default materials.
+			</description>
+		</method>
+		<method name="create_assembly_node">
+			<return type="Dictionary" />
+			<param index="0" name="name" type="String" />
+			<param index="1" name="shape" type="ocgd_shape" />
+			<param index="2" name="transform" type="Array" />
+			<description>
+				Creates an assembly node dictionary with the specified name, shape, and transformation matrix. Used for building hierarchical assembly structures.
+			</description>
+		</method>
+		<method name="export_assembly">
+			<return type="bool" />
+			<param index="0" name="shapes" type="Array" />
+			<param index="1" name="transforms" type="Array" />
+			<param index="2" name="file_path" type="String" />
+			<description>
+				Exports an assembly of shapes with their corresponding transformations to a GLB file. Returns true on success, false on failure.
+			</description>
+		</method>
+		<method name="export_assembly_with_options">
+			<return type="bool" />
+			<param index="0" name="shapes" type="Array" />
+			<param index="1" name="transforms" type="Array" />
+			<param index="2" name="file_path" type="String" />
+			<param index="3" name="options" type="Dictionary" />
+			<description>
+				Exports an assembly with custom export options. The options dictionary can override default settings for this specific export.
+			</description>
+		</method>
+		<method name="export_hierarchical_assembly">
+			<return type="bool" />
+			<param index="0" name="assembly_tree" type="Dictionary" />
+			<param index="1" name="file_path" type="String" />
+			<description>
+				Exports a hierarchical assembly structure defined by the assembly tree dictionary. Preserves parent-child relationships and nested transformations.
+			</description>
+		</method>
+		<method name="export_shape">
+			<return type="bool" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="file_path" type="String" />
+			<description>
+				Exports a single shape to a GLB file. Returns true on success, false on failure.
+			</description>
+		</method>
+		<method name="export_shape_with_options">
+			<return type="bool" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="file_path" type="String" />
+			<param index="2" name="options" type="Dictionary" />
+			<description>
+				Exports a single shape with custom export options. The options dictionary can override default settings for this specific export.
+			</description>
+		</method>
+		<method name="export_shapes">
+			<return type="bool" />
+			<param index="0" name="shapes" type="Array" />
+			<param index="1" name="file_path" type="String" />
+			<description>
+				Exports multiple shapes to a GLB file as separate objects. Returns true on success, false on failure.
+			</description>
+		</method>
+		<method name="get_angular_deflection" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the current angular deflection value used for mesh generation. Lower values produce smoother curved surfaces.
+			</description>
+		</method>
+		<method name="get_default_material_name" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the name used for the default material when no specific material is assigned to a shape.
+			</description>
+		</method>
+		<method name="get_export_capabilities" qualifiers="const">
+			<return type="Dictionary" />
+			<description>
+				Returns a dictionary describing the export capabilities and supported features of this exporter.
+			</description>
+		</method>
+		<method name="get_export_colors" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether color information is included in the export.
+			</description>
+		</method>
+		<method name="get_export_info" qualifiers="const">
+			<return type="Dictionary" />
+			<description>
+				Returns information about the exporter configuration and last export operation.
+			</description>
+		</method>
+		<method name="get_export_materials" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether material information is included in the export.
+			</description>
+		</method>
+		<method name="get_export_textures" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether texture information is included in the export.
+			</description>
+		</method>
+		<method name="get_exported_triangle_count" qualifiers="const">
+			<return type="int" />
+			<description>
+				Returns the number of triangles in the last export operation. Useful for performance analysis.
+			</description>
+		</method>
+		<method name="get_exported_vertex_count" qualifiers="const">
+			<return type="int" />
+			<description>
+				Returns the number of vertices in the last export operation. Useful for performance analysis.
+			</description>
+		</method>
+		<method name="get_last_error" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the last error message from an export operation, or an empty string if no error occurred.
+			</description>
+		</method>
+		<method name="get_merge_faces" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether adjacent faces are merged during mesh generation to reduce triangle count.
+			</description>
+		</method>
+		<method name="get_mesh_deflection" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the current mesh deflection value. Lower values produce higher quality meshes with more triangles.
+			</description>
+		</method>
+		<method name="get_mesh_optimization" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether mesh optimization is enabled to reduce triangle count and improve performance.
+			</description>
+		</method>
+		<method name="get_mesh_statistics" qualifiers="const">
+			<return type="Dictionary" />
+			<description>
+				Returns detailed statistics about the mesh generation process from the last export operation.
+			</description>
+		</method>
+		<method name="get_supported_extensions" qualifiers="const">
+			<return type="Array" />
+			<description>
+				Returns an array of supported file extensions for export (typically ["glb", "gltf"]).
+			</description>
+		</method>
+		<method name="get_texture_size" qualifiers="const">
+			<return type="int" />
+			<description>
+				Returns the resolution used for generated textures (width and height in pixels).
+			</description>
+		</method>
+		<method name="get_type" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the type identifier of this exporter ("ocgd_glb_exporter").
+			</description>
+		</method>
+		<method name="get_vertex_welding_tolerance" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the tolerance used for welding nearby vertices during mesh optimization.
+			</description>
+		</method>
+		<method name="has_error" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns true if an error occurred during the last export operation.
+			</description>
+		</method>
+		<method name="is_null" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether this exporter instance is in a null/invalid state.
+			</description>
+		</method>
+		<method name="new_exporter" qualifiers="static">
+			<return type="ocgd_glb_exporter" />
+			<description>
+				Creates and returns a new GLB exporter instance. This is the preferred way to create an exporter since GDExtensions don't support non-empty constructors.
+			</description>
+		</method>
+		<method name="preview_export" qualifiers="const">
+			<return type="Dictionary" />
+			<description>
+				Performs a dry run of the export process and returns information about what would be exported without actually creating the file.
+			</description>
+		</method>
+		<method name="set_angular_deflection">
+			<return type="void" />
+			<param index="0" name="deflection" type="float" />
+			<description>
+				Sets the angular deflection value for mesh generation. Lower values produce smoother curved surfaces but increase triangle count. Typical range: 0.01 to 1.0 radians.
+			</description>
+		</method>
+		<method name="set_coordinate_system_conversion">
+			<return type="void" />
+			<param index="0" name="from_system" type="String" />
+			<param index="1" name="to_system" type="String" />
+			<description>
+				Configures coordinate system conversion between different CAD and graphics conventions (e.g., "CAD" to "OpenGL").
+			</description>
+		</method>
+		<method name="set_default_material_name">
+			<return type="void" />
+			<param index="0" name="name" type="String" />
+			<description>
+				Sets the name used for the default material when no specific material is assigned to a shape.
+			</description>
+		</method>
+		<method name="set_export_colors">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables the export of color information. When enabled, shape colors are included in the GLB file.
+			</description>
+		</method>
+		<method name="set_export_materials">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables the export of material information. When enabled, material properties are included in the GLB file.
+			</description>
+		</method>
+		<method name="set_export_textures">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables the export of texture information. When enabled, textures are included in the GLB file.
+			</description>
+		</method>
+		<method name="set_merge_faces">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables face merging during mesh generation. When enabled, adjacent faces are merged to reduce triangle count.
+			</description>
+		</method>
+		<method name="set_mesh_deflection">
+			<return type="void" />
+			<param index="0" name="deflection" type="float" />
+			<description>
+				Sets the mesh deflection value. Lower values produce higher quality meshes with more triangles. Typical range: 0.001 to 1.0.
+			</description>
+		</method>
+		<method name="set_mesh_optimization">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables mesh optimization to reduce triangle count and improve rendering performance.
+			</description>
+		</method>
+		<method name="set_texture_size">
+			<return type="void" />
+			<param index="0" name="size" type="int" />
+			<description>
+				Sets the resolution for generated textures. Common values are 256, 512, 1024, or 2048 pixels.
+			</description>
+		</method>
+		<method name="set_unit_scale">
+			<return type="void" />
+			<param index="0" name="scale" type="float" />
+			<description>
+				Sets the unit scale factor for coordinate conversion. Use this to convert between different unit systems (e.g., mm to m).
+			</description>
+		</method>
+		<method name="set_vertex_welding_tolerance">
+			<return type="void" />
+			<param index="0" name="tolerance" type="float" />
+			<description>
+				Sets the tolerance for welding nearby vertices during mesh optimization. Smaller values preserve more detail.
+			</description>
+		</method>
+		<method name="set_y_up_conversion">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables Y-up coordinate conversion for compatibility with different graphics engines.
+			</description>
+		</method>
+		<method name="validate_shapes_for_export" qualifiers="const">
+			<return type="bool" />
+			<param index="0" name="shapes" type="Array" />
+			<description>
+				Validates whether the provided shapes are suitable for export. Returns true if all shapes can be exported successfully.
+			</description>
+		</method>
+	</methods>
+</class>

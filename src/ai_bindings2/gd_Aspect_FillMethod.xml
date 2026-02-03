@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="gd_Aspect_FillMethod" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Defines the fill methods to write bitmaps in a window.
+	</brief_description>
+	<description>
+		Binding for the Open CASCADE Aspect_FillMethod enum.
+		This class provides the fill methods used to write bitmaps in a window.
+		Note: This is an enum wrapper for Godot GDExtension and does not wrap any underlying C++ object.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+		<constant name="FM_NONE" value="0" description="No fill method." />
+		<constant name="FM_CENTERED" value="1" description="Bitmap is centered in the window." />
+		<constant name="FM_TILED" value="2" description="Bitmap is tiled in the window." />
+		<constant name="FM_STRETCH" value="3" description="Bitmap is stretched to fit the window." />
+	</constants>
+</class>

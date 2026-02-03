@@ -1,0 +1,750 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="ocgd_topology_explorer" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Advanced topology exploration and analysis tool for OpenCASCADE shapes.
+	</brief_description>
+	<description>
+		The [ocgd_topology_explorer] class provides comprehensive tools for analyzing the topology and geometry of OpenCASCADE shapes. It allows detailed inspection of faces, edges, vertices, and their relationships, as well as precise distance measurements and geometric analysis.
+
+		This class is essential for CAD applications that need to understand the structure of imported models, perform quality checks, or extract specific geometric information for further processing.
+
+		The explorer can analyze shape hierarchy, measure distances between geometric elements, calculate curvature properties, and identify geometric features like holes, fillets, and specific surface types.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="analyze_shape_topology">
+			<return type="Dictionary" />
+			<description>
+				Performs a comprehensive analysis of the current shape's topology and returns detailed information including counts of all shape types, validity checks, and bounding box data.
+			</description>
+		</method>
+		<method name="calculate_mass_properties">
+			<return type="Dictionary" />
+			<description>
+				Calculates mass properties for solid shapes including volume, surface area, center of gravity, and moments of inertia. Only works with valid solid geometries.
+			</description>
+		</method>
+		<method name="calculate_shape_similarity">
+			<return type="float" />
+			<param index="0" name="other_shape" type="ocgd_shape" />
+			<description>
+				Calculates a similarity score between the current shape and another shape based on topological and geometric properties. Returns a value between 0.0 and 1.0.
+			</description>
+		</method>
+		<method name="clear_error">
+			<return type="void" />
+			<description>
+				Clears any stored error message from the last operation.
+			</description>
+		</method>
+		<method name="clear_shape">
+			<return type="void" />
+			<description>
+				Removes the currently assigned shape from the explorer, freeing any cached analysis data.
+			</description>
+		</method>
+		<method name="compare_topologies">
+			<return type="bool" />
+			<param index="0" name="other_shape" type="ocgd_shape" />
+			<description>
+				Compares the topology of the current shape with another shape. Returns true if they have the same topological structure.
+			</description>
+		</method>
+		<method name="edges_intersect">
+			<return type="bool" />
+			<param index="0" name="edge_index1" type="int" />
+			<param index="1" name="edge_index2" type="int" />
+			<description>
+				Checks if two edges intersect. Returns true if the edges have any intersection points.
+			</description>
+		</method>
+		<method name="evaluate_face_at_uv">
+			<return type="Vector3" />
+			<param index="0" name="face_index" type="int" />
+			<param index="1" name="u" type="float" />
+			<param index="2" name="v" type="float" />
+			<description>
+				Evaluates the surface of a face at the given UV parameters and returns the 3D point on the surface.
+			</description>
+		</method>
+		<method name="export_topology_info">
+			<return type="Dictionary" />
+			<description>
+				Exports comprehensive topology information as a structured dictionary suitable for serialization or reporting.
+			</description>
+		</method>
+		<method name="export_topology_report">
+			<return type="String" />
+			<description>
+				Generates a human-readable text report of the shape's topology and geometric properties.
+			</description>
+		</method>
+		<method name="faces_intersect">
+			<return type="bool" />
+			<param index="0" name="face_index1" type="int" />
+			<param index="1" name="face_index2" type="int" />
+			<description>
+				Checks if two faces intersect. Returns true if the faces have any overlapping regions.
+			</description>
+		</method>
+		<method name="find_chamfers">
+			<return type="Array" />
+			<description>
+				Identifies chamfer features in the shape and returns an array of face indices that form chamfers.
+			</description>
+		</method>
+		<method name="find_conical_faces">
+			<return type="Array" />
+			<description>
+				Finds all conical faces in the shape and returns an array of their indices.
+			</description>
+		</method>
+		<method name="find_cylindrical_faces">
+			<return type="Array" />
+			<description>
+				Finds all cylindrical faces in the shape and returns an array of their indices.
+			</description>
+		</method>
+		<method name="find_degenerate_faces">
+			<return type="Array" />
+			<description>
+				Identifies degenerate or problematic faces that may cause issues in processing and returns their indices.
+			</description>
+		</method>
+		<method name="find_edge_intersections">
+			<return type="Array" />
+			<param index="0" name="edge_index1" type="int" />
+			<param index="1" name="edge_index2" type="int" />
+			<description>
+				Finds all intersection points between two edges and returns them as an array of Vector3 positions.
+			</description>
+		</method>
+		<method name="find_face_intersections">
+			<return type="Array" />
+			<param index="0" name="face_index1" type="int" />
+			<param index="1" name="face_index2" type="int" />
+			<description>
+				Finds intersection curves between two faces and returns geometric information about the intersections.
+			</description>
+		</method>
+		<method name="find_fillets">
+			<return type="Array" />
+			<description>
+				Identifies fillet features in the shape and returns an array of face indices that form fillets.
+			</description>
+		</method>
+		<method name="find_free_edges">
+			<return type="Array" />
+			<description>
+				Finds edges that are not shared by two faces (boundary edges) and returns their indices. Useful for detecting open surfaces.
+			</description>
+		</method>
+		<method name="find_holes">
+			<return type="Array" />
+			<description>
+				Identifies hole features in the shape such as cylindrical holes and returns information about their location and dimensions.
+			</description>
+		</method>
+		<method name="find_planar_faces">
+			<return type="Array" />
+			<description>
+				Finds all planar (flat) faces in the shape and returns an array of their indices.
+			</description>
+		</method>
+		<method name="find_small_features">
+			<return type="Array" />
+			<param index="0" name="min_size" type="float" />
+			<description>
+				Finds geometric features smaller than the specified minimum size. Useful for identifying features that might cause meshing problems.
+			</description>
+		</method>
+		<method name="find_spherical_faces">
+			<return type="Array" />
+			<description>
+				Finds all spherical faces in the shape and returns an array of their indices.
+			</description>
+		</method>
+		<method name="get_adjacent_faces">
+			<return type="Array" />
+			<param index="0" name="face_index" type="int" />
+			<description>
+				Returns an array of face indices that are adjacent to the specified face (sharing edges).
+			</description>
+		</method>
+		<method name="get_cache_results" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether analysis results are cached to improve performance for repeated queries.
+			</description>
+		</method>
+		<method name="get_center_of_gravity">
+			<return type="Vector3" />
+			<description>
+				Calculates and returns the center of gravity (centroid) of the shape. Works best with solid geometries.
+			</description>
+		</method>
+		<method name="get_closest_point_on_edge">
+			<return type="Vector3" />
+			<param index="0" name="point" type="Vector3" />
+			<param index="1" name="edge_index" type="int" />
+			<description>
+				Finds the closest point on the specified edge to the given point and returns its position.
+			</description>
+		</method>
+		<method name="get_closest_point_on_face">
+			<return type="Vector3" />
+			<param index="0" name="point" type="Vector3" />
+			<param index="1" name="face_index" type="int" />
+			<description>
+				Finds the closest point on the specified face to the given point and returns its position.
+			</description>
+		</method>
+		<method name="get_closest_points_edge_to_edge">
+			<return type="Dictionary" />
+			<param index="0" name="edge_index1" type="int" />
+			<param index="1" name="edge_index2" type="int" />
+			<description>
+				Finds the closest points between two edges and returns a dictionary with both points and the distance.
+			</description>
+		</method>
+		<method name="get_closest_points_face_to_face">
+			<return type="Dictionary" />
+			<param index="0" name="face_index1" type="int" />
+			<param index="1" name="face_index2" type="int" />
+			<description>
+				Finds the closest points between two faces and returns a dictionary with both points and the distance.
+			</description>
+		</method>
+		<method name="get_compound_count" qualifiers="const">
+			<return type="int" />
+			<description>
+				Returns the number of compound shapes in the current shape.
+			</description>
+		</method>
+		<method name="get_compounds">
+			<return type="Array" />
+			<description>
+				Returns an array of indices for all compound shapes in the current shape.
+			</description>
+		</method>
+		<method name="get_connected_edges">
+			<return type="Array" />
+			<param index="0" name="edge_index" type="int" />
+			<description>
+				Returns an array of edge indices that are connected to the specified edge (sharing vertices).
+			</description>
+		</method>
+		<method name="get_edge_bounding_box">
+			<return type="Dictionary" />
+			<param index="0" name="edge_index" type="int" />
+			<description>
+				Returns the bounding box of the specified edge as a dictionary with min/max coordinates.
+			</description>
+		</method>
+		<method name="get_edge_bounds">
+			<return type="Dictionary" />
+			<param index="0" name="edge_index" type="int" />
+			<description>
+				Returns the parametric bounds of the edge curve as a dictionary with start and end parameter values.
+			</description>
+		</method>
+		<method name="get_edge_center">
+			<return type="Vector3" />
+			<param index="0" name="edge_index" type="int" />
+			<description>
+				Returns the center point of the specified edge.
+			</description>
+		</method>
+		<method name="get_edge_count" qualifiers="const">
+			<return type="int" />
+			<description>
+				Returns the total number of edges in the current shape.
+			</description>
+		</method>
+		<method name="get_edge_curvature_analysis">
+			<return type="Dictionary" />
+			<param index="0" name="edge_index" type="int" />
+			<description>
+				Performs detailed curvature analysis on the specified edge and returns curvature information along the curve.
+			</description>
+		</method>
+		<method name="get_edge_curvature_at_param">
+			<return type="float" />
+			<param index="0" name="edge_index" type="int" />
+			<param index="1" name="parameter" type="float" />
+			<description>
+				Returns the curvature value of the edge at the specified parameter position.
+			</description>
+		</method>
+		<method name="get_edge_end_point">
+			<return type="Vector3" />
+			<param index="0" name="edge_index" type="int" />
+			<description>
+				Returns the end point of the specified edge.
+			</description>
+		</method>
+		<method name="get_edge_length">
+			<return type="float" />
+			<param index="0" name="edge_index" type="int" />
+			<description>
+				Returns the length of the specified edge.
+			</description>
+		</method>
+		<method name="get_edge_properties">
+			<return type="Dictionary" />
+			<param index="0" name="edge_index" type="int" />
+			<description>
+				Returns comprehensive properties of the specified edge including geometric and topological information.
+			</description>
+		</method>
+		<method name="get_edge_start_point">
+			<return type="Vector3" />
+			<param index="0" name="edge_index" type="int" />
+			<description>
+				Returns the start point of the specified edge.
+			</description>
+		</method>
+		<method name="get_edge_type">
+			<return type="String" />
+			<param index="0" name="edge_index" type="int" />
+			<description>
+				Returns the geometric type of the edge (e.g., "line", "circle", "ellipse", "bezier", "bspline").
+			</description>
+		</method>
+		<method name="get_edges">
+			<return type="Array" />
+			<description>
+				Returns an array of indices for all edges in the current shape.
+			</description>
+		</method>
+		<method name="get_edges_of_face">
+			<return type="Array" />
+			<param index="0" name="face_index" type="int" />
+			<description>
+				Returns an array of edge indices that bound the specified face.
+			</description>
+		</method>
+		<method name="get_edges_of_vertex">
+			<return type="Array" />
+			<param index="0" name="vertex_index" type="int" />
+			<description>
+				Returns an array of edge indices that connect to the specified vertex.
+			</description>
+		</method>
+		<method name="get_face_area">
+			<return type="float" />
+			<param index="0" name="face_index" type="int" />
+			<description>
+				Calculates and returns the surface area of the specified face.
+			</description>
+		</method>
+		<method name="get_face_bounding_box">
+			<return type="Dictionary" />
+			<param index="0" name="face_index" type="int" />
+			<description>
+				Returns the bounding box of the specified face as a dictionary with min/max coordinates.
+			</description>
+		</method>
+		<method name="get_face_bounds">
+			<return type="Dictionary" />
+			<param index="0" name="face_index" type="int" />
+			<description>
+				Returns the bounding box of the specified face in 3D space.
+			</description>
+		</method>
+		<method name="get_face_center">
+			<return type="Vector3" />
+			<param index="0" name="face_index" type="int" />
+			<description>
+				Returns the center point of the specified face.
+			</description>
+		</method>
+		<method name="get_face_count" qualifiers="const">
+			<return type="int" />
+			<description>
+				Returns the total number of faces in the current shape.
+			</description>
+		</method>
+		<method name="get_face_curvature_at_uv">
+			<return type="Dictionary" />
+			<param index="0" name="face_index" type="int" />
+			<param index="1" name="u" type="float" />
+			<param index="2" name="v" type="float" />
+			<description>
+				Returns curvature information at the specified UV coordinates on the face surface.
+			</description>
+		</method>
+		<method name="get_face_derivatives_at_uv">
+			<return type="Dictionary" />
+			<param index="0" name="face_index" type="int" />
+			<param index="1" name="u" type="float" />
+			<param index="2" name="v" type="float" />
+			<description>
+				Returns the first and second derivatives of the face surface at the specified UV coordinates.
+			</description>
+		</method>
+		<method name="get_face_gaussian_curvature_at_uv">
+			<return type="float" />
+			<param index="0" name="face_index" type="int" />
+			<param index="1" name="u" type="float" />
+			<param index="2" name="v" type="float" />
+			<description>
+				Returns the Gaussian curvature of the face at the specified UV coordinates.
+			</description>
+		</method>
+		<method name="get_face_mean_curvature_at_uv">
+			<return type="float" />
+			<param index="0" name="face_index" type="int" />
+			<param index="1" name="u" type="float" />
+			<param index="2" name="v" type="float" />
+			<description>
+				Returns the mean curvature of the face at the specified UV coordinates.
+			</description>
+		</method>
+		<method name="get_face_normal">
+			<return type="Vector3" />
+			<param index="0" name="face_index" type="int" />
+			<description>
+				Returns the normal vector of the specified face at its center point.
+			</description>
+		</method>
+		<method name="get_face_properties">
+			<return type="Dictionary" />
+			<param index="0" name="face_index" type="int" />
+			<description>
+				Returns comprehensive properties of the specified face including geometric and topological information.
+			</description>
+		</method>
+		<method name="get_face_type">
+			<return type="String" />
+			<param index="0" name="face_index" type="int" />
+			<description>
+				Returns the geometric type of the face (e.g., "plane", "cylinder", "sphere", "cone", "torus").
+			</description>
+		</method>
+		<method name="get_face_uv_bounds">
+			<return type="Dictionary" />
+			<param index="0" name="face_index" type="int" />
+			<description>
+				Returns the UV parameter bounds of the face surface.
+			</description>
+		</method>
+		<method name="get_faces">
+			<return type="Array" />
+			<description>
+				Returns an array of indices for all faces in the current shape.
+			</description>
+		</method>
+		<method name="get_faces_of_solid">
+			<return type="Array" />
+			<param index="0" name="solid_index" type="int" />
+			<description>
+				Returns an array of face indices that belong to the specified solid.
+			</description>
+		</method>
+		<method name="get_include_orientation_info" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether orientation information is included in topology analysis results.
+			</description>
+		</method>
+		<method name="get_last_error" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the last error message from a topology operation, or an empty string if no error occurred.
+			</description>
+		</method>
+		<method name="get_moments_of_inertia">
+			<return type="Dictionary" />
+			<description>
+				Calculates and returns the moments of inertia for the shape around its center of gravity.
+			</description>
+		</method>
+		<method name="get_overall_bounding_box">
+			<return type="Dictionary" />
+			<description>
+				Returns the overall bounding box of the entire shape as a dictionary with min/max coordinates and dimensions.
+			</description>
+		</method>
+		<method name="get_precision_tolerance" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the precision tolerance used for geometric calculations and comparisons.
+			</description>
+		</method>
+		<method name="get_shape">
+			<return type="ocgd_shape" />
+			<description>
+				Returns the currently assigned shape being analyzed by this explorer.
+			</description>
+		</method>
+		<method name="get_shape_statistics">
+			<return type="Dictionary" />
+			<description>
+				Returns statistical information about the shape including counts of all topological elements.
+			</description>
+		</method>
+		<method name="get_shell_count" qualifiers="const">
+			<return type="int" />
+			<description>
+				Returns the number of shells in the current shape.
+			</description>
+		</method>
+		<method name="get_shells">
+			<return type="Array" />
+			<description>
+				Returns an array of indices for all shells in the current shape.
+			</description>
+		</method>
+		<method name="get_solid_count" qualifiers="const">
+			<return type="int" />
+			<description>
+				Returns the number of solid bodies in the current shape.
+			</description>
+		</method>
+		<method name="get_solids">
+			<return type="Array" />
+			<description>
+				Returns an array of indices for all solids in the current shape.
+			</description>
+		</method>
+		<method name="get_surface_area">
+			<return type="float" />
+			<description>
+				Calculates and returns the total surface area of the shape.
+			</description>
+		</method>
+		<method name="get_topology_differences">
+			<return type="Dictionary" />
+			<param index="0" name="other_shape" type="ocgd_shape" />
+			<description>
+				Compares the current shape with another and returns a dictionary describing the topological differences.
+			</description>
+		</method>
+		<method name="get_type" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the type identifier of this explorer ("ocgd_topology_explorer").
+			</description>
+		</method>
+		<method name="get_vertex_bounding_box">
+			<return type="Dictionary" />
+			<param index="0" name="vertex_index" type="int" />
+			<description>
+				Returns the bounding box of the specified vertex (typically a point with tolerance).
+			</description>
+		</method>
+		<method name="get_vertex_count" qualifiers="const">
+			<return type="int" />
+			<description>
+				Returns the total number of vertices in the current shape.
+			</description>
+		</method>
+		<method name="get_vertex_position">
+			<return type="Vector3" />
+			<param index="0" name="vertex_index" type="int" />
+			<description>
+				Returns the 3D position of the specified vertex.
+			</description>
+		</method>
+		<method name="get_vertex_properties">
+			<return type="Dictionary" />
+			<param index="0" name="vertex_index" type="int" />
+			<description>
+				Returns properties of the specified vertex including position and tolerance information.
+			</description>
+		</method>
+		<method name="get_vertex_tolerance">
+			<return type="float" />
+			<param index="0" name="vertex_index" type="int" />
+			<description>
+				Returns the tolerance value associated with the specified vertex.
+			</description>
+		</method>
+		<method name="get_vertices">
+			<return type="Array" />
+			<description>
+				Returns an array of indices for all vertices in the current shape.
+			</description>
+		</method>
+		<method name="get_vertices_of_edge">
+			<return type="Array" />
+			<param index="0" name="edge_index" type="int" />
+			<description>
+				Returns an array of vertex indices that define the endpoints of the specified edge.
+			</description>
+		</method>
+		<method name="get_volume">
+			<return type="float" />
+			<description>
+				Calculates and returns the volume of the shape. Only works with closed solid geometries.
+			</description>
+		</method>
+		<method name="get_wire_count" qualifiers="const">
+			<return type="int" />
+			<description>
+				Returns the number of wires in the current shape.
+			</description>
+		</method>
+		<method name="get_wires">
+			<return type="Array" />
+			<description>
+				Returns an array of indices for all wires in the current shape.
+			</description>
+		</method>
+		<method name="has_error" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns true if an error occurred during the last topology operation.
+			</description>
+		</method>
+		<method name="has_shape" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns true if a valid shape is currently assigned to this explorer.
+			</description>
+		</method>
+		<method name="is_edge_closed">
+			<return type="bool" />
+			<param index="0" name="edge_index" type="int" />
+			<description>
+				Returns true if the specified edge forms a closed loop (start and end points coincide).
+			</description>
+		</method>
+		<method name="is_edge_straight">
+			<return type="bool" />
+			<param index="0" name="edge_index" type="int" />
+			<description>
+				Returns true if the specified edge is a straight line.
+			</description>
+		</method>
+		<method name="is_face_closed">
+			<return type="bool" />
+			<param index="0" name="face_index" type="int" />
+			<description>
+				Returns true if the specified face is closed in both U and V parametric directions.
+			</description>
+		</method>
+		<method name="is_face_planar">
+			<return type="bool" />
+			<param index="0" name="face_index" type="int" />
+			<description>
+				Returns true if the specified face is planar (flat).
+			</description>
+		</method>
+		<method name="is_null" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether this explorer instance is in a null/invalid state.
+			</description>
+		</method>
+		<method name="is_shape_closed">
+			<return type="bool" />
+			<description>
+				Returns true if the current shape is topologically closed (no boundary edges).
+			</description>
+		</method>
+		<method name="is_shape_manifold">
+			<return type="bool" />
+			<description>
+				Returns true if the current shape is a valid manifold (each edge is shared by exactly two faces).
+			</description>
+		</method>
+		<method name="is_shape_valid">
+			<return type="bool" />
+			<description>
+				Returns true if the current shape passes OpenCASCADE's validity checks.
+			</description>
+		</method>
+		<method name="measure_distance_edge_to_edge">
+			<return type="float" />
+			<param index="0" name="edge_index1" type="int" />
+			<param index="1" name="edge_index2" type="int" />
+			<description>
+				Calculates the minimum distance between two edges.
+			</description>
+		</method>
+		<method name="measure_distance_face_to_face">
+			<return type="float" />
+			<param index="0" name="face_index1" type="int" />
+			<param index="1" name="face_index2" type="int" />
+			<description>
+				Calculates the minimum distance between two faces.
+			</description>
+		</method>
+		<method name="measure_distance_point_to_edge">
+			<return type="float" />
+			<param index="0" name="point" type="Vector3" />
+			<param index="1" name="edge_index" type="int" />
+			<description>
+				Calculates the minimum distance from a point to the specified edge.
+			</description>
+		</method>
+		<method name="measure_distance_point_to_face">
+			<return type="float" />
+			<param index="0" name="point" type="Vector3" />
+			<param index="1" name="face_index" type="int" />
+			<description>
+				Calculates the minimum distance from a point to the specified face.
+			</description>
+		</method>
+		<method name="measure_distance_point_to_point">
+			<return type="float" />
+			<param index="0" name="point1" type="Vector3" />
+			<param index="1" name="point2" type="Vector3" />
+			<description>
+				Calculates the Euclidean distance between two points.
+			</description>
+		</method>
+		<method name="measure_distance_vertex_to_vertex">
+			<return type="float" />
+			<param index="0" name="vertex_index1" type="int" />
+			<param index="1" name="vertex_index2" type="int" />
+			<description>
+				Calculates the distance between two vertices.
+			</description>
+		</method>
+		<method name="new_explorer" qualifiers="static">
+			<return type="ocgd_topology_explorer" />
+			<description>
+				Creates and returns a new topology explorer instance. This is the preferred way to create an explorer since GDExtensions don't support non-empty constructors.
+			</description>
+		</method>
+		<method name="save_topology_analysis">
+			<return type="bool" />
+			<param index="0" name="file_path" type="String" />
+			<description>
+				Saves the current topology analysis to a file. Returns true on success.
+			</description>
+		</method>
+		<method name="set_cache_results">
+			<return type="void" />
+			<param index="0" name="cache" type="bool" />
+			<description>
+				Enables or disables caching of analysis results to improve performance for repeated queries.
+			</description>
+		</method>
+		<method name="set_include_orientation_info">
+			<return type="void" />
+			<param index="0" name="include" type="bool" />
+			<description>
+				Enables or disables inclusion of orientation information in topology analysis results.
+			</description>
+		</method>
+		<method name="set_precision_tolerance">
+			<return type="void" />
+			<param index="0" name="tolerance" type="float" />
+			<description>
+				Sets the precision tolerance used for geometric calculations and comparisons. Smaller values provide higher precision.
+			</description>
+		</method>
+		<method name="set_shape">
+			<return type="void" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Assigns a shape to this explorer for analysis. Any cached analysis data is cleared when a new shape is set.
+			</description>
+		</method>
+	</methods>
+</class>

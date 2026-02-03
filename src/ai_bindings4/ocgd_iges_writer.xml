@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="ocgd_iges_writer" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../class.xsd">
+	<brief_description>
+		OpenCASCADE IGES file writer for exporting 3D shapes and CAD data.
+	</brief_description>
+	<description>
+		The ocgd_iges_writer class provides comprehensive functionality for exporting OpenCASCADE shapes to IGES (Initial Graphics Exchange Specification) files. IGES is a widely-used CAD file format that enables the exchange of geometric and manufacturing data between different CAD systems.
+
+		This writer supports various IGES versions and can export shapes with colors, layers, and detailed geometric information. It provides extensive configuration options for precision control, entity type selection, and format compliance.
+
+		Key features:
+		- Support for multiple IGES versions (1.0 through 5.3)
+		- Color and layer export capabilities
+		- BREP and analytical surface support
+		- Configurable precision and tolerance settings
+		- Entity type optimization
+		- Validation and error handling
+		- Configuration presets for common use cases
+
+		Example usage:
+		```gdscript
+		var writer = ocgd_iges_writer.new_iges_writer()
+		writer.set_write_colors(true)
+		writer.set_precision_value(0.01)
+		var success = writer.write_shape(my_shape, "output.iges")
+		if not success:
+			print("Error: " + writer.get_last_error())
+		```
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="clear_last_error">
+			<return type="void" />
+			<description>
+				Clears the last error message. Useful for resetting error state before performing new operations.
+			</description>
+		</method>
+		<method name="get_angular_tolerance" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the current angular tolerance value used for curve calculations during export.
+			</description>
+		</method>
+		<method name="get_author_name" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the author name included in the IGES file header.
+			</description>
+		</method>
+		<method name="get_convert_curves_to_bsplines" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether curves are converted to B-splines during export.
+			</description>
+		</method>
+		<method name="get_convert_surfaces_to_bsplines" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether surfaces are converted to B-splines during export.
+			</description>
+		</method>
+		<method name="get_current_configuration">
+			<return type="Dictionary" />
+			<description>
+				Returns a dictionary containing all current writer configuration settings. Useful for saving and restoring configurations.
+			</description>
+		</method>
+		<method name="get_curve_tolerance" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the current curve tolerance value. Default is 0.01.
+			</description>
+		</method>
+		<method name="get_description" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the description text included in the IGES file header.
+			</description>
+		</method>
+		<method name="get_drafting_standard" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the drafting standard identifier. Default is "NONE".
+			</description>
+		</method>
+		<method name="get_global_scale" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the global scale factor applied to all geometry. Default is 1.0.
+			</description>
+		</method>
+		<method name="get_iges_file_info">
+			<return type="Dictionary" />
+			<param index="0" name="file_path" type="String" />
+			<description>
+				Analyzes an existing IGES file and returns information about its structure and validity. Returns a dictionary with file properties.
+			</description>
+		</method>
+		<method name="get_iges_version" qualifiers="const">
+			<return type="int" />
+			<description>
+				Returns the current IGES version number. Default is 11 (IGES 5.3).
+			</description>
+		</method>
+		<method name="get_last_error" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the last error message from write operations. Empty string indicates no error.
+			</description>
+		</method>
+		<method name="get_linear_tolerance" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the current linear tolerance value used for geometric calculations during export.
+			</description>
+		</method>
+		<method name="get_merge_surfaces" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether surface merging is enabled during export.
+			</description>
+		</method>
+		<method name="get_model_space_units" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the model space units setting. Default is "MM" (millimeters).
+			</description>
+		</method>
+		<method name="get_model_units" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the model units setting. Default is "MM" (millimeters).
+			</description>
+		</method>
+		<method name="get_optimize_curves" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether curve optimization is enabled during export. Default is true.
+			</description>
+		</method>
+		<method name="get_organization" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the organization name included in the IGES file header.
+			</description>
+		</method>
+		<method name="get_precision_value" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the current precision value for geometric calculations. Default is 0.01.
+			</description>
+		</method>
+		<method name="get_preprocessor_version" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the preprocessor version string. Default is "1.0".
+			</description>
+		</method>
+		<method name="get_quality_level" qualifiers="const">
+			<return type="int" />
+			<description>
+				Returns the current quality level (1=low, 2=medium, 3=high). Quality level affects precision and tolerance settings.
+			</description>
+		</method>
+		<method name="get_supported_units">
+			<return type="Array" />
+			<description>
+				Returns an array of supported length units: ["MM", "M", "IN", "FT", "MI", "MU"].
+			</description>
+		</method>
+		<method name="get_supported_versions">
+			<return type="Array" />
+			<description>
+				Returns an array of supported IGES version numbers: [6, 7, 8, 9, 10, 11].
+			</description>
+		</method>
+		<method name="get_surface_tolerance" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the current surface tolerance value. Default is 0.01.
+			</description>
+		</method>
+		<method name="get_system_identifier" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the system identifier included in IGES file headers. Default is "OpenCASCADE.gd".
+			</description>
+		</method>
+		<method name="get_unit_scale_factor" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the unit scale factor for unit conversions. Default is 1.0.
+			</description>
+		</method>
+		<method name="get_validate_on_write" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether shape validation is performed before writing. Default is true.
+			</description>
+		</method>
+		<method name="get_write_analytical_surfaces" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether analytical surfaces (planes, cylinders, etc.) are written as native IGES entities. Default is true.
+			</description>
+		</method>
+		<method name="get_write_brep_entities" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether BREP (boundary representation) entities are included in exported IGES files. Default is true.
+			</description>
+		</method>
+		<method name="get_write_colors" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether color information is included in exported IGES files. Default is true.
+			</description>
+		</method>
+		<method name="get_write_isoparametric_curves" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether isoparametric curves are written to the IGES file.
+			</description>
+		</method>
+		<method name="get_write_layers" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether layer information is included in exported IGES files. Default is true.
+			</description>
+		</method>
+		<method name="get_write_names" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether shape names are included in exported IGES files. Default is true.
+			</description>
+		</method>
+		<method name="get_write_parameter_space_curves" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether parameter space curves are written to the IGES file.
+			</description>
+		</method>
+		<method name="get_write_precision_mode" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether precision mode is enabled for geometric calculations. Default is true.
+			</description>
+		</method>
+		<method name="get_write_statistics">
+			<return type="Dictionary" />
+			<description>
+				Returns statistics about the last write operation, including configuration settings and any errors.
+			</description>
+		</method>
+		<method name="get_write_trimmed_surfaces" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether trimmed surfaces are included in exported IGES files. Default is true.
+			</description>
+		</method>
+		<method name="is_valid_iges_file">
+			<return type="bool" />
+			<param index="0" name="file_path" type="String" />
+			<description>
+				Checks if the specified file is a valid IGES file by examining its header structure.
+			</description>
+		</method>
+		<method name="load_configuration">
+			<return type="void" />
+			<param index="0" name="config" type="Dictionary" />
+			<description>
+				Loads writer configuration from a dictionary. The dictionary should contain configuration keys matching the writer's settings.
+			</description>
+		</method>
+		<method name="new_iges_writer" qualifiers="static">
+			<return type="ocgd_iges_writer" />
+			<description>
+				Factory method that creates and returns a new ocgd_iges_writer instance with default settings.
+			</description>
+		</method>
+		<method name="set_angular_tolerance">
+			<return type="void" />
+			<param index="0" name="tolerance" type="float" />
+			<description>
+				Sets the angular tolerance for curve calculations during export.
+			</description>
+		</method>
+		<method name="set_author_name">
+			<return type="void" />
+			<param index="0" name="name" type="String" />
+			<description>
+				Sets the author name to be included in the IGES file header.
+			</description>
+		</method>
+		<method name="set_configuration_preset">
+			<return type="void" />
+			<param index="0" name="preset_name" type="String" />
+			<description>
+				Applies a predefined configuration preset. Available presets: "CAD_EXPORT", "MINIMAL", "HIGH_PRECISION".
+			</description>
+		</method>
+		<method name="set_convert_curves_to_bsplines">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to convert curves to B-splines during export. B-splines provide universal compatibility.
+			</description>
+		</method>
+		<method name="set_convert_surfaces_to_bsplines">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to convert surfaces to B-splines during export. B-splines provide universal compatibility.
+			</description>
+		</method>
+		<method name="set_curve_tolerance">
+			<return type="void" />
+			<param index="0" name="tolerance" type="float" />
+			<description>
+				Sets the tolerance value for curve calculations and optimization.
+			</description>
+		</method>
+		<method name="set_description">
+			<return type="void" />
+			<param index="0" name="desc" type="String" />
+			<description>
+				Sets a description to be included in the IGES file header.
+			</description>
+		</method>
+		<method name="set_drafting_standard">
+			<return type="void" />
+			<param index="0" name="standard" type="String" />
+			<description>
+				Sets the drafting standard identifier for the IGES file. Common values include "ANSI", "ISO", "JIS".
+			</description>
+		</method>
+		<method name="set_global_scale">
+			<return type="void" />
+			<param index="0" name="scale" type="float" />
+			<description>
+				Sets a global scale factor applied to all geometry during export.
+			</description>
+		</method>
+		<method name="set_iges_version">
+			<return type="void" />
+			<param index="0" name="version" type="int" />
+			<description>
+				Sets the IGES version number. Supported versions range from 6 (IGES 1.0) to 11 (IGES 5.3).
+			</description>
+		</method>
+		<method name="set_linear_tolerance">
+			<return type="void" />
+			<param index="0" name="tolerance" type="float" />
+			<description>
+				Sets the linear tolerance for geometric calculations during export.
+			</description>
+		</method>
+		<method name="set_merge_surfaces">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to merge adjacent surfaces during export. This can reduce file size but may affect geometry fidelity.
+			</description>
+		</method>
+		<method name="set_model_space_units">
+			<return type="void" />
+			<param index="0" name="units" type="String" />
+			<description>
+				Sets the model space units for the IGES file. Common values: "MM", "M", "IN", "FT".
+			</description>
+		</method>
+		<method name="set_model_units">
+			<return type="void" />
+			<param index="0" name="units" type="String" />
+			<description>
+				Sets the model units for the IGES file. Common values: "MM", "M", "IN", "FT".
+			</description>
+		</method>
+		<method name="set_optimize_curves">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to optimize curves during export. Optimization can improve file size and compatibility.
+			</description>
+		</method>
+		<method name="set_organization">
+			<return type="void" />
+			<param index="0" name="org" type="String" />
+			<description>
+				Sets the organization name to be included in the IGES file header.
+			</description>
+		</method>
+		<method name="set_precision_value">
+			<return type="void" />
+			<param index="0" name="precision" type="float" />
+			<description>
+				Sets the precision value for geometric calculations. Lower values provide higher precision but larger file sizes.
+			</description>
+		</method>
+		<method name="set_preprocessor_version">
+			<return type="void" />
+			<param index="0" name="version" type="String" />
+			<description>
+				Sets the preprocessor version string included in the IGES file header.
+			</description>
+		</method>
+		<method name="set_quality_level">
+			<return type="void" />
+			<param index="0" name="level" type="int" />
+			<description>
+				Sets the overall quality level (1=low, 2=medium, 3=high). This affects precision and tolerance settings automatically.
+			</description>
+		</method>
+		<method name="set_surface_tolerance">
+			<return type="void" />
+			<param index="0" name="tolerance" type="float" />
+			<description>
+				Sets the tolerance value for surface calculations and optimization.
+			</description>
+		</method>
+		<method name="set_system_identifier">
+			<return type="void" />
+			<param index="0" name="identifier" type="String" />
+			<description>
+				Sets the system identifier for IGES file headers.
+			</description>
+		</method>
+		<method name="set_unit_scale_factor">
+			<return type="void" />
+			<param index="0" name="factor" type="float" />
+			<description>
+				Sets the unit scale factor for unit conversions during export.
+			</description>
+		</method>
+		<method name="set_validate_on_write">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to validate shapes before writing. Validation can catch geometry issues but adds processing time.
+			</description>
+		</method>
+		<method name="set_write_analytical_surfaces">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to write analytical surfaces (planes, cylinders, etc.) as native IGES entities. Provides better accuracy for simple shapes.
+			</description>
+		</method>
+		<method name="set_write_brep_entities">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to include BREP (boundary representation) entities in exported IGES files. Required for complex geometry.
+			</description>
+		</method>
+		<method name="set_write_colors">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to include color information in exported IGES files. Colors improve visualization in CAD systems.
+			</description>
+		</method>
+		<method name="set_write_isoparametric_curves">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to write isoparametric curves to the IGES file. These curves help with surface visualization.
+			</description>
+		</method>
+		<method name="set_write_layers">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to include layer information in exported IGES files. Useful for organizing complex assemblies.
+			</description>
+		</method>
+		<method name="set_write_names">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to include shape names in exported IGES files. Names help identify components in CAD systems.
+			</description>
+		</method>
+		<method name="set_write_parameter_space_curves">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to write parameter space curves to the IGES file. These curves define surface boundaries.
+			</description>
+		</method>
+		<method name="set_write_precision_mode">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to use precision mode for geometric calculations. Precision mode provides more accurate geometry representation.
+			</description>
+		</method>
+		<method name="set_write_trimmed_surfaces">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to include trimmed surfaces in exported IGES files. Trimmed surfaces provide accurate boundary representation.
+			</description>
+		</method>
+		<method name="validate_shape_for_iges">
+			<return type="bool" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Validates whether a shape is suitable for IGES export. Returns true if the shape can be exported successfully.
+			</description>
+		</method>
+		<method name="write_shape">
+			<return type="bool" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="file_path" type="String" />
+			<description>
+				Writes a single shape to an IGES file. Returns true on success, false on failure. Check get_last_error() for error details.
+			</description>
+		</method>
+		<method name="write_shapes">
+			<return type="bool" />
+			<param index="0" name="shapes" type="Array" />
+			<param index="1" name="file_path" type="String" />
+			<description>
+				Writes multiple shapes to a single IGES file as a compound shape. All shapes are combined into one geometry entity.
+			</description>
+		</method>
+		<method name="write_shapes_with_colors">
+			<return type="bool" />
+			<param index="0" name="shapes" type="Array" />
+			<param index="1" name="colors" type="Array" />
+			<param index="2" name="file_path" type="String" />
+			<description>
+				Writes multiple shapes with associated colors to an IGES file. Colors array should contain Vector3 values (RGB 0-1).
+			</description>
+		</method>
+		<method name="write_shapes_with_layers">
+			<return type="bool" />
+			<param index="0" name="shapes" type="Array" />
+			<param index="1" name="layer_names" type="Array" />
+			<param index="2" name="file_path" type="String" />
+			<description>
+				Writes multiple shapes with associated layer names to an IGES file. Layer names help organize components in CAD systems.
+			</description>
+		</method>
+		<method name="write_with_metadata">
+			<return type="bool" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="file_path" type="String" />
+			<param index="2" name="metadata" type="Dictionary" />
+			<description>
+				Writes a shape with additional metadata to an IGES file. Metadata dictionary can contain author, organization, and description information.
+			</description>
+		</method>
+	</methods>
+</class>

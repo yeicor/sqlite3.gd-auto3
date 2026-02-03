@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="gd_V3d_StereoDumpOptions" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Options to be used with image dumping for stereo cameras.
+	</brief_description>
+	<description>
+		Provides options for dumping images from stereo cameras in OpenCASCADE. The value will have no effect with disabled stereo output.
+
+		This class is a Godot GDExtension wrapper for the OpenCASCADE V3d_StereoDumpOptions enum.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="new">
+			<return type="gd_V3d_StereoDumpOptions" />
+			<description>
+				Creates a new gd_V3d_StereoDumpOptions instance.
+			</description>
+		</method>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+		<constant name="SDO_MONO" value="0" enum="StereoDumpOptions">
+			Ignore stereo mode and dump monographic projection for stereo camera.
+		</constant>
+		<constant name="SDO_LEFT_EYE" value="1" enum="StereoDumpOptions">
+			Dump only left eye projection for stereo camera.
+		</constant>
+		<constant name="SDO_RIGHT_EYE" value="2" enum="StereoDumpOptions">
+			Dump only right eye projection for stereo camera.
+		</constant>
+		<constant name="SDO_BLENDED" value="3" enum="StereoDumpOptions">
+			Dump blended pair specific to the active device output Graphic3d_StereoMode.
+			Result will be undefined for modes like Graphic3d_StereoMode_QuadBuffer.
+		</constant>
+	</constants>
+</class>

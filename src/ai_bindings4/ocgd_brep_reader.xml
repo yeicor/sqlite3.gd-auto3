@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="ocgd_brep_reader" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		OpenCASCADE BREP file reader for importing native CAD geometry.
+	</brief_description>
+	<description>
+		The [ocgd_brep_reader] class provides functionality to read OpenCASCADE BREP (Boundary Representation) files, which are the native format for OpenCASCADE geometry. BREP files contain precise geometric and topological information about 3D shapes.
+
+		This reader supports loading from files or directly from string content, with extensive validation and error handling. It can handle complex geometric data including curves, surfaces, and triangulation information.
+
+		BREP format preserves the exact mathematical representation of CAD geometry, making it ideal for precise engineering applications where accuracy is critical.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="analyze_shape" qualifiers="const">
+			<return type="Dictionary" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Analyzes a loaded shape and returns detailed information including face count, edge count, vertex count, solid count, and bounding box dimensions.
+			</description>
+		</method>
+		<method name="clear_error">
+			<return type="void" />
+			<description>
+				Clears any stored error message from the last import operation.
+			</description>
+		</method>
+		<method name="detect_brep_version" qualifiers="const">
+			<return type="String" />
+			<param index="0" name="file_path" type="String" />
+			<description>
+				Attempts to detect the version or variant of the BREP file format. Returns version information or "unknown" if detection fails.
+			</description>
+		</method>
+		<method name="get_all_shapes">
+			<return type="Array" />
+			<description>
+				Returns an array of all shapes contained in the last loaded BREP file. For BREP files, this typically contains a single shape.
+			</description>
+		</method>
+		<method name="get_file_info" qualifiers="const">
+			<return type="Dictionary" />
+			<description>
+				Returns information about the reader configuration and last import operation, including precision settings and load options.
+			</description>
+		</method>
+		<method name="get_fix_shapes" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether automatic shape fixing is enabled for invalid geometry during import.
+			</description>
+		</method>
+		<method name="get_last_error" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the last error message from an import operation, or an empty string if no error occurred.
+			</description>
+		</method>
+		<method name="get_load_curves" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether curve information is loaded from BREP files during import.
+			</description>
+		</method>
+		<method name="get_load_statistics" qualifiers="const">
+			<return type="Dictionary" />
+			<description>
+				Returns detailed statistics about the last load operation, including timing and memory usage information.
+			</description>
+		</method>
+		<method name="get_load_surfaces" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether surface information is loaded from BREP files during import.
+			</description>
+		</method>
+		<method name="get_load_time" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the time taken for the last load operation in seconds.
+			</description>
+		</method>
+		<method name="get_load_triangulation" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether triangulation data is loaded from BREP files during import. Triangulation improves display performance.
+			</description>
+		</method>
+		<method name="get_memory_limit" qualifiers="const">
+			<return type="int" />
+			<description>
+				Returns the memory limit in megabytes for import operations. Zero means no limit.
+			</description>
+		</method>
+		<method name="get_merge_vertices" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether nearby vertices are merged during import to reduce geometric complexity.
+			</description>
+		</method>
+		<method name="get_precision_tolerance" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the precision tolerance used for geometric operations during import. Smaller values provide higher precision.
+			</description>
+		</method>
+		<method name="get_shape_complexity" qualifiers="const">
+			<return type="int" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Calculates and returns a complexity score for the given shape based on the number of faces, edges, and vertices.
+			</description>
+		</method>
+		<method name="get_supported_extensions" qualifiers="const">
+			<return type="Array" />
+			<description>
+				Returns an array of supported file extensions for BREP import (typically ["brep", "brp"]).
+			</description>
+		</method>
+		<method name="get_type" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the type identifier of this reader ("ocgd_brep_reader").
+			</description>
+		</method>
+		<method name="has_error" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns true if an error occurred during the last import operation.
+			</description>
+		</method>
+		<method name="is_brep_file" qualifiers="const">
+			<return type="bool" />
+			<param index="0" name="file_path" type="String" />
+			<description>
+				Checks if the given file path has a BREP file extension. Does not validate file contents.
+			</description>
+		</method>
+		<method name="is_null" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether this reader instance is in a null/invalid state.
+			</description>
+		</method>
+		<method name="load_file">
+			<return type="ocgd_shape" />
+			<param index="0" name="file_path" type="String" />
+			<description>
+				Loads a BREP file from the specified path and returns an [ocgd_shape] object. Returns null on failure.
+			</description>
+		</method>
+		<method name="load_file_with_options">
+			<return type="ocgd_shape" />
+			<param index="0" name="file_path" type="String" />
+			<param index="1" name="options" type="Dictionary" />
+			<description>
+				Loads a BREP file with custom import options. The options dictionary can override default settings for precision, shape fixing, and data loading preferences.
+			</description>
+		</method>
+		<method name="load_from_string">
+			<return type="ocgd_shape" />
+			<param index="0" name="brep_content" type="String" />
+			<description>
+				Loads BREP geometry directly from string content instead of a file. Useful for embedded or generated BREP data.
+			</description>
+		</method>
+		<method name="new_reader" qualifiers="static">
+			<return type="ocgd_brep_reader" />
+			<description>
+				Creates and returns a new BREP reader instance. This is the preferred way to create a reader since GDExtensions don't support non-empty constructors.
+			</description>
+		</method>
+		<method name="set_fix_shapes">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables automatic shape fixing for invalid geometry during import. When enabled, the reader attempts to repair broken shapes.
+			</description>
+		</method>
+		<method name="set_load_curves">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables loading of curve information from BREP files. Curves are needed for precise edge representation.
+			</description>
+		</method>
+		<method name="set_load_surfaces">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables loading of surface information from BREP files. Surfaces are needed for precise face representation.
+			</description>
+		</method>
+		<method name="set_load_triangulation">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables loading of triangulation data from BREP files. Triangulation improves display performance but increases memory usage.
+			</description>
+		</method>
+		<method name="set_memory_limit">
+			<return type="void" />
+			<param index="0" name="limit_mb" type="int" />
+			<description>
+				Sets the memory limit in megabytes for import operations. Set to 0 for no limit. Helps prevent excessive memory usage with large files.
+			</description>
+		</method>
+		<method name="set_merge_vertices">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables merging of nearby vertices during import. This can reduce geometric complexity but may affect precision.
+			</description>
+		</method>
+		<method name="set_precision_tolerance">
+			<return type="void" />
+			<param index="0" name="tolerance" type="float" />
+			<description>
+				Sets the precision tolerance for geometric operations during import. Smaller values provide higher precision but may be more sensitive to numerical errors.
+			</description>
+		</method>
+		<method name="validate_file">
+			<return type="bool" />
+			<param index="0" name="file_path" type="String" />
+			<description>
+				Validates whether the specified file is a valid BREP file that can be imported. Returns true if the file is valid and readable.
+			</description>
+		</method>
+		<method name="validate_string">
+			<return type="bool" />
+			<param index="0" name="brep_content" type="String" />
+			<description>
+				Validates whether the provided string content represents valid BREP data that can be parsed.
+			</description>
+		</method>
+	</methods>
+</class>

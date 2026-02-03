@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="ocgd_step_reader" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		A reader for importing STEP (.step, .stp) CAD files using OpenCASCADE.
+	</brief_description>
+	<description>
+		The ocgd_step_reader provides functionality to import STEP (Standard for the Exchange of Product Data) files into OpenCASCADE shape objects. It supports loading assemblies, parts, colors, names, and layer information from STEP files. STEP files are widely used in CAD applications for exchanging 3D models and assembly data.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="new_reader" qualifiers="static">
+			<return type="ocgd_step_reader" />
+			<description>
+				Creates a new STEP reader instance with default settings.
+			</description>
+		</method>
+		<method name="load_file">
+			<return type="ocgd_shape" />
+			<param index="0" name="file_path" type="String" />
+			<description>
+				Loads a STEP file and returns the imported shape. Uses default import options.
+			</description>
+		</method>
+		<method name="load_file_with_options">
+			<return type="ocgd_shape" />
+			<param index="0" name="file_path" type="String" />
+			<param index="1" name="options" type="Dictionary" />
+			<description>
+				Loads a STEP file with custom import options. The options dictionary can contain keys like "units" and "precision" to control the import process.
+			</description>
+		</method>
+		<method name="get_file_info">
+			<return type="Dictionary" />
+			<description>
+				Returns information about the reader and its current state, including transfer settings and any errors.
+			</description>
+		</method>
+		<method name="get_all_shapes">
+			<return type="Array" />
+			<description>
+				Returns an array of all shapes found in the last loaded file. Currently returns an empty array (implementation planned for future versions).
+			</description>
+		</method>
+		<method name="set_transfer_colors">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables the transfer of color information from STEP files during import.
+			</description>
+		</method>
+		<method name="get_transfer_colors">
+			<return type="bool" />
+			<description>
+				Returns true if color transfer is enabled.
+			</description>
+		</method>
+		<method name="set_transfer_names">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables the transfer of name/label information from STEP files during import.
+			</description>
+		</method>
+		<method name="get_transfer_names">
+			<return type="bool" />
+			<description>
+				Returns true if name transfer is enabled.
+			</description>
+		</method>
+		<method name="set_transfer_layers">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables the transfer of layer information from STEP files during import.
+			</description>
+		</method>
+		<method name="get_transfer_layers">
+			<return type="bool" />
+			<description>
+				Returns true if layer transfer is enabled.
+			</description>
+		</method>
+		<method name="get_last_error">
+			<return type="String" />
+			<description>
+				Returns the last error message encountered during import operations.
+			</description>
+		</method>
+		<method name="has_error">
+			<return type="bool" />
+			<description>
+				Returns true if there was an error in the last operation.
+			</description>
+		</method>
+		<method name="clear_error">
+			<return type="void" />
+			<description>
+				Clears the current error state and message.
+			</description>
+		</method>
+		<method name="validate_file">
+			<return type="bool" />
+			<param index="0" name="file_path" type="String" />
+			<description>
+				Validates whether a file can be read as a STEP file without fully importing it. Returns true if the file appears to be a valid STEP file.
+			</description>
+		</method>
+		<method name="get_supported_extensions">
+			<return type="Array" />
+			<description>
+				Returns an array of supported file extensions for STEP files: ["step", "stp"].
+			</description>
+		</method>
+		<method name="get_type">
+			<return type="String" />
+			<description>
+				Returns the class type name "ocgd_step_reader".
+			</description>
+		</method>
+		<method name="is_null">
+			<return type="bool" />
+			<description>
+				Returns false (readers are never considered null).
+			</description>
+		</method>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+	</constants>
+</class>

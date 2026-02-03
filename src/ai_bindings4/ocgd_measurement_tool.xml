@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="ocgd_measurement_tool" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Advanced CAD measurement tool for precise geometric analysis and dimensional inspection.
+	</brief_description>
+	<description>
+		The [ocgd_measurement_tool] class provides comprehensive measurement capabilities for CAD applications, offering precise dimensional analysis, geometric property calculation, and quality inspection tools.
+
+		This tool supports a wide range of measurements including distances, angles, areas, volumes, curvature analysis, and specialized CAD features like hole diameters, fillet radii, and wall thickness measurements. It includes advanced features for tolerance analysis, interference detection, and manufacturing feasibility assessment.
+
+		All measurements support configurable units, precision settings, and detailed reporting for professional CAD workflows.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="clear_error">
+			<return type="void" />
+			<description>
+				Clears any stored error message from the last measurement operation.
+			</description>
+		</method>
+		<method name="convert_angle">
+			<return type="float" />
+			<param index="0" name="value" type="float" />
+			<param index="1" name="from_units" type="String" />
+			<param index="2" name="to_units" type="String" />
+			<description>
+				Converts an angle value between different angular units. Supports radians, degrees, and gradians.
+			</description>
+		</method>
+		<method name="convert_area">
+			<return type="float" />
+			<param index="0" name="value" type="float" />
+			<param index="1" name="from_units" type="String" />
+			<param index="2" name="to_units" type="String" />
+			<description>
+				Converts an area value between different unit systems. Automatically handles squared unit conversions.
+			</description>
+		</method>
+		<method name="convert_length">
+			<return type="float" />
+			<param index="0" name="value" type="float" />
+			<param index="1" name="from_units" type="String" />
+			<param index="2" name="to_units" type="String" />
+			<description>
+				Converts a length value between different unit systems (mm, cm, m, in, ft).
+			</description>
+		</method>
+		<method name="convert_volume">
+			<return type="float" />
+			<param index="0" name="value" type="float" />
+			<param index="1" name="from_units" type="String" />
+			<param index="2" name="to_units" type="String" />
+			<description>
+				Converts a volume value between different unit systems. Automatically handles cubed unit conversions.
+			</description>
+		</method>
+		<method name="get_last_error" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the last error message from a measurement operation, or an empty string if no error occurred.
+			</description>
+		</method>
+		<method name="get_measurement_units" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the current measurement units being used for all measurements.
+			</description>
+		</method>
+		<method name="get_precision_tolerance" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the precision tolerance used for geometric calculations and comparisons.
+			</description>
+		</method>
+		<method name="get_type" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the type identifier of this measurement tool ("ocgd_measurement_tool").
+			</description>
+		</method>
+		<method name="get_unit_scale_factor" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the current unit scale factor applied to all measurements.
+			</description>
+		</method>
+		<method name="get_use_high_precision" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether high-precision mode is enabled for more accurate calculations.
+			</description>
+		</method>
+		<method name="get_validate_inputs" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether input validation is enabled for all measurement operations.
+			</description>
+		</method>
+		<method name="has_error" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns true if an error occurred during the last measurement operation.
+			</description>
+		</method>
+		<method name="is_null" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether this measurement tool instance is in a null/invalid state.
+			</description>
+		</method>
+		<method name="measure_angle_between_planes">
+			<return type="float" />
+			<param index="0" name="plane1" type="ocgd_shape" />
+			<param index="1" name="plane2" type="ocgd_shape" />
+			<description>
+				Measures the angle between two planar faces. Returns the angle in radians between the face normals.
+			</description>
+		</method>
+		<method name="measure_angle_between_vectors">
+			<return type="float" />
+			<param index="0" name="vector1" type="Vector3" />
+			<param index="1" name="vector2" type="Vector3" />
+			<description>
+				Measures the angle between two 3D vectors. Returns the angle in radians.
+			</description>
+		</method>
+		<method name="measure_bounding_box">
+			<return type="Dictionary" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Calculates the axis-aligned bounding box of a shape. Returns a dictionary with min/max coordinates, dimensions, center, and volume.
+			</description>
+		</method>
+		<method name="measure_bounding_box_volume">
+			<return type="float" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Calculates the volume of the bounding box that contains the shape.
+			</description>
+		</method>
+		<method name="measure_bounding_sphere">
+			<return type="Dictionary" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Calculates the bounding sphere of a shape. Returns center, radius, diameter, volume, and surface area.
+			</description>
+		</method>
+		<method name="measure_center_of_mass">
+			<return type="Vector3" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Calculates the center of mass (centroid) of the shape based on its volume distribution.
+			</description>
+		</method>
+		<method name="measure_centroid">
+			<return type="Vector3" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Calculates the geometric centroid of the shape. Typically equivalent to center of mass for uniform density.
+			</description>
+		</method>
+		<method name="measure_clearance">
+			<return type="float" />
+			<param index="0" name="shape1" type="ocgd_shape" />
+			<param index="1" name="shape2" type="ocgd_shape" />
+			<description>
+				Measures the clearance (minimum distance) between two shapes. Positive values indicate clearance, negative indicates interference.
+			</description>
+		</method>
+		<method name="measure_closest_points">
+			<return type="Dictionary" />
+			<param index="0" name="shape1" type="ocgd_shape" />
+			<param index="1" name="shape2" type="ocgd_shape" />
+			<description>
+				Finds the closest points between two shapes. Returns the distance and coordinates of both closest points.
+			</description>
+		</method>
+		<method name="measure_curvature_at_point">
+			<return type="float" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="face_index" type="int" />
+			<param index="2" name="u" type="float" />
+			<param index="3" name="v" type="float" />
+			<description>
+				Measures the curvature at a specific UV point on a face surface.
+			</description>
+		</method>
+		<method name="measure_distance_3d">
+			<return type="float" />
+			<param index="0" name="point1" type="Vector3" />
+			<param index="1" name="point2" type="Vector3" />
+			<description>
+				Measures the Euclidean distance between two 3D points.
+			</description>
+		</method>
+		<method name="measure_distance_between_shapes">
+			<return type="float" />
+			<param index="0" name="shape1" type="ocgd_shape" />
+			<param index="1" name="shape2" type="ocgd_shape" />
+			<description>
+				Measures the minimum distance between two shapes. Returns negative values for overlapping shapes.
+			</description>
+		</method>
+		<method name="measure_distance_detailed">
+			<return type="Dictionary" />
+			<param index="0" name="point1" type="Vector3" />
+			<param index="1" name="point2" type="Vector3" />
+			<description>
+				Performs detailed distance measurement between two points, returning distance, direction, midpoint, and component distances.
+			</description>
+		</method>
+		<method name="measure_distance_to_shape">
+			<return type="float" />
+			<param index="0" name="point" type="Vector3" />
+			<param index="1" name="shape" type="ocgd_shape" />
+			<description>
+				Measures the minimum distance from a point to any part of a shape.
+			</description>
+		</method>
+		<method name="measure_edge_length">
+			<return type="float" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="edge_index" type="int" />
+			<description>
+				Measures the length of a specific edge in the shape.
+			</description>
+		</method>
+		<method name="measure_face_area">
+			<return type="float" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="face_index" type="int" />
+			<description>
+				Measures the surface area of a specific face in the shape.
+			</description>
+		</method>
+		<method name="measure_fillet_radius">
+			<return type="float" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="face_index" type="int" />
+			<description>
+				Measures the radius of a fillet feature on the specified face. Returns -1 if the face is not a fillet.
+			</description>
+		</method>
+		<method name="measure_gaussian_curvature">
+			<return type="float" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="face_index" type="int" />
+			<param index="2" name="u" type="float" />
+			<param index="3" name="v" type="float" />
+			<description>
+				Measures the Gaussian curvature at a specific UV point on a face surface.
+			</description>
+		</method>
+		<method name="measure_hole_diameter">
+			<return type="float" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="face_index" type="int" />
+			<description>
+				Measures the diameter of a cylindrical hole feature. Returns -1 if the face is not a cylindrical hole.
+			</description>
+		</method>
+		<method name="measure_interference_analysis">
+			<return type="Dictionary" />
+			<param index="0" name="shape1" type="ocgd_shape" />
+			<param index="1" name="shape2" type="ocgd_shape" />
+			<description>
+				Performs detailed interference analysis between two shapes, including penetration depth and interference volume.
+			</description>
+		</method>
+		<method name="measure_mean_curvature">
+			<return type="float" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="face_index" type="int" />
+			<param index="2" name="u" type="float" />
+			<param index="3" name="v" type="float" />
+			<description>
+				Measures the mean curvature at a specific UV point on a face surface.
+			</description>
+		</method>
+		<method name="measure_moments_of_inertia">
+			<return type="Dictionary" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Calculates the moments of inertia tensor for the shape. Returns the full 3x3 inertia matrix and center of mass.
+			</description>
+		</method>
+		<method name="measure_surface_area">
+			<return type="float" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Measures the total surface area of the shape.
+			</description>
+		</method>
+		<method name="measure_volume">
+			<return type="float" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Measures the volume of the shape. Only works with closed solid geometries.
+			</description>
+		</method>
+		<method name="measure_wall_thickness">
+			<return type="float" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="point" type="Vector3" />
+			<param index="2" name="direction" type="Vector3" />
+			<description>
+				Measures the wall thickness at a specific point in a given direction. Useful for analyzing thin-walled parts.
+			</description>
+		</method>
+		<method name="new_tool" qualifiers="static">
+			<return type="ocgd_measurement_tool" />
+			<description>
+				Creates and returns a new measurement tool instance. This is the preferred way to create a tool since GDExtensions don't support non-empty constructors.
+			</description>
+		</method>
+		<method name="set_measurement_units">
+			<return type="void" />
+			<param index="0" name="units" type="String" />
+			<description>
+				Sets the measurement units for all subsequent measurements. Supports mm, cm, m, in, ft.
+			</description>
+		</method>
+		<method name="set_precision_tolerance">
+			<return type="void" />
+			<param index="0" name="tolerance" type="float" />
+			<description>
+				Sets the precision tolerance for geometric calculations. Smaller values provide higher precision but may be more sensitive to numerical errors.
+			</description>
+		</method>
+		<method name="set_unit_scale_factor">
+			<return type="void" />
+			<param index="0" name="scale" type="float" />
+			<description>
+				Sets a custom unit scale factor. All measurements will be multiplied by this factor.
+			</description>
+		</method>
+		<method name="set_use_high_precision">
+			<return type="void" />
+			<param index="0" name="high_precision" type="bool" />
+			<description>
+				Enables or disables high-precision mode for more accurate calculations at the cost of performance.
+			</description>
+		</method>
+		<method name="set_validate_inputs">
+			<return type="void" />
+			<param index="0" name="validate" type="bool" />
+			<description>
+				Enables or disables input validation for all measurement operations. Disabling can improve performance but may lead to errors with invalid inputs.
+			</description>
+		</method>
+		<method name="validate_edge_index">
+			<return type="bool" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="edge_index" type="int" />
+			<description>
+				Validates whether the given edge index is valid for the shape.
+			</description>
+		</method>
+		<method name="validate_face_index">
+			<return type="bool" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="face_index" type="int" />
+			<description>
+				Validates whether the given face index is valid for the shape.
+			</description>
+		</method>
+		<method name="validate_shape">
+			<return type="bool" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Validates whether a shape is suitable for measurement operations. Checks for null shapes and geometric validity.
+			</description>
+		</method>
+	</methods>
+</class>

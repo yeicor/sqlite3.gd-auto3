@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="gd_Vrml_MaterialBindingAndNormalBinding" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Godot GDExtension wrapper for the Open CASCADE Vrml_MaterialBindingAndNormalBinding enum.
+	</brief_description>
+	<description>
+		This class exposes the Vrml_MaterialBindingAndNormalBinding enum from Open CASCADE to Godot scripts.
+		It is a dummy wrapper and does not provide any methods or properties other than the enum constants.
+		Use this class to access material and normal binding modes for VRML objects in Open CASCADE via Godot.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+		<constant name="DEFAULT" value="0" description="Default binding mode. Equivalent to Vrml_DEFAULT in Open CASCADE."/>
+		<constant name="OVERALL" value="1" description="Overall binding mode. Equivalent to Vrml_OVERALL in Open CASCADE."/>
+		<constant name="PER_PART" value="2" description="Per-part binding mode. Equivalent to Vrml_PER_PART in Open CASCADE."/>
+		<constant name="PER_PART_INDEXED" value="3" description="Per-part indexed binding mode. Equivalent to Vrml_PER_PART_INDEXED in Open CASCADE."/>
+		<constant name="PER_FACE" value="4" description="Per-face binding mode. Equivalent to Vrml_PER_FACE in Open CASCADE."/>
+		<constant name="PER_FACE_INDEXED" value="5" description="Per-face indexed binding mode. Equivalent to Vrml_PER_FACE_INDEXED in Open CASCADE."/>
+		<constant name="PER_VERTEX" value="6" description="Per-vertex binding mode. Equivalent to Vrml_PER_VERTEX in Open CASCADE."/>
+		<constant name="PER_VERTEX_INDEXED" value="7" description="Per-vertex indexed binding mode. Equivalent to Vrml_PER_VERTEX_INDEXED in Open CASCADE."/>
+	</constants>
+</class>

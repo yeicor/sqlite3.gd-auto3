@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="gd_OSD_WhoAmIEnum" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Binding for the OSD_WhoAmI enum from OpenCASCADE.
+	</brief_description>
+	<description>
+		Allows great accuracy for error management.
+		This enum is private in OpenCASCADE, but exposed here for binding purposes.
+		No methods are available; only the enum values are exposed.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+		<constant name="Directory" value="0" description="OSD_WDirectory" />
+		<constant name="DirectoryIterator" value="1" description="OSD_WDirectoryIterator" />
+		<constant name="Environment" value="2" description="OSD_WEnvironment" />
+		<constant name="File" value="3" description="OSD_WFile" />
+		<constant name="FileNode" value="4" description="OSD_WFileNode" />
+		<constant name="FileIterator" value="5" description="OSD_WFileIterator" />
+		<constant name="Path" value="6" description="OSD_WPath" />
+		<constant name="Process" value="7" description="OSD_WProcess" />
+		<constant name="Protection" value="8" description="OSD_WProtection" />
+		<constant name="Host" value="9" description="OSD_WHost" />
+		<constant name="Disk" value="10" description="OSD_WDisk" />
+		<constant name="Chronometer" value="11" description="OSD_WChronometer" />
+		<constant name="Timer" value="12" description="OSD_WTimer" />
+		<constant name="Package" value="13" description="OSD_WPackage" />
+		<constant name="EnvironmentIterator" value="14" description="OSD_WEnvironmentIterator" />
+	</constants>
+</class>

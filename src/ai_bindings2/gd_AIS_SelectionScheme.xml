@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="gd_AIS_SelectionScheme" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Sets selection schemes for interactive contexts.
+	</brief_description>
+	<description>
+		This class provides an enum for selection schemes used in Open CASCADE interactive contexts.
+		These schemes define how selection operations are performed, such as replacing, adding, or removing objects from the current selection.
+
+		Note: This is a pure enum wrapper for Godot GDExtension and does not wrap any underlying C++ object.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="gd_AIS_SelectionScheme">
+			<return type="void" />
+			<description>
+				Constructs a new gd_AIS_SelectionScheme instance.
+			</description>
+		</method>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+		<constant name="UNKNOWN" value="-1" description="Undefined scheme." />
+		<constant name="Replace" value="0" description="Clears current selection and selects detected objects." />
+		<constant name="Add" value="1" description="Adds detected object to current selection." />
+		<constant name="Remove" value="2" description="Removes detected object from the current selection." />
+		<constant name="XOR" value="3" description="Performs XOR for detected objects, other selected not touched." />
+		<constant name="Clear" value="4" description="Clears current selection." />
+		<constant name="ReplaceExtra" value="5" description="Replace with one difference: if result of replace is empty, and current selection contains detected element, it will be selected." />
+	</constants>
+</class>

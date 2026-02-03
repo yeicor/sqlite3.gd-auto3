@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="gd_Standard_WarningsDisable" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		No binding classes or methods are available for Standard_WarningsDisable.
+	</brief_description>
+	<description>
+		This file is a binding stub for Standard_WarningsDisable.hxx from Open CASCADE Technology.
+		Standard_WarningsDisable.hxx only contains preprocessor directives to suppress compiler warnings and does not define any classes or callable methods.
+		No Godot API is exposed by this binding.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+	</constants>
+</class>

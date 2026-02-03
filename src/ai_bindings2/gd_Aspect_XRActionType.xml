@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="gd_Aspect_XRActionType" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Godot binding for the Open CASCADE Aspect_XRActionType enum.
+	</brief_description>
+	<description>
+		This class provides Godot bindings for the Aspect_XRActionType enum from Open CASCADE Technology.
+		Used to represent XR action types such as digital, analog, pose, skeletal, and haptic actions.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+		<constant name="InputDigital" value="0" description="Boolean input (like button)." />
+		<constant name="InputAnalog" value="1" description="Analog input (1/2/3 axes)." />
+		<constant name="InputPose" value="2" description="Positional input." />
+		<constant name="InputSkeletal" value="3" description="Skeletal input." />
+		<constant name="OutputHaptic" value="4" description="Haptic output (vibration)." />
+	</constants>
+</class>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="gd_OSD_LoadMode" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Binding wrapper for the OSD_LoadMode enumeration from Open CASCADE.
+	</brief_description>
+	<description>
+		This class provides Godot bindings for the OSD_LoadMode enumeration, which is used to specify how shareable libraries are loaded in Open CASCADE.
+
+		Note: This is an enum wrapper only; no instances or methods are available except for the enum values.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+		<constant name="RTLD_LAZY" value="0" description="Lazy function call binding; functions are resolved as needed." />
+		<constant name="RTLD_NOW" value="1" description="Immediate function call binding; all functions are resolved when the library is loaded." />
+	</constants>
+</class>

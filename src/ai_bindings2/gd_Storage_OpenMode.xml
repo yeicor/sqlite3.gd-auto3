@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="gd_Storage_OpenMode" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Specifies opening modes for a file.
+	</brief_description>
+	<description>
+		This class provides an enum specifying opening modes for a file, as defined in Open CASCADE's Storage_OpenMode.
+
+		- VSNone: No mode is specified.
+		- VSRead: The file is open for reading operations.
+		- VSWrite: The file is open for writing operations.
+		- VSReadWrite: The file is open for both reading and writing operations.
+
+		Note: This is an enum wrapper for use in Godot GDExtension. No methods or properties are exposed other than the enum itself.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+		<constant name="VSNone" value="0" description="No mode is specified." />
+		<constant name="VSRead" value="1" description="The file is open for reading operations." />
+		<constant name="VSWrite" value="2" description="The file is open for writing operations." />
+		<constant name="VSReadWrite" value="3" description="The file is open for both reading and writing operations." />
+	</constants>
+</class>

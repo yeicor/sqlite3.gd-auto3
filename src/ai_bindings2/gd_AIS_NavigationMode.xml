@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="gd_AIS_NavigationMode" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Camera navigation mode enum wrapper for OpenCASCADE AIS_NavigationMode.
+	</brief_description>
+	<description>
+		This class exposes the AIS_NavigationMode enum from OpenCASCADE to Godot.
+		No methods are available; only enum values are published.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+		<constant name="Orbit" value="0" description="Orbit rotation camera navigation mode." />
+		<constant name="FirstPersonFlight" value="1" description="Flight rotation (first person) camera navigation mode." />
+		<constant name="FirstPersonWalk" value="2" description="Walking mode (first person) camera navigation mode." />
+		<constant name="Lower" value="0" description="Lower bound for navigation mode enum." />
+		<constant name="Upper" value="2" description="Upper bound for navigation mode enum." />
+	</constants>
+</class>

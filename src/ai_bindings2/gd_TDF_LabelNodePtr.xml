@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="gd_TDF_LabelNodePtr" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Binding for Open CASCADE TDF_LabelNodePtr (typedef for TDF_LabelNode*).
+	</brief_description>
+	<description>
+		This class is a placeholder for the Open CASCADE TDF_LabelNodePtr type.
+
+		Original C++ header:
+		Created by: DAUTRY Philippe
+		Copyright (c) 1997-1999 Matra Datavision
+		Copyright (c) 1999-2014 OPEN CASCADE SAS
+
+		This file is part of Open CASCADE Technology software library.
+
+		Note: TDF_LabelNodePtr is a typedef for TDF_LabelNode*, and does not expose any callable methods or properties.
+		No binding methods are available in this wrapper.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+	</constants>
+</class>

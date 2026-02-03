@@ -1,0 +1,33 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":disableDependencyDashboard"
+  ],
+  "automerge": true,
+  "automergeType": "branch",
+  "schedule": [
+    "* * * * 0,6"
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": [
+      "* * * * 0,6"
+    ]
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update OS versions in GitHub Actions matrix",
+      "managerFilePatterns": [
+        ".github/workflows/*.yml",
+        ".github/workflows/*.yaml",
+      ],
+      "matchStrings": [
+        "os:\\s*\"?(?<depName>ubuntu|windows|macos)-(?<currentValue>[^\"} ]*)"
+      ],
+      "datasourceTemplate": "github-runners",
+      "versioningTemplate": "docker"
+    }
+  ]
+}

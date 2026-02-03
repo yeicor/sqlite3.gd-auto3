@@ -1,0 +1,164 @@
+on:
+  workflow_call:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+  merge_group:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [
+            # https://docs.godotengine.org/en/stable/about/system_requirements.html
+            { vcpkg_triplet: "x64-linux", os: "ubuntu-24.04" },
+            { vcpkg_triplet: "x86-linux", os: "ubuntu-24.04" },
+            { vcpkg_triplet: "arm64-linux", os: "ubuntu-24.04-arm" },
+            { vcpkg_triplet: "arm-linux", os: "ubuntu-24.04-arm" },
+            { vcpkg_triplet: "x64-mingw-static", os: "windows-2025" },
+            { vcpkg_triplet: "x86-mingw-static", os: "windows-2025" },
+            { vcpkg_triplet: "arm64-mingw-static", os: "windows-2025" },
+            { vcpkg_triplet: "x64-windows-static", os: "windows-2025" }, # MSVC instead of mingw
+            { vcpkg_triplet: "x86-windows-static", os: "windows-2025" }, # MSVC instead of mingw
+            { vcpkg_triplet: "arm64-windows-static", os: "windows-2025" }, # MSVC instead of mingw
+            { vcpkg_triplet: "arm64-osx", os: "macos-15" },
+            { vcpkg_triplet: "x64-osx", os: "macos-15" },
+            { vcpkg_triplet: "wasm32-emscripten-pic", os: "ubuntu-24.04" },
+            { vcpkg_triplet: "x64-android", os: "ubuntu-24.04" },
+            { vcpkg_triplet: "x86-android", os: "ubuntu-24.04" },
+            { vcpkg_triplet: "arm64-android", os: "ubuntu-24.04" },
+            { vcpkg_triplet: "arm-android", os: "ubuntu-24.04" },
+            { vcpkg_triplet: "arm64-ios", os: "macos-15" },
+          ]
+        # Note: vcpkg forces building both Debug and Release on a single run. This is not the same as the templates!
+        target-type: ["template_debug"] # , "template_release"
+        float-precision: ["single"] # TODO: , "double"
+
+    runs-on: "${{ matrix.target.os }}"
+    steps:
+      - if: "matrix.target.os == 'ubuntu-24.04' || matrix.target.os == 'ubuntu-24.04-arm'"
+        run: |  # Free a bunch of disk space
+          sudo rm -rf /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          sudo docker builder prune -a
+    
+      - uses: "actions/checkout@v5"
+        with:
+          submodules: "recursive"
+
+      # <Triplet-specific setup>
+      - if: "matrix.target.vcpkg_triplet == 'x86-linux'"
+        run: "sudo apt-get update && sudo apt-get install -y gcc-multilib g++-multilib"
+      - if: "matrix.target.vcpkg_triplet == 'arm-linux'"
+        run: 'sudo apt-get update && sudo apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf && echo "cmake_extra_args=''-DCMAKE_C_COMPILER=arm-linux-gnueabihf-gcc'', ''-DCMAKE_CXX_COMPILER=arm-linux-gnueabihf-g++''" >> $GITHUB_ENV'
+      - if: "matrix.target.os == 'ubuntu-24.04' || matrix.target.os == 'ubuntu-24.04-arm'"
+        run:
+          | # Need to install some system dependencies (for the target platform! not the host)
+          set -ex
+          arch_selector=""
+          if [ "${{ matrix.target.vcpkg_triplet }}" == "x86-linux" ]; then
+            arch_selector=":i386"
+            sudo dpkg --add-architecture i386
+          elif [ "${{ matrix.target.vcpkg_triplet }}" == "arm-linux" ]; then
+            arch_selector=":armhf"
+            sudo dpkg --add-architecture armhf
+          fi # Others use the native architecture
+          sudo apt-get update && sudo apt-get install -y "libx11-dev${arch_selector}" "libgl1-mesa-dev${arch_selector}" "libfontconfig-dev${arch_selector}"
+      - if: "matrix.target.os == 'windows-2025' && contains(matrix.target.vcpkg_triplet, '-mingw')"
+        uses: "egor-tensin/setup-mingw@v2"
+        with:
+          version: "12.2.0" # It seems like newer versions are broken (follow godot-cpp)
+      - if: "matrix.target.os == 'windows-2025'"
+        run: "echo 'LDFLAGS=-Wl,-allow-multiple-definition' >> $GITHUB_ENV"
+      - if: "matrix.target.os == 'macos-15'"
+        run: "brew install autoconf automake autoconf-archive"
+      - if: "matrix.target.vcpkg_triplet == 'wasm32-emscripten-pic'"
+        uses: "mymindstorm/setup-emsdk@v14"
+        with:
+          version: "4.0.12" # More recent than Godot's default, since we need allow-multiple-definition support
+      - if: "matrix.target.vcpkg_triplet == 'wasm32-emscripten-pic'"
+        run: 'echo "cmake_extra_args=''-DGODOTCPP_THREADS=OFF''" >> $GITHUB_ENV && echo ''LDFLAGS=-Wl,-allow-multiple-definition'' >> $GITHUB_ENV'
+      - if: "contains(matrix.target.vcpkg_triplet, '-android')"
+        uses: "nttld/setup-ndk@v1"
+        id: "setup-ndk"
+        with:
+          ndk-version: "r23c" # Same as https://github.com/godotengine/godot/blob/<GODOT_VERSION>/platform/android/detect.py
+          link-to-sdk: true
+      - if: "contains(matrix.target.vcpkg_triplet, '-android')"
+        run: 'echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV' # && echo \"cmake_extra_args='-DANDROID_ABI=${{ matrix.target.cmake_sys_proc }}', '-UCMAKE_SYSTEM_PROCESSOR'\"
+      # </Triplet-specific setup>
+
+      # <Cache restore>
+      - uses: "mozilla-actions/sccache-action@v0.0.9"
+        with:
+          disable_annotations: "true"
+      - shell: "bash"
+        run:
+          | # Installed packages and caches are exported for use as a cache in the next workflow run
+          set -ex
+          [[ -d .cache ]] || mkdir -p .cache
+          [[ -d .cache/sccache ]] || mkdir -p .cache/sccache
+          echo "SCCACHE_DIR=$(pwd)/.cache/sccache" >> $GITHUB_ENV # Does this work with windows paths?
+          echo "SCCACHE_CACHE_SIZE=5G" >> $GITHUB_ENV # More than enough to keep the most recent project cached (as vcpkg's installed directory is copied directly)
+
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+          last_workflow_id=$(gh run list --workflow="${{ github.workflow }}" --branch="${{ github.ref_name }}" --status=completed --json databaseId,conclusion --limit 1 --jq '[.[] | select(.conclusion != "cancelled" and .conclusion != "")][0].databaseId')
+          gh run download "$last_workflow_id" --name "vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}" || \
+              echo "::warning ::Failed to download and extract previous vcpkg installed artifacts, skipping cache..."
+
+          find vcpkg/installed/ || echo "vcpkg/installed/ not found"  # For debugging purposes, to see if the cache was restored
+          find .cache/sccache/ || echo ".cache/sccache/ not found"  # For debugging purposes, to see if the cache was restored
+      # </Cache restore>
+      # <Install and build>
+      - shell: "bash"
+        run:
+          | # HACK: Customize the vcpkg install of the main repo package with custom CMAKE_ARGS
+          set -ex
+          echo "$__GD_CMAKE_ARGS" >__GD_CMAKE_ARGS # Alternative way to pass the variable (required for windows)
+          "$VCPKG_ROOT/bootstrap-vcpkg${{matrix.target.os == 'windows-2025' && '.bat' || '.sh'}}"
+          "$VCPKG_ROOT/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" remove build123d-gd --classic || true  # Avoid caching too much
+          "$VCPKG_ROOT/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" install build123d-gd --classic
+          # For some unknown reason, cmake + windows does not install the dll to the proper folder, do it here...
+          if [ "${{ matrix.target.os }}" == "windows-2025" ]; then
+              cp "vcpkg/packages/build123d-gd_${{ matrix.target.vcpkg_triplet }}/${{ matrix.target-type == 'template_debug' && 'debug/' || '' }}bin"/*.dll "demo/addons/build123d.gd/"
+          fi
+        env:
+          VCPKG_ROOT: "vcpkg"
+          VCPKG_DISABLE_METRICS: "1"
+          VCPKG_DEFAULT_TRIPLET: "${{ matrix.target.vcpkg_triplet }}"
+          VCPKG_OVERLAY_TRIPLETS: "vcpkg_triplets"
+          VCPKG_OVERLAY_PORTS: "vcpkg_ports"
+          __GD_CMAKE_ARGS: "-DGODOTCPP_TARGET=${{ matrix.target-type }} -DGODOTCPP_PRECISION=${{ matrix.float-precision }} ${{ env.cmake_extra_args }}"
+      # </Install and build>
+
+      # <Cache save and export artifacts>
+      - shell: "bash" # Print cache statistics
+        run: "sccache --show-stats || true"
+      - uses: "actions/upload-artifact@v5"
+        with: # Build main artifact with only the addon files
+          name: "build123d.gd-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
+          path: "demo/addons/build123d.gd/**"
+      - uses: "actions/upload-artifact@v5"
+        if: "always()"
+        with: # Build artifact useful for caching
+          name: "vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
+          path: "vcpkg/installed/\n${{ env.SCCACHE_DIR }}"
+      - uses: "actions/upload-artifact@v5"
+        if: "always()"
+        with: # Build artifact useful for debugging
+          name: "vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
+          path: "vcpkg/buildtrees/\ncpkg/packages/"
+      # </Export artifacts>
+  merge:
+    runs-on: "ubuntu-24.04"
+    needs: "build"
+    steps:
+      - uses: "actions/upload-artifact/merge@v5"
+        with:
+          name: "build123d.gd"
+          pattern: "build123d.gd-*"
+          # delete-merged: true

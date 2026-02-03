@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="gd_CDF_SubComponentStatus" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Binding wrapper for the OpenCASCADE CDF_SubComponentStatus enum.
+	</brief_description>
+	<description>
+		This class provides Godot GDExtension bindings for the CDF_SubComponentStatus enum from OpenCASCADE.
+		No methods are exposed; only the enum values are available for use in scripts.
+		Original C++ documentation:
+		- Created on: 1997-08-07
+		- Created by: Jean-Louis Frenkel
+		- Copyright (c) 1997-1999 Matra Datavision
+		- Copyright (c) 1999-2014 OPEN CASCADE SAS
+		- This file is part of Open CASCADE Technology software library.
+		- This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License version 2.1 as published by the Free Software Foundation, with special exception defined in the file OCCT_LGPL_EXCEPTION.txt.
+		- Alternatively, this file may be used under the terms of Open CASCADE commercial license or contractual agreement.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+		<constant name="CDF_SCS_Consistent" value="0" description="Indicates the subcomponent is consistent." />
+		<constant name="CDF_SCS_Unconsistent" value="1" description="Indicates the subcomponent is unconsistent." />
+		<constant name="CDF_SCS_Stored" value="2" description="Indicates the subcomponent is stored." />
+		<constant name="CDF_SCS_Modified" value="3" description="Indicates the subcomponent is modified." />
+	</constants>
+</class>

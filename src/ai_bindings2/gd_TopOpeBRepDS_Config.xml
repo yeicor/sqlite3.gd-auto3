@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="gd_TopOpeBRepDS_Config" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Binding wrapper for the TopOpeBRepDS_Config enum from Open CASCADE Technology.
+	</brief_description>
+	<description>
+		This class provides Godot bindings for the TopOpeBRepDS_Config enum, which is used in Open CASCADE Technology to represent configuration states for BRep data structures.
+
+		Original C++ header documentation:
+		Created on: 1993-06-17
+		Created by: Jean Yves LEBEY
+		Copyright (c) 1993-1999 Matra Datavision
+		Copyright (c) 1999-2014 OPEN CASCADE SAS
+
+		This file is part of Open CASCADE Technology software library.
+
+		This library is free software; you can redistribute it and/or modify it under
+		the terms of the GNU Lesser General Public License version 2.1 as published
+		by the Free Software Foundation, with special exception defined in the file
+		OCCT_LGPL_EXCEPTION.txt. Consult the file LICENSE_LGPL_21.txt included in OCCT
+		distribution for complete text of the license and disclaimer of any warranty.
+
+		Alternatively, this file may be used under the terms of Open CASCADE
+		commercial license or contractual agreement.
+
+		Note: This is a dummy wrapper for enum exposure only. No methods or properties are available.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+		<constant name="UNSHGEOMETRY" value="0" description="Represents the TopOpeBRepDS_UNSHGEOMETRY configuration." />
+		<constant name="SAMEORIENTED" value="1" description="Represents the TopOpeBRepDS_SAMEORIENTED configuration." />
+		<constant name="DIFFORIENTED" value="2" description="Represents the TopOpeBRepDS_DIFFORIENTED configuration." />
+	</constants>
+</class>

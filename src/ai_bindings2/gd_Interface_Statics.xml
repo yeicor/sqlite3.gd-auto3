@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="gd_Interface_Statics" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Godot GDExtension bindings for Open CASCADE Interface_Statics static handle macros.
+	</brief_description>
+	<description>
+		This class provides documentation for the Interface_Statics static handle macros from Open CASCADE.
+		No callable methods or properties are exposed in this binding, as the original header only defines macros for static handle management.
+		See the original Interface_Statics.hxx for usage and initialization details.
+
+		Note: If future versions of Interface_Statics.hxx introduce Standard_EXPORT classes with callable methods, this documentation will be updated accordingly.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+	</constants>
+</class>

@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="ocgd_step_writer" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../class.xsd">
+	<brief_description>
+		OpenCASCADE STEP file writer for exporting 3D shapes and assemblies.
+	</brief_description>
+	<description>
+		The ocgd_step_writer class provides comprehensive functionality for exporting OpenCASCADE shapes to STEP (Standard for the Exchange of Product Data) files. STEP is an ISO standard (ISO 10303) widely used in CAD/CAM/CAE applications for exchanging 3D model data.
+
+		This writer supports various STEP application protocols (AP203, AP214, AP242) and can export shapes with colors, materials, layers, and hierarchical assembly structures. It provides extensive configuration options for precision control, unit settings, and feature inclusion.
+
+		Key features:
+		- Support for multiple STEP application protocols and schemas
+		- Color and material export capabilities
+		- Layer and naming support
+		- Assembly structure export
+		- Configurable precision and tessellation settings
+		- Validation and error handling
+		- Configuration presets for common use cases
+
+		Example usage:
+		```gdscript
+		var writer = ocgd_step_writer.new_step_writer()
+		writer.set_write_colors(true)
+		writer.set_precision_value(0.01)
+		var success = writer.write_shape(my_shape, "output.step")
+		if not success:
+			print("Error: " + writer.get_last_error())
+		```
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="clear_last_error">
+			<return type="void" />
+			<description>
+				Clears the last error message. Useful for resetting error state before performing new operations.
+			</description>
+		</method>
+		<method name="get_angular_tolerance" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the current angular tolerance value used for geometric calculations during export.
+			</description>
+		</method>
+		<method name="get_angle_unit" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the current angle unit setting. Default is radians (0.01745329252).
+			</description>
+		</method>
+		<method name="get_application_protocol" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the current STEP application protocol (AP203, AP214, or AP242). Default is "AP214".
+			</description>
+		</method>
+		<method name="get_authorization" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the authorization information included in the STEP file header.
+			</description>
+		</method>
+		<method name="get_compress_output" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether output compression is enabled. Note: STEP format doesn't support native compression.
+			</description>
+		</method>
+		<method name="get_current_configuration">
+			<return type="Dictionary" />
+			<description>
+				Returns a dictionary containing all current writer configuration settings. Useful for saving and restoring configurations.
+			</description>
+		</method>
+		<method name="get_description" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the description text included in the STEP file header.
+			</description>
+		</method>
+		<method name="get_implementation_level" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the implementation level identifier. Default is "2;1".
+			</description>
+		</method>
+		<method name="get_last_error" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the last error message from write operations. Empty string indicates no error.
+			</description>
+		</method>
+		<method name="get_length_unit" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the current length unit setting. Default is 1.0 (millimeters).
+			</description>
+		</method>
+		<method name="get_linear_tolerance" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the current linear tolerance value used for geometric calculations during export.
+			</description>
+		</method>
+		<method name="get_merge_surfaces" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether surface merging is enabled during export.
+			</description>
+		</method>
+		<method name="get_originating_system" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the originating system identifier included in STEP file headers. Default is "OpenCASCADE.gd".
+			</description>
+		</method>
+		<method name="get_precision_value" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the current precision value for geometric calculations. Default is 0.01.
+			</description>
+		</method>
+		<method name="get_quality_level" qualifiers="const">
+			<return type="int" />
+			<description>
+				Returns the current quality level (1=low, 2=medium, 3=high). Quality level affects precision and tessellation settings.
+			</description>
+		</method>
+		<method name="get_schema_identifier" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the current STEP schema identifier. Default is "AUTOMOTIVE_DESIGN".
+			</description>
+		</method>
+		<method name="get_solid_angle_unit" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the current solid angle unit setting. Default is 1.0 (steradians).
+			</description>
+		</method>
+		<method name="get_step_file_info">
+			<return type="Dictionary" />
+			<param index="0" name="file_path" type="String" />
+			<description>
+				Analyzes an existing STEP file and returns information about its structure and validity. Returns a dictionary with file properties.
+			</description>
+		</method>
+		<method name="get_supported_protocols">
+			<return type="Array" />
+			<description>
+				Returns an array of supported STEP application protocols: ["AP203", "AP214", "AP242"].
+			</description>
+		</method>
+		<method name="get_supported_schemas">
+			<return type="Array" />
+			<description>
+				Returns an array of supported STEP schema identifiers: ["CONFIG_CONTROL_DESIGN", "AUTOMOTIVE_DESIGN", "STRUCTURAL_ANALYSIS_DESIGN"].
+			</description>
+		</method>
+		<method name="get_supported_units">
+			<return type="Array" />
+			<description>
+				Returns an array of supported length units: ["mm", "m", "in", "ft"].
+			</description>
+		</method>
+		<method name="get_tessellation_angular_deflection" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the current angular deflection setting for tessellation. Default is 0.1.
+			</description>
+		</method>
+		<method name="get_tessellation_deviation" qualifiers="const">
+			<return type="float" />
+			<description>
+				Returns the current deviation setting for tessellation. Default is 0.1.
+			</description>
+		</method>
+		<method name="get_validate_on_write" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether shape validation is performed before writing. Default is true.
+			</description>
+		</method>
+		<method name="get_write_colors" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether color information is included in exported STEP files. Default is true.
+			</description>
+		</method>
+		<method name="get_write_curve_colors" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether curve color information is included in exported STEP files.
+			</description>
+		</method>
+		<method name="get_write_layers" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether layer information is included in exported STEP files. Default is true.
+			</description>
+		</method>
+		<method name="get_write_materials" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether material information is included in exported STEP files. Default is true.
+			</description>
+		</method>
+		<method name="get_write_names" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether shape names are included in exported STEP files. Default is true.
+			</description>
+		</method>
+		<method name="get_write_precision_mode" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether precision mode is enabled for geometric calculations. Default is true.
+			</description>
+		</method>
+		<method name="get_write_shape_names" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether individual shape names are written to the STEP file.
+			</description>
+		</method>
+		<method name="get_write_surface_colors" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether surface color information is included in exported STEP files.
+			</description>
+		</method>
+		<method name="get_write_statistics">
+			<return type="Dictionary" />
+			<description>
+				Returns statistics about the last write operation, including configuration settings and any errors.
+			</description>
+		</method>
+		<method name="get_write_tessellation" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns whether tessellation information is included in exported STEP files. Default is false.
+			</description>
+		</method>
+		<method name="is_valid_step_file">
+			<return type="bool" />
+			<param index="0" name="file_path" type="String" />
+			<description>
+				Checks if the specified file is a valid STEP file by examining its header structure.
+			</description>
+		</method>
+		<method name="load_configuration">
+			<return type="void" />
+			<param index="0" name="config" type="Dictionary" />
+			<description>
+				Loads writer configuration from a dictionary. The dictionary should contain configuration keys matching the writer's settings.
+			</description>
+		</method>
+		<method name="new_step_writer" qualifiers="static">
+			<return type="ocgd_step_writer" />
+			<description>
+				Factory method that creates and returns a new ocgd_step_writer instance with default settings.
+			</description>
+		</method>
+		<method name="set_angular_tolerance">
+			<return type="void" />
+			<param index="0" name="tolerance" type="float" />
+			<description>
+				Sets the angular tolerance for geometric calculations during export.
+			</description>
+		</method>
+		<method name="set_angle_unit">
+			<return type="void" />
+			<param index="0" name="unit" type="float" />
+			<description>
+				Sets the angle unit for the STEP file. Standard value is 0.01745329252 (radians).
+			</description>
+		</method>
+		<method name="set_application_protocol">
+			<return type="void" />
+			<param index="0" name="protocol" type="String" />
+			<description>
+				Sets the STEP application protocol. Valid values are "AP203", "AP214", and "AP242". AP214 provides the most comprehensive feature support.
+			</description>
+		</method>
+		<method name="set_authorization">
+			<return type="void" />
+			<param index="0" name="auth" type="String" />
+			<description>
+				Sets authorization information to be included in the STEP file header.
+			</description>
+		</method>
+		<method name="set_compress_output">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to attempt output compression. Note: STEP format doesn't support native compression.
+			</description>
+		</method>
+		<method name="set_configuration_preset">
+			<return type="void" />
+			<param index="0" name="preset_name" type="String" />
+			<description>
+				Applies a predefined configuration preset. Available presets: "CAD_EXPORT", "MINIMAL", "HIGH_PRECISION".
+			</description>
+		</method>
+		<method name="set_description">
+			<return type="void" />
+			<param index="0" name="desc" type="String" />
+			<description>
+				Sets a description to be included in the STEP file header.
+			</description>
+		</method>
+		<method name="set_implementation_level">
+			<return type="void" />
+			<param index="0" name="level" type="String" />
+			<description>
+				Sets the implementation level identifier for the STEP file. Default is "2;1".
+			</description>
+		</method>
+		<method name="set_length_unit">
+			<return type="void" />
+			<param index="0" name="unit" type="float" />
+			<description>
+				Sets the length unit for the STEP file. Standard value is 1.0 for millimeters.
+			</description>
+		</method>
+		<method name="set_linear_tolerance">
+			<return type="void" />
+			<param index="0" name="tolerance" type="float" />
+			<description>
+				Sets the linear tolerance for geometric calculations during export.
+			</description>
+		</method>
+		<method name="set_merge_surfaces">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to merge adjacent surfaces during export. This can reduce file size but may affect geometry fidelity.
+			</description>
+		</method>
+		<method name="set_originating_system">
+			<return type="void" />
+			<param index="0" name="system" type="String" />
+			<description>
+				Sets the originating system identifier for STEP file headers.
+			</description>
+		</method>
+		<method name="set_precision_value">
+			<return type="void" />
+			<param index="0" name="precision" type="float" />
+			<description>
+				Sets the precision value for geometric calculations. Lower values provide higher precision but larger file sizes.
+			</description>
+		</method>
+		<method name="set_quality_level">
+			<return type="void" />
+			<param index="0" name="level" type="int" />
+			<description>
+				Sets the overall quality level (1=low, 2=medium, 3=high). This affects precision and tessellation settings automatically.
+			</description>
+		</method>
+		<method name="set_schema_identifier">
+			<return type="void" />
+			<param index="0" name="schema" type="String" />
+			<description>
+				Sets the STEP schema identifier. Common values include "AUTOMOTIVE_DESIGN", "CONFIG_CONTROL_DESIGN", and "STRUCTURAL_ANALYSIS_DESIGN".
+			</description>
+		</method>
+		<method name="set_solid_angle_unit">
+			<return type="void" />
+			<param index="0" name="unit" type="float" />
+			<description>
+				Sets the solid angle unit for the STEP file. Standard value is 1.0 (steradians).
+			</description>
+		</method>
+		<method name="set_tessellation_angular_deflection">
+			<return type="void" />
+			<param index="0" name="deflection" type="float" />
+			<description>
+				Sets the angular deflection parameter for tessellation when write_tessellation is enabled.
+			</description>
+		</method>
+		<method name="set_tessellation_deviation">
+			<return type="void" />
+			<param index="0" name="deviation" type="float" />
+			<description>
+				Sets the deviation parameter for tessellation when write_tessellation is enabled.
+			</description>
+		</method>
+		<method name="set_validate_on_write">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to validate shapes before writing. Validation can catch geometry issues but adds processing time.
+			</description>
+		</method>
+		<method name="set_write_colors">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to include color information in exported STEP files. Requires AP214 or AP242 protocol for full support.
+			</description>
+		</method>
+		<method name="set_write_curve_colors">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to include curve color information in exported STEP files.
+			</description>
+		</method>
+		<method name="set_write_layers">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to include layer information in exported STEP files. Useful for organizing complex assemblies.
+			</description>
+		</method>
+		<method name="set_write_materials">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to include material information in exported STEP files. Requires AP214 or AP242 protocol.
+			</description>
+		</method>
+		<method name="set_write_names">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to include shape names in exported STEP files. Names help identify components in CAD systems.
+			</description>
+		</method>
+		<method name="set_write_precision_mode">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to use precision mode for geometric calculations. Precision mode provides more accurate geometry representation.
+			</description>
+		</method>
+		<method name="set_write_shape_names">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to write individual shape names to the STEP file.
+			</description>
+		</method>
+		<method name="set_write_surface_colors">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to include surface color information in exported STEP files.
+			</description>
+		</method>
+		<method name="set_write_tessellation">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Sets whether to include tessellation (mesh) information in exported STEP files. This can improve visualization performance.
+			</description>
+		</method>
+		<method name="validate_shape_for_step">
+			<return type="bool" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<description>
+				Validates whether a shape is suitable for STEP export. Returns true if the shape can be exported successfully.
+			</description>
+		</method>
+		<method name="write_assembly">
+			<return type="bool" />
+			<param index="0" name="assembly_structure" type="Dictionary" />
+			<param index="1" name="file_path" type="String" />
+			<description>
+				Writes a hierarchical assembly structure to a STEP file. The assembly_structure dictionary should contain shape arrays and positioning information.
+			</description>
+		</method>
+		<method name="write_shape">
+			<return type="bool" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="file_path" type="String" />
+			<description>
+				Writes a single shape to a STEP file. Returns true on success, false on failure. Check get_last_error() for error details.
+			</description>
+		</method>
+		<method name="write_shapes">
+			<return type="bool" />
+			<param index="0" name="shapes" type="Array" />
+			<param index="1" name="file_path" type="String" />
+			<description>
+				Writes multiple shapes to a single STEP file as a compound shape. All shapes are combined into one geometry entity.
+			</description>
+		</method>
+		<method name="write_shapes_with_colors">
+			<return type="bool" />
+			<param index="0" name="shapes" type="Array" />
+			<param index="1" name="colors" type="Array" />
+			<param index="2" name="file_path" type="String" />
+			<description>
+				Writes multiple shapes with associated colors to a STEP file. Colors array should contain Vector3 values (RGB 0-1).
+			</description>
+		</method>
+		<method name="write_shapes_with_layers">
+			<return type="bool" />
+			<param index="0" name="shapes" type="Array" />
+			<param index="1" name="layer_names" type="Array" />
+			<param index="2" name="file_path" type="String" />
+			<description>
+				Writes multiple shapes with associated layer names to a STEP file. Layer names help organize components in CAD systems.
+			</description>
+		</method>
+		<method name="write_shapes_with_materials">
+			<return type="bool" />
+			<param index="0" name="shapes" type="Array" />
+			<param index="1" name="materials" type="Array" />
+			<param index="2" name="file_path" type="String" />
+			<description>
+				Writes multiple shapes with associated material information to a STEP file. Materials array should contain Dictionary objects with material properties.
+			</description>
+		</method>
+		<method name="write_with_metadata">
+			<return type="bool" />
+			<param index="0" name="shape" type="ocgd_shape" />
+			<param index="1" name="file_path" type="String" />
+			<param index="2" name="metadata" type="Dictionary" />
+			<description>
+				Writes a shape with additional metadata to a STEP file. Metadata dictionary can contain description, authorization, and other header information.
+			</description>
+		</method>
+	</methods>
+</class>

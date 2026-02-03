@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="ocgd_iges_reader" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		A reader for importing IGES (.iges, .igs) CAD files using OpenCASCADE.
+	</brief_description>
+	<description>
+		The ocgd_iges_reader provides functionality to import IGES (Initial Graphics Exchange Specification) files into OpenCASCADE shape objects. IGES is a widely used CAD data exchange format that supports complex geometry, surfaces, and solid models. This reader supports loading assemblies, parts, colors, names, layer information, and various IGES entities with configurable precision settings.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="new_reader" qualifiers="static">
+			<return type="ocgd_iges_reader" />
+			<description>
+				Creates a new IGES reader instance with default settings.
+			</description>
+		</method>
+		<method name="load_file">
+			<return type="ocgd_shape" />
+			<param index="0" name="file_path" type="String" />
+			<description>
+				Loads an IGES file and returns the imported shape. Uses default import options.
+			</description>
+		</method>
+		<method name="load_file_with_options">
+			<return type="ocgd_shape" />
+			<param index="0" name="file_path" type="String" />
+			<param index="1" name="options" type="Dictionary" />
+			<description>
+				Loads an IGES file with custom import options. The options dictionary can contain keys like "precision", "units", and "fail_on_unknown_entity" to control the import process.
+			</description>
+		</method>
+		<method name="get_file_info">
+			<return type="Dictionary" />
+			<description>
+				Returns information about the reader and its current state, including transfer settings, precision, and any errors.
+			</description>
+		</method>
+		<method name="get_all_shapes">
+			<return type="Array" />
+			<description>
+				Returns an array of all shapes found in the last loaded file. Currently returns an empty array (implementation planned for future versions).
+			</description>
+		</method>
+		<method name="set_transfer_colors">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables the transfer of color information from IGES files during import.
+			</description>
+		</method>
+		<method name="get_transfer_colors">
+			<return type="bool" />
+			<description>
+				Returns true if color transfer is enabled.
+			</description>
+		</method>
+		<method name="set_transfer_names">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables the transfer of name/label information from IGES files during import.
+			</description>
+		</method>
+		<method name="get_transfer_names">
+			<return type="bool" />
+			<description>
+				Returns true if name transfer is enabled.
+			</description>
+		</method>
+		<method name="set_transfer_layers">
+			<return type="void" />
+			<param index="0" name="enable" type="bool" />
+			<description>
+				Enables or disables the transfer of layer information from IGES files during import.
+			</description>
+		</method>
+		<method name="get_transfer_layers">
+			<return type="bool" />
+			<description>
+				Returns true if layer transfer is enabled.
+			</description>
+		</method>
+		<method name="set_precision">
+			<return type="void" />
+			<param index="0" name="precision" type="float" />
+			<description>
+				Sets the precision value used during IGES import. Lower values result in higher precision but slower import times.
+			</description>
+		</method>
+		<method name="get_precision">
+			<return type="float" />
+			<description>
+				Returns the current precision setting for IGES import.
+			</description>
+		</method>
+		<method name="get_last_error">
+			<return type="String" />
+			<description>
+				Returns the last error message encountered during import operations.
+			</description>
+		</method>
+		<method name="has_error">
+			<return type="bool" />
+			<description>
+				Returns true if there was an error in the last operation.
+			</description>
+		</method>
+		<method name="clear_error">
+			<return type="void" />
+			<description>
+				Clears the current error state and message.
+			</description>
+		</method>
+		<method name="validate_file">
+			<return type="bool" />
+			<param index="0" name="file_path" type="String" />
+			<description>
+				Validates whether a file can be read as an IGES file without fully importing it. Returns true if the file appears to be a valid IGES file.
+			</description>
+		</method>
+		<method name="get_supported_extensions">
+			<return type="Array" />
+			<description>
+				Returns an array of supported file extensions for IGES files: ["iges", "igs"].
+			</description>
+		</method>
+		<method name="get_entity_count">
+			<return type="int" />
+			<description>
+				Returns the number of entities in the last loaded IGES file. Currently returns 0 (implementation planned for future versions).
+			</description>
+		</method>
+		<method name="get_file_statistics">
+			<return type="Dictionary" />
+			<description>
+				Returns statistical information about the last loaded IGES file, including entity count and transfer settings.
+			</description>
+		</method>
+		<method name="get_type">
+			<return type="String" />
+			<description>
+				Returns the class type name "ocgd_iges_reader".
+			</description>
+		</method>
+		<method name="is_null">
+			<return type="bool" />
+			<description>
+				Returns false (readers are never considered null).
+			</description>
+		</method>
+	</methods>
+	<members>
+	</members>
+	<signals>
+	</signals>
+	<constants>
+	</constants>
+</class>

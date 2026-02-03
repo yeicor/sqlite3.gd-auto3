@@ -1,0 +1,20 @@
+# Ignore generated source files
+/src/gen*
+
+# Build artifacts.
+/build/
+
+# IDEs
+/.idea/
+/.vscode/
+/compile_commands.json
+/.cache/
+
+# VCPKG
+/vcpkg_ports/*/.last_build
+
+# Godot auto generated files
+/demo/.godot/
+# Ignore library files but not the gdextension file
+demo/addons/build123d.gd/*
+!demo/addons/build123d.gd/build123d.gd.gdextension
