@@ -1,9 +1,12 @@
 MESSAGE(STATUS "Using toolchain file: ${CMAKE_TOOLCHAIN_FILE}")
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-project(build123d.gd CXX)
+project(sqlite3.gd CXX)
+
+# Option to build tests (disabled by default for vcpkg builds)
+option(BUILD_TESTING "Build the test suite" OFF)
 
 # Syntax-only mode for fast builds (only checks syntax, does not link or install)
 if(SYNTAX_ONLY)
@@ -65,7 +68,7 @@ else()
 endif()
 
 # Godot C++ bindings
-set(GODOTCPP_DISABLE_EXCEPTIONS OFF)  # OpenCASCADE requires exceptions
+set(GODOTCPP_DISABLE_EXCEPTIONS OFF)
 # FIXME: Godot tries to find cocoa for all apple platforms, open an issue in godot-cpp to fix this
 if (APPLE AND IOS)
     file(READ "${CMAKE_CURRENT_SOURCE_DIR}/godot-cpp/cmake/macos.cmake" MACOS_CMAKE_CONTENTS)
@@ -76,7 +79,7 @@ endif ()
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/godot-cpp")
 
 # Dependencies
-find_package(OpenCASCADE REQUIRED)
+find_package(unofficial-sqlite3 CONFIG REQUIRED)
 
 # Define the documentation sources (the godot-cpp cmake version does not work?)
 if(GODOTCPP_TARGET MATCHES "editor|template_debug")
@@ -100,8 +103,7 @@ file(GLOB_RECURSE SOURCES "src/*.cpp" "src/**/*.cpp")
 if(SYNTAX_ONLY)
     # Syntax-only mode: Compile sources as OBJECT library, do not link or install
     add_library(${PROJECT_NAME}_syntax_only OBJECT ${SOURCES} ${DOC_GEN_FILE})
-    target_include_directories(${PROJECT_NAME}_syntax_only PRIVATE ${OpenCASCADE_INCLUDE_DIRS})
-    target_link_libraries(${PROJECT_NAME}_syntax_only PRIVATE godot-cpp ${OpenCASCADE_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME}_syntax_only PRIVATE godot-cpp unofficial::sqlite3::sqlite3)
     target_compile_options(${PROJECT_NAME}_syntax_only PRIVATE
         $<$<CXX_COMPILER_ID:GNU,Clang>:-fsyntax-only>
         $<$<CXX_COMPILER_ID:MSVC>:/Zs>
@@ -109,8 +111,7 @@ if(SYNTAX_ONLY)
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/") # No-op installation
 else()
     add_library(${PROJECT_NAME} SHARED ${SOURCES} ${DOC_GEN_FILE})
-    target_include_directories(${PROJECT_NAME} PRIVATE ${OpenCASCADE_INCLUDE_DIRS})
-    target_link_libraries(${PROJECT_NAME} PRIVATE godot-cpp ${OpenCASCADE_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME} PRIVATE godot-cpp unofficial::sqlite3::sqlite3)
 
     # Install the complete bindings to the demo project with the correct suffix
     get_target_property(GODOTCPP_SUFFIX godot-cpp GODOTCPP_SUFFIX)
@@ -123,4 +124,9 @@ else()
     set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${OUTPUT_NAME}")
     install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION "${INSTALL_FOLDER}")
     # FIXME: Try harder to install to the proper directory on windows???
+endif()
+
+# Add tests subdirectory if testing is enabled
+if(BUILD_TESTING AND NOT SYNTAX_ONLY)
+    add_subdirectory(tests)
 endif()

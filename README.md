@@ -1,3 +1,3 @@
-# WIP: OpenCASCADE.gd
+# SQLite3.gd
 
-An attempt to integrate OpenCASCADE with Godot Engine using GDExtension.
+A Godot GDExtension for SQLite3 database integration.

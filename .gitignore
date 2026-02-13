@@ -12,9 +12,10 @@
 
 # VCPKG
 /vcpkg_ports/*/.last_build
+/vcpkg_installed/
 
 # Godot auto generated files
 /demo/.godot/
 # Ignore library files but not the gdextension file
-demo/addons/build123d.gd/*
-!demo/addons/build123d.gd/build123d.gd.gdextension
+demo/addons/sqlite3.gd/*
+!demo/addons/sqlite3.gd/sqlite3.gd.gdextension

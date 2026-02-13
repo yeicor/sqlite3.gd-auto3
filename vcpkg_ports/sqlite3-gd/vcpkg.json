@@ -1,0 +1,5 @@
+{
+  "name": "sqlite3-gd",
+  "version": "0.0.1",
+  "dependencies": ["sqlite3", "gtest"]
+}

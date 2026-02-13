@@ -41,11 +41,11 @@ jobs:
     runs-on: "${{ matrix.target.os }}"
     steps:
       - if: "matrix.target.os == 'ubuntu-24.04' || matrix.target.os == 'ubuntu-24.04-arm'"
-        run: |  # Free a bunch of disk space
+        run: | # Free a bunch of disk space
           sudo rm -rf /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
           sudo docker image prune --all --force
           sudo docker builder prune -a
-    
+
       - uses: "actions/checkout@v5"
         with:
           submodules: "recursive"
@@ -120,11 +120,11 @@ jobs:
           set -ex
           echo "$__GD_CMAKE_ARGS" >__GD_CMAKE_ARGS # Alternative way to pass the variable (required for windows)
           "$VCPKG_ROOT/bootstrap-vcpkg${{matrix.target.os == 'windows-2025' && '.bat' || '.sh'}}"
-          "$VCPKG_ROOT/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" remove build123d-gd --classic || true  # Avoid caching too much
-          "$VCPKG_ROOT/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" install build123d-gd --classic
+          "$VCPKG_ROOT/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" remove sqlite3-gd --classic || true  # Avoid caching too much
+          "$VCPKG_ROOT/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" install sqlite3-gd --classic
           # For some unknown reason, cmake + windows does not install the dll to the proper folder, do it here...
           if [ "${{ matrix.target.os }}" == "windows-2025" ]; then
-              cp "vcpkg/packages/build123d-gd_${{ matrix.target.vcpkg_triplet }}/${{ matrix.target-type == 'template_debug' && 'debug/' || '' }}bin"/*.dll "demo/addons/build123d.gd/"
+              cp "vcpkg/packages/sqlite3-gd_${{ matrix.target.vcpkg_triplet }}/${{ matrix.target-type == 'template_debug' && 'debug/' || '' }}bin"/*.dll "demo/addons/sqlite3.gd/"
           fi
         env:
           VCPKG_ROOT: "vcpkg"
@@ -140,8 +140,8 @@ jobs:
         run: "sccache --show-stats || true"
       - uses: "actions/upload-artifact@v5"
         with: # Build main artifact with only the addon files
-          name: "build123d.gd-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
-          path: "demo/addons/build123d.gd/**"
+          name: "sqlite3.gd-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
+          path: "demo/addons/sqlite3.gd/**"
       - uses: "actions/upload-artifact@v5"
         if: "always()"
         with: # Build artifact useful for caching
@@ -159,6 +159,6 @@ jobs:
     steps:
       - uses: "actions/upload-artifact/merge@v5"
         with:
-          name: "build123d.gd"
-          pattern: "build123d.gd-*"
+          name: "sqlite3.gd"
+          pattern: "sqlite3.gd-*"
           # delete-merged: true

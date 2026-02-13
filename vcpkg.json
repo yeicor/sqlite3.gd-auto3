@@ -1,13 +1,5 @@
 {
-  "name": "build123d-gd",
+  "name": "sqlite3-gd-auto3",
   "version": "0.0.1",
-  "dependencies": [
-    {
-      "name": "opencascade",
-      "features": [
-        "freetype",
-        "rapidjson"
-      ]
-    }
-  ]
+  "dependencies": ["sqlite3"]
 }
