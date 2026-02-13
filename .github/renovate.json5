@@ -15,6 +15,9 @@
       "* * * * 0,6"
     ]
   },
+  "git-submodules": {
+    "enabled": true
+  },
   "customManagers": [
     {
       "customType": "regex",
