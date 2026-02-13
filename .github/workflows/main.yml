@@ -119,9 +119,9 @@ jobs:
           | # HACK: Customize the vcpkg install of the main repo package with custom CMAKE_ARGS
           set -ex
           echo "$__GD_CMAKE_ARGS" >__GD_CMAKE_ARGS # Alternative way to pass the variable (required for windows)
-          "$VCPKG_ROOT/bootstrap-vcpkg${{matrix.target.os == 'windows-2025' && '.bat' || '.sh'}}"
-          "$VCPKG_ROOT/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" remove sqlite3-gd --classic || true  # Avoid caching too much
-          "$VCPKG_ROOT/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" install sqlite3-gd --classic
+          "vcpkg/bootstrap-vcpkg${{matrix.target.os == 'windows-2025' && '.bat' || '.sh'}}"
+          "vcpkg/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" remove sqlite3-gd --classic || true  # Avoid caching too much
+          "vcpkg/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" install sqlite3-gd --classic
         env:
           VCPKG_DISABLE_METRICS: "1"
           VCPKG_DEFAULT_TRIPLET: "${{ matrix.target.vcpkg_triplet }}"
