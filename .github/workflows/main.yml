@@ -177,9 +177,8 @@ jobs:
           submodules: "recursive"
       - uses: "actions/download-artifact@v7"
         with:
-          name: "sqlite3.gd"
           pattern: "sqlite3.gd-*"
-          # delete-merged: true
+          path: "demo/addons/sqlite3.gd"
       - if: "matrix.export_name == 'Android'"
         uses: "nttld/setup-ndk@v1"
         id: "setup-ndk"
