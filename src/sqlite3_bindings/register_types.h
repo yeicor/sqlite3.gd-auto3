@@ -8,9 +8,9 @@ using namespace godot;
 #include "SQLite3ResultSet.h"
 #include "SQLite3Backup.h"
 
-void sqlite3_initialize_module(ModuleInitializationLevel p_level);
+void sqlite3_gd_initialize_module(ModuleInitializationLevel p_level);
 
-void sqlite3_uninitialize_module(ModuleInitializationLevel p_level);
+void sqlite3_gd_uninitialize_module(ModuleInitializationLevel p_level);
 
 extern "C" {
     GDExtensionBool GDE_EXPORT sqlite3_gd_library_init(

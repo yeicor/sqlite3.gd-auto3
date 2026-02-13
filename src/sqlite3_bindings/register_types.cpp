@@ -13,7 +13,7 @@
 
 using namespace godot;
 
-void sqlite3_initialize_module(ModuleInitializationLevel p_level) {
+void sqlite3_gd_initialize_module(ModuleInitializationLevel p_level) {
     if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
         return;
     }
@@ -27,7 +27,7 @@ void sqlite3_initialize_module(ModuleInitializationLevel p_level) {
     GDREGISTER_CLASS(SQLite3Blob);
 }
 
-void sqlite3_uninitialize_module(ModuleInitializationLevel p_level) {
+void sqlite3_gd_uninitialize_module(ModuleInitializationLevel p_level) {
     if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
         return;
     }
@@ -44,8 +44,8 @@ extern "C" {
             p_get_proc_address, p_library, r_initialization
         );
 
-        init_obj.register_initializer(sqlite3_initialize_module);
-        init_obj.register_terminator(sqlite3_uninitialize_module);
+        init_obj.register_initializer(sqlite3_gd_initialize_module);
+        init_obj.register_terminator(sqlite3_gd_uninitialize_module);
         init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_SCENE);
 
         return init_obj.init();
