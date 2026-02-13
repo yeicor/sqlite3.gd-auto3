@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - "main"
+    tags:
+      - "v*"
   pull_request:
     branches:
       - "main"
@@ -217,3 +219,25 @@ jobs:
           name: "demo-exports"
           pattern: "export-*"
           # delete-merged: true
+      - uses: "actions/download-artifact@v7"
+        with:
+          name: "sqlite3.gd"
+          path: "demo/addons/sqlite3.gd"
+      - uses: "actions/upload-artifact@v6"
+        with: # This is the one to publish in the asset store (proper paths)
+          name: "sqlite3-addon"
+          path: "demo/addons"
+
+  release:
+    runs-on: ubuntu-latest
+    needs: merge
+    if: github.ref_type == 'tag'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: sqlite3-addon
+          path: addon
+      - run: zip -r sqlite3-addon.zip addon
+      - run: gh release upload ${{ github.ref_name }} sqlite3-addon.zip
