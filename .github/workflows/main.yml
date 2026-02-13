@@ -174,18 +174,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-24.04
-            export_name: "Linux/X11"
-          - os: ubuntu-24.04
-            export_name: "HTML5"
-          - os: ubuntu-24.04
-            export_name: "Android"
-          - os: windows-2025
-            export_name: "Windows Desktop"
-          - os: macos-15
-            export_name: "macOS"
-          - os: macos-15
-            export_name: "iOS"
+          - export_name: "Linux/X11"
+            os: ubuntu-24.04
+          - export_name: "HTML5"
+            os: ubuntu-24.04
+          - export_name: "Android"
+            os: ubuntu-24.04
+          - export_name: "Windows Desktop"
+            os: windows-2025
+          - export_name: "macOS"
+            os: macos-15
+          - export_name: "iOS"
+            os: macos-15
         mode: ["debug", "release"]
         export_name:
           ["Linux/X11", "HTML5", "Android", "Windows Desktop", "macOS", "iOS"]
@@ -216,7 +216,8 @@ jobs:
           godot --editor --path demo --quit  # Editor pass is sometimes required to run/export
           godot --path demo --quit  # Run the integration test and exit
           godot --export-${{ matrix.mode }} "${{ matrix.export_name }}" --path demo  # Export to the requested platform
+          echo "EXPORT_NAME=$(echo "${{ matrix.export_name }}" | tr '[:upper:]' '[:lower:]' | tr -d ' /')" >> $GITHUB_ENV
       - uses: "actions/upload-artifact@v5"
         with:
-          name: "export-${{ toLower(replace(replace(matrix.export_name, ' ', ''), '/', '')) }}-${{ matrix.mode }}"
+          name: "export-${{ env.EXPORT_NAME }}-${{ matrix.mode }}"
           path: "demo/export/**"
