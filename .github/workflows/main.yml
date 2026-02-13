@@ -220,14 +220,16 @@ jobs:
           ndk-version: "r23c"
       - if: "matrix.platform == 'Android'"
         run: 'echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV'
-      - uses: "michalmarchewczyk/setup-godot@v1"
+      - uses: chickensoft-games/setup-godot@v2
         with:
-          version: "4.6.0"
-          export-templates: true
-          export-templates-version: "4.6.0"
-      - run: "godot --editor --path demo --quit"
-      - run: "godot --path demo --quit"
-      - run: 'godot --export-${{ matrix.mode }} "${{ matrix.export_name }}" --path demo'
+          version: 4.6.0
+          use-dotnet: false
+          include-templates: true
+      - shell: bash
+        run: |
+          godot --editor --path demo --quit  # Editor pass is sometimes required to run/export
+          godot --path demo --quit  # Run the integration test and exit
+          godot --export-${{ matrix.mode }} "${{ matrix.export_name }}" --path demo  # Export to the requested platform
       - uses: "actions/upload-artifact@v5"
         with:
           name: "export-${{ matrix.platform }}-${{ matrix.mode }}"
