@@ -20,7 +20,9 @@ vcpkg_configure_cmake(
     MAYBE_UNUSED_VARIABLES GODOTCPP_PRECISION
 )
 
-vcpkg_build_cmake(TARGET sqlite3_gd_tests)
+if(NOT VCPKG_CROSSCOMPILING OR VCPKG_TARGET_TRIPLET MATCHES "wasm")
+    vcpkg_build_cmake(TARGET sqlite3_gd_tests)
+endif()
 
 vcpkg_build_cmake(TARGET install)
 
