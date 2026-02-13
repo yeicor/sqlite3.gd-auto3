@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SQLite3ResultSet" inherits="RefCounted" version="4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		SQLite3 result set iterator class.
+	</brief_description>
+	<description>
+		This class provides an iterator interface for SQLite3 query results, allowing sequential access to rows returned by a SELECT statement.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="next">
+			<return type="bool" />
+			<description>
+				Advances to the next row in the result set. Returns [code]true[/code] if a row is available, [code]false[/code] if no more rows.
+			</description>
+		</method>
+		<method name="current_row">
+			<return type="Dictionary" />
+			<description>
+				Returns the current row as a dictionary with column names as keys and values as variants.
+			</description>
+		</method>
+		<method name="column_names">
+			<return type="Array" />
+			<description>
+				Returns an array of strings containing the names of the columns in the result set.
+			</description>
+		</method>
+		<method name="column_count">
+			<return type="int" />
+			<description>
+				Returns the number of columns in the result set.
+			</description>
+		</method>
+		<method name="close">
+			<return type="void" />
+			<description>
+				Closes the result set and releases associated resources.
+			</description>
+		</method>
+	</methods>
+</class>

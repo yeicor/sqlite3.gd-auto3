@@ -1,0 +1,659 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SQLite3Database" inherits="RefCounted" version="4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		SQLite3 database wrapper class.
+	</brief_description>
+	<description>
+		This class wraps the sqlite3* database handle and provides methods for opening, closing, executing SQL, and managing database connections. It corresponds to the SQLite3 database API.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="open" qualifiers="static">
+			<return type="SQLite3Database" />
+			<argument index="0" name="filename" type="String" />
+			<argument index="1" name="flags" type="int" />
+			<argument index="2" name="vfs" type="String" />
+			<description>
+				Opens a new database connection. The database is created if it does not already exist. Returns a new SQLite3Database instance on success, or null on failure.
+			</description>
+		</method>
+		<method name="open_v2" qualifiers="static">
+			<return type="SQLite3Database" />
+			<argument index="0" name="filename" type="String" />
+			<argument index="1" name="flags" type="int" />
+			<argument index="2" name="vfs" type="String" />
+			<description>
+				Opens a new database connection with extended options. The flags parameter can be used to control the type of database access (e.g., read-only, read-write).
+			</description>
+		</method>
+		<method name="db_handle" qualifiers="static">
+			<return type="SQLite3Database" />
+			<argument index="0" name="stmt" type="SQLite3Statement" />
+			<description>
+				Returns the database handle associated with the given prepared statement.
+			</description>
+		</method>
+		<method name="close">
+			<return type="int" />
+			<description>
+				Closes the database connection. Returns SQLITE_OK on success, or an error code on failure.
+			</description>
+		</method>
+		<method name="close_v2">
+			<return type="int" />
+			<description>
+				Closes the database connection, allowing any pending operations to complete. Returns SQLITE_OK on success, or an error code on failure.
+			</description>
+		</method>
+		<method name="exec">
+			<return type="int" />
+			<argument index="0" name="sql" type="String" />
+			<description>
+				Executes one or more SQL statements. This is a simplified version without callback support. Returns [code]SQLITE_OK[/code] on success, or an error code on failure.
+			</description>
+		</method>
+		<method name="errcode">
+			<return type="int" />
+			<description>
+				Returns the numeric result code for the most recent failed API call associated with this database connection.
+			</description>
+		</method>
+		<method name="extended_errcode">
+			<return type="int" />
+			<description>
+				Returns the extended numeric result code for the most recent failed API call associated with this database connection.
+			</description>
+		</method>
+		<method name="errmsg">
+			<return type="String" />
+			<description>
+				Returns a string describing the error for the most recent failed API call associated with this database connection.
+			</description>
+		</method>
+		<method name="errmsg16">
+			<return type="String" />
+			<description>
+				Returns a UTF-16 string describing the error for the most recent failed API call associated with this database connection.
+			</description>
+		</method>
+		<method name="errstr">
+			<return type="String" />
+			<argument index="0" name="errcode" type="int" />
+			<description>
+				Returns a string describing the given error code.
+			</description>
+		</method>
+		<method name="error_offset">
+			<return type="int" />
+			<description>
+				Returns the byte offset into the SQL statement text where the error occurred, if applicable.
+			</description>
+		</method>
+		<method name="last_insert_rowid">
+			<return type="int" />
+			<description>
+				Returns the rowid of the most recent successful INSERT into a rowid table.
+			</description>
+		</method>
+		<method name="set_last_insert_rowid">
+			<return type="void" />
+			<argument index="0" name="rowid" type="int" />
+			<description>
+				Sets the value returned by [method last_insert_rowid].
+			</description>
+		</method>
+		<method name="changes">
+			<return type="int" />
+			<description>
+				Returns the number of rows modified, inserted, or deleted by the most recent INSERT, UPDATE, or DELETE statement.
+			</description>
+		</method>
+		<method name="changes64">
+			<return type="int" />
+			<description>
+				Returns the number of rows modified, inserted, or deleted by the most recent INSERT, UPDATE, or DELETE statement as a 64-bit integer.
+			</description>
+		</method>
+		<method name="total_changes">
+			<return type="int" />
+			<description>
+				Returns the total number of rows modified, inserted, or deleted since the database connection was opened.
+			</description>
+		</method>
+		<method name="total_changes64">
+			<return type="int" />
+			<description>
+				Returns the total number of rows modified, inserted, or deleted since the database connection was opened as a 64-bit integer.
+			</description>
+		</method>
+		<method name="interrupt">
+			<return type="void" />
+			<description>
+				Causes any pending database operation to abort and return at its earliest opportunity.
+			</description>
+		</method>
+		<method name="busy_timeout">
+			<return type="int" />
+			<argument index="0" name="ms" type="int" />
+			<description>
+				Sets a busy timeout for the database connection. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="setlk_timeout">
+			<return type="int" />
+			<argument index="0" name="ms" type="int" />
+			<argument index="1" name="flags" type="int" />
+			<description>
+				Sets a busy timeout with additional flags. This is a custom extension.
+			</description>
+		</method>
+		<method name="is_interrupted">
+			<return type="bool" />
+			<description>
+				Returns true if the database connection has been interrupted.
+			</description>
+		</method>
+		<method name="complete" qualifiers="static">
+			<return type="bool" />
+			<param index="0" name="sql" type="String" />
+			<description>
+				Returns true if the SQL string appears to be complete (not truncated in the middle of a statement).
+			</description>
+		</method>
+
+		<method name="prepare">
+			<return type="SQLite3Statement" />
+			<argument index="0" name="sql" type="String" />
+			<argument index="1" name="nByte" type="int" />
+			<description>
+				Compiles an SQL statement into a prepared statement object. Returns the prepared statement on success.
+			</description>
+		</method>
+		<method name="prepare_v2">
+			<return type="SQLite3Statement" />
+			<argument index="0" name="sql" type="String" />
+			<argument index="1" name="nByte" type="int" />
+			<description>
+				Compiles an SQL statement into a prepared statement object with improved error reporting. Returns the prepared statement on success.
+			</description>
+		</method>
+		<method name="prepare_v3">
+			<return type="SQLite3Statement" />
+			<argument index="0" name="sql" type="String" />
+			<argument index="1" name="nByte" type="int" />
+			<argument index="2" name="prepFlags" type="int" />
+			<description>
+				Compiles an SQL statement into a prepared statement object with additional flags. Returns the prepared statement on success.
+			</description>
+		</method>
+		<method name="get_table">
+			<return type="Array" />
+			<argument index="0" name="sql" type="String" />
+			<description>
+				Executes an SQL query and returns the result as an array of arrays. Each inner array represents a row.
+			</description>
+		</method>
+		<method name="query">
+			<return type="SQLite3ResultSet" />
+			<argument index="0" name="sql" type="String" />
+			<description>
+				Executes an SQL query and returns a result set for iteration.
+			</description>
+		</method>
+		<method name="backup_init">
+			<return type="SQLite3Backup" />
+			<argument index="0" name="zDestName" type="String" />
+			<argument index="1" name="destDb" type="SQLite3Database" />
+			<argument index="2" name="zSrcName" type="String" />
+			<description>
+				Initializes a backup operation from this database to another database. Returns a backup object on success.
+			</description>
+		</method>
+		<method name="db_config">
+			<return type="int" />
+			<argument index="0" name="op" type="int" />
+			<argument index="1" name="args" type="Variant" />
+			<description>
+				Configures various database options. The operation and arguments depend on the specific configuration.
+			</description>
+		</method>
+		<method name="get_autocommit">
+			<return type="bool" />
+			<description>
+				Returns true if the database is in autocommit mode.
+			</description>
+		</method>
+		<method name="db_name">
+			<return type="String" />
+			<argument index="0" name="N" type="int" />
+			<description>
+				Returns the name of the N-th database attached to the connection.
+			</description>
+		</method>
+		<method name="db_filename">
+			<return type="String" />
+			<argument index="0" name="zDbName" type="String" />
+			<description>
+				Returns the filename associated with a database.
+			</description>
+		</method>
+		<method name="db_readonly">
+			<return type="bool" />
+			<argument index="0" name="zDbName" type="String" />
+			<description>
+				Returns [code]true[/code] if the database is read-only.
+			</description>
+		</method>
+		<method name="txn_state">
+			<return type="int" />
+			<argument index="0" name="zSchema" type="String" />
+			<description>
+				Returns the current transaction state for the specified schema.
+			</description>
+		</method>
+		<method name="next_stmt">
+			<return type="SQLite3Statement" />
+			<argument index="0" name="pStmt" type="SQLite3Statement" />
+			<description>
+				Returns the next prepared statement associated with this database connection.
+			</description>
+		</method>
+		<method name="busy_handler">
+			<return type="int" />
+			<argument index="0" name="handler" type="Callable" />
+			<description>
+				Sets a busy handler callback. The callback is called when the database is busy, with the number of times it has been called. Return non-zero to continue waiting, zero to give up.
+			</description>
+		</method>
+		<method name="commit_hook">
+			<return type="void" />
+			<argument index="0" name="hook" type="Callable" />
+			<description>
+				Sets a commit hook callback. The callback is called before a commit. Return non-zero to rollback the transaction.
+			</description>
+		</method>
+		<method name="rollback_hook">
+			<return type="void" />
+			<argument index="0" name="hook" type="Callable" />
+			<description>
+				Sets a rollback hook callback. The callback is called when a transaction is rolled back.
+			</description>
+		</method>
+		<method name="update_hook">
+			<return type="void" />
+			<argument index="0" name="hook" type="Callable" />
+			<description>
+				Sets an update hook callback. The callback is called when a row is updated, inserted, or deleted. Parameters: type (1=delete, 2=insert, 3=update), db name, table name, rowid.
+			</description>
+		</method>
+		<method name="autovacuum_pages">
+			<return type="int" />
+			<argument index="0" name="callback" type="Callable" />
+			<description>
+				Sets a callback for autovacuum page decisions. The callback receives db name, nPage, nFree, rc and returns the number of pages to autovacuum.
+			</description>
+		</method>
+		<method name="enable_load_extension">
+			<return type="int" />
+			<argument index="0" name="onoff" type="int" />
+			<description>
+				Enables or disables the loading of SQLite extensions. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="load_extension">
+			<return type="int" />
+			<argument index="0" name="zFile" type="String" />
+			<argument index="1" name="zProc" type="String" />
+			<description>
+				Loads an SQLite extension from a shared library. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="declare_vtab">
+			<return type="int" />
+			<argument index="0" name="zSQL" type="String" />
+			<description>
+				Declares the schema of a virtual table. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="overload_function">
+			<return type="int" />
+			<argument index="0" name="zFuncName" type="String" />
+			<argument index="1" name="nArg" type="int" />
+			<description>
+				Overloads a function for use in virtual tables. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="blob_open">
+			<return type="SQLite3Blob" />
+			<argument index="0" name="zDb" type="String" />
+			<argument index="1" name="zTable" type="String" />
+			<argument index="2" name="zColumn" type="String" />
+			<argument index="3" name="iRow" type="int" />
+			<argument index="4" name="flags" type="int" />
+			<description>
+				Opens a blob for incremental I/O. Returns a blob handle on success.
+			</description>
+		</method>
+		<method name="file_control">
+			<return type="int" />
+			<argument index="0" name="zDbName" type="String" />
+			<argument index="1" name="op" type="int" />
+			<argument index="2" name="pArg" type="Variant" />
+			<description>
+				Invokes special operations on the database file. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="db_status">
+			<return type="Array" />
+			<argument index="0" name="op" type="int" />
+			<argument index="1" name="resetFlg" type="bool" />
+			<description>
+				Returns status information about the database. The array contains current and highwater values.
+			</description>
+		</method>
+		<method name="db_cacheflush">
+			<return type="int" />
+			<description>
+				Flushes the database cache. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="system_errno">
+			<return type="int" />
+			<description>
+				Returns the system errno value for the most recent I/O error.
+			</description>
+		</method>
+		<method name="serialize">
+			<return type="Array" />
+			<argument index="0" name="zSchema" type="String" />
+			<argument index="1" name="mFlags" type="int" />
+			<description>
+				Serializes the database into a byte array. Returns the serialized data.
+			</description>
+		</method>
+		<method name="deserialize">
+			<return type="int" />
+			<argument index="0" name="zSchema" type="String" />
+			<argument index="1" name="pData" type="PackedByteArray" />
+			<argument index="2" name="szDb" type="int" />
+			<argument index="3" name="szBuf" type="int" />
+			<argument index="4" name="mFlags" type="int" />
+			<description>
+				Deserializes a database from a byte array. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="limit">
+			<return type="int" />
+			<argument index="0" name="id" type="int" />
+			<argument index="1" name="newVal" type="int" />
+			<description>
+				Sets or queries runtime limits on the database connection. Returns the previous limit value.
+			</description>
+		</method>
+		<method name="table_column_metadata">
+			<return type="Dictionary" />
+			<argument index="0" name="zDbName" type="String" />
+			<argument index="1" name="zTableName" type="String" />
+			<argument index="2" name="zColumnName" type="String" />
+			<description>
+				Returns metadata about a column in a table. The dictionary contains information like data type, collation, etc.
+			</description>
+		</method>
+		<method name="db_release_memory">
+			<return type="int" />
+			<description>
+				Attempts to free as much heap memory as possible from the database connection. Returns the amount of memory freed.
+			</description>
+		</method>
+		<method name="soft_heap_limit64">
+			<return type="int" />
+			<argument index="0" name="N" type="int" />
+			<description>
+				Sets the soft heap limit for the database connection. Returns the previous limit.
+			</description>
+		</method>
+		<method name="wal_checkpoint">
+			<return type="int" />
+			<argument index="0" name="zDb" type="String" />
+			<description>
+				Runs a checkpoint operation on the WAL file. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="wal_checkpoint_v2">
+			<return type="Array" />
+			<argument index="0" name="zDb" type="String" />
+			<argument index="1" name="eMode" type="int" />
+			<description>
+				Runs a checkpoint operation with mode control. Returns an array with checkpoint statistics.
+			</description>
+		</method>
+	</methods>
+	<constants>
+		<constant name="SQLITE_OK" value="0">
+			Result code indicating success.
+		</constant>
+		<constant name="SQLITE_ERROR" value="1">
+			Result code indicating a generic error.
+		</constant>
+		<constant name="SQLITE_INTERNAL" value="2">
+			Result code indicating an internal SQLite error.
+		</constant>
+		<constant name="SQLITE_PERM" value="3">
+			Result code indicating access permission denied.
+		</constant>
+		<constant name="SQLITE_ABORT" value="4">
+			Result code indicating operation aborted.
+		</constant>
+		<constant name="SQLITE_BUSY" value="5">
+			Result code indicating database is busy.
+		</constant>
+		<constant name="SQLITE_LOCKED" value="6">
+			Result code indicating database is locked.
+		</constant>
+		<constant name="SQLITE_NOMEM" value="7">
+			Result code indicating out of memory.
+		</constant>
+		<constant name="SQLITE_READONLY" value="8">
+			Result code indicating attempt to write to a read-only database.
+		</constant>
+		<constant name="SQLITE_INTERRUPT" value="9">
+			Result code indicating operation interrupted.
+		</constant>
+		<constant name="SQLITE_IOERR" value="10">
+			Result code indicating I/O error.
+		</constant>
+		<constant name="SQLITE_CORRUPT" value="11">
+			Result code indicating database corruption.
+		</constant>
+		<constant name="SQLITE_NOTFOUND" value="12">
+			Result code indicating not found.
+		</constant>
+		<constant name="SQLITE_FULL" value="13">
+			Result code indicating database full.
+		</constant>
+		<constant name="SQLITE_CANTOPEN" value="14">
+			Result code indicating cannot open database.
+		</constant>
+		<constant name="SQLITE_PROTOCOL" value="15">
+			Result code indicating protocol error.
+		</constant>
+		<constant name="SQLITE_EMPTY" value="16">
+			Result code indicating database is empty.
+		</constant>
+		<constant name="SQLITE_SCHEMA" value="17">
+			Result code indicating schema changed.
+		</constant>
+		<constant name="SQLITE_TOOBIG" value="18">
+			Result code indicating string or blob too big.
+		</constant>
+		<constant name="SQLITE_CONSTRAINT" value="19">
+			Result code indicating constraint violation.
+		</constant>
+		<constant name="SQLITE_MISMATCH" value="20">
+			Result code indicating data type mismatch.
+		</constant>
+		<constant name="SQLITE_MISUSE" value="21">
+			Result code indicating library used incorrectly.
+		</constant>
+		<constant name="SQLITE_NOLFS" value="22">
+			Result code indicating no large file support.
+		</constant>
+		<constant name="SQLITE_AUTH" value="23">
+			Result code indicating authorization denied.
+		</constant>
+		<constant name="SQLITE_FORMAT" value="24">
+			Result code indicating auxiliary database format error.
+		</constant>
+		<constant name="SQLITE_RANGE" value="25">
+			Result code indicating bind parameter out of range.
+		</constant>
+		<constant name="SQLITE_NOTADB" value="26">
+			Result code indicating file is not a database.
+		</constant>
+		<constant name="SQLITE_NOTICE" value="27">
+			Result code for notices.
+		</constant>
+		<constant name="SQLITE_WARNING" value="28">
+			Result code for warnings.
+		</constant>
+		<constant name="SQLITE_ROW" value="100">
+			Result code indicating a row is ready.
+		</constant>
+		<constant name="SQLITE_DONE" value="101">
+			Result code indicating the statement has finished executing.
+		</constant>
+		<constant name="SQLITE_OPEN_READONLY" value="1">
+			Open flag for read-only access.
+		</constant>
+		<constant name="SQLITE_OPEN_READWRITE" value="2">
+			Open flag for read-write access.
+		</constant>
+		<constant name="SQLITE_OPEN_CREATE" value="4">
+			Open flag to create the database if it does not exist.
+		</constant>
+		<constant name="SQLITE_OPEN_DELETEONCLOSE" value="8">
+			Open flag to delete the database when closed.
+		</constant>
+		<constant name="SQLITE_OPEN_EXCLUSIVE" value="16">
+			Open flag for exclusive access.
+		</constant>
+		<constant name="SQLITE_OPEN_AUTOPROXY" value="32">
+			Open flag for automatic proxy.
+		</constant>
+		<constant name="SQLITE_OPEN_URI" value="64">
+			Open flag to allow URI filenames.
+		</constant>
+		<constant name="SQLITE_OPEN_MEMORY" value="128">
+			Open flag for in-memory database.
+		</constant>
+		<constant name="SQLITE_OPEN_MAIN_DB" value="256">
+			Open flag for main database.
+		</constant>
+		<constant name="SQLITE_OPEN_TEMP_DB" value="512">
+			Open flag for temporary database.
+		</constant>
+		<constant name="SQLITE_OPEN_TRANSIENT_DB" value="1024">
+			Open flag for transient database.
+		</constant>
+		<constant name="SQLITE_OPEN_MAIN_JOURNAL" value="2048">
+			Open flag for main journal.
+		</constant>
+		<constant name="SQLITE_OPEN_TEMP_JOURNAL" value="4096">
+			Open flag for temporary journal.
+		</constant>
+		<constant name="SQLITE_OPEN_SUBJOURNAL" value="8192">
+			Open flag for subjournal.
+		</constant>
+		<constant name="SQLITE_OPEN_MASTER_JOURNAL" value="16384">
+			Open flag for master journal.
+		</constant>
+		<constant name="SQLITE_OPEN_NOMUTEX" value="32768">
+			Open flag for no mutex.
+		</constant>
+		<constant name="SQLITE_OPEN_FULLMUTEX" value="65536">
+			Open flag for full mutex.
+		</constant>
+		<constant name="SQLITE_OPEN_SHAREDCACHE" value="131072">
+			Open flag for shared cache.
+		</constant>
+		<constant name="SQLITE_OPEN_PRIVATECACHE" value="262144">
+			Open flag for private cache.
+		</constant>
+		<constant name="SQLITE_OPEN_WAL" value="524288">
+			Open flag for WAL mode.
+		</constant>
+		<constant name="SQLITE_OPEN_NOFOLLOW" value="16777216">
+			Open flag to not follow symlinks.
+		</constant>
+		<constant name="SQLITE_INTEGER" value="1">
+			Data type for integer values.
+		</constant>
+		<constant name="SQLITE_FLOAT" value="2">
+			Data type for floating-point values.
+		</constant>
+		<constant name="SQLITE_TEXT" value="3">
+			Data type for text values.
+		</constant>
+		<constant name="SQLITE_BLOB" value="4">
+			Data type for blob values.
+		</constant>
+		<constant name="SQLITE_NULL" value="5">
+			Data type for null values.
+		</constant>
+		<constant name="SQLITE_TRANSIENT" value="-1">
+			Flag for transient data.
+		</constant>
+		<constant name="SQLITE_STATIC" value="0">
+			Flag for static data.
+		</constant>
+		<constant name="SQLITE_UTF8" value="1">
+			Encoding for UTF-8.
+		</constant>
+		<constant name="SQLITE_UTF16" value="2">
+			Encoding for UTF-16.
+		</constant>
+		<constant name="SQLITE_UTF16BE" value="3">
+			Encoding for UTF-16 big-endian.
+		</constant>
+		<constant name="SQLITE_UTF16LE" value="4">
+			Encoding for UTF-16 little-endian.
+		</constant>
+		<constant name="SQLITE_LIMIT_LENGTH" value="0">
+			Limit on the size of a string or BLOB.
+		</constant>
+		<constant name="SQLITE_LIMIT_SQL_LENGTH" value="1">
+			Limit on the size of an SQL statement.
+		</constant>
+		<constant name="SQLITE_LIMIT_COLUMN" value="2">
+			Limit on the number of columns in a table.
+		</constant>
+		<constant name="SQLITE_LIMIT_EXPR_DEPTH" value="3">
+			Limit on the depth of the parse tree.
+		</constant>
+		<constant name="SQLITE_LIMIT_COMPOUND_SELECT" value="4">
+			Limit on the number of terms in a compound SELECT statement.
+		</constant>
+		<constant name="SQLITE_LIMIT_VDBE_OP" value="5">
+			Limit on the number of instructions in a virtual machine program.
+		</constant>
+		<constant name="SQLITE_LIMIT_FUNCTION_ARG" value="6">
+			Limit on the number of arguments to a function.
+		</constant>
+		<constant name="SQLITE_LIMIT_ATTACHED" value="7">
+			Limit on the number of attached databases.
+		</constant>
+		<constant name="SQLITE_LIMIT_LIKE_PATTERN_LENGTH" value="8">
+			Limit on the length of the pattern in a LIKE or GLOB operator.
+		</constant>
+		<constant name="SQLITE_LIMIT_VARIABLE_NUMBER" value="9">
+			Limit on the number of parameters in an SQL statement.
+		</constant>
+		<constant name="SQLITE_LIMIT_TRIGGER_DEPTH" value="10">
+			Limit on the depth of recursion for triggers.
+		</constant>
+		<constant name="SQLITE_LIMIT_WORKER_THREADS" value="11">
+			Limit on the number of auxiliary worker threads.
+		</constant>
+	</constants>
+</class>

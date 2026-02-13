@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SQLite3Backup" inherits="RefCounted" version="4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		SQLite3 backup operation wrapper class.
+	</brief_description>
+	<description>
+		This class wraps the sqlite3_backup* handle and provides methods for performing database backup operations from one database to another.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="step">
+			<return type="int" />
+			<argument index="0" name="nPage" type="int" />
+			<description>
+				Copies up to nPage pages from the source database to the destination. Returns [code]SQLITE_OK[/code] if finished, [code]SQLITE_DONE[/code] if more work needed, or an error code.
+			</description>
+		</method>
+		<method name="remaining">
+			<return type="int" />
+			<description>
+				Returns the number of pages still to be backed up.
+			</description>
+		</method>
+		<method name="pagecount">
+			<return type="int" />
+			<description>
+				Returns the total number of pages in the source database.
+			</description>
+		</method>
+		<method name="finish">
+			<return type="int" />
+			<description>
+				Completes the backup operation and releases resources. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+	</methods>
+</class>

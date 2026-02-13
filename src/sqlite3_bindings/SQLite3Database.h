@@ -42,6 +42,13 @@ private:
     sqlite3* _db;
 
 public:
+    Callable _busy_handler;
+    Callable _commit_hook;
+    Callable _rollback_hook;
+    Callable _update_hook;
+    Callable _autovacuum_callback;
+
+public:
     // Constructors
     SQLite3Database();
     SQLite3Database(sqlite3* db);

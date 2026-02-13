@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SQLite3Statement" inherits="RefCounted" version="4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		SQLite3 prepared statement wrapper class.
+	</brief_description>
+	<description>
+		This class wraps the sqlite3_stmt* handle and provides methods for binding parameters, executing statements, and retrieving results. It corresponds to the SQLite3 prepared statement API.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="sql">
+			<return type="String" />
+			<description>
+				Returns the original SQL text used to prepare the statement.
+			</description>
+		</method>
+		<method name="expanded_sql">
+			<return type="String" />
+			<description>
+				Returns the SQL text with bound parameters expanded.
+			</description>
+		</method>
+		<method name="readonly">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the statement makes no direct changes to the database.
+			</description>
+		</method>
+		<method name="isexplain">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the statement is an EXPLAIN or EXPLAIN QUERY PLAN statement.
+			</description>
+		</method>
+		<method name="explain">
+			<return type="int" />
+			<argument index="0" name="eMode" type="int" />
+			<description>
+				Sets the EXPLAIN mode for the statement. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="busy">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the statement is currently executing.
+			</description>
+		</method>
+		<method name="bind_blob">
+			<return type="int" />
+			<argument index="0" name="index" type="int" />
+			<argument index="1" name="value" type="PackedByteArray" />
+			<argument index="2" name="transient" type="bool" />
+			<description>
+				Binds a blob value to a parameter. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="bind_blob64">
+			<return type="int" />
+			<argument index="0" name="index" type="int" />
+			<argument index="1" name="value" type="PackedByteArray" />
+			<argument index="2" name="transient" type="bool" />
+			<description>
+				Binds a large blob value to a parameter. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="bind_double">
+			<return type="int" />
+			<argument index="0" name="index" type="int" />
+			<argument index="1" name="value" type="float" />
+			<description>
+				Binds a double value to a parameter. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="bind_int">
+			<return type="int" />
+			<argument index="0" name="index" type="int" />
+			<argument index="1" name="value" type="int" />
+			<description>
+				Binds an integer value to a parameter. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="bind_int64">
+			<return type="int" />
+			<argument index="0" name="index" type="int" />
+			<argument index="1" name="value" type="int" />
+			<description>
+				Binds a 64-bit integer value to a parameter. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="bind_null">
+			<return type="int" />
+			<argument index="0" name="index" type="int" />
+			<description>
+				Binds a NULL value to a parameter. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="bind_text">
+			<return type="int" />
+			<argument index="0" name="index" type="int" />
+			<argument index="1" name="value" type="String" />
+			<argument index="2" name="transient" type="bool" />
+			<description>
+				Binds a text value to a parameter. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="bind_text16">
+			<return type="int" />
+			<argument index="0" name="index" type="int" />
+			<argument index="1" name="value" type="String" />
+			<argument index="2" name="transient" type="bool" />
+			<description>
+				Binds a UTF-16 text value to a parameter. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="bind_text64">
+			<return type="int" />
+			<argument index="0" name="index" type="int" />
+			<argument index="1" name="value" type="String" />
+			<argument index="2" name="transient" type="bool" />
+			<argument index="3" name="encoding" type="int" />
+			<description>
+				Binds a text value with encoding specification. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="bind_value">
+			<return type="int" />
+			<argument index="0" name="index" type="int" />
+			<argument index="1" name="value" type="Variant" />
+			<description>
+				Binds a variant value to a parameter, automatically choosing the appropriate type. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="bind_zeroblob">
+			<return type="int" />
+			<argument index="0" name="index" type="int" />
+			<argument index="1" name="n" type="int" />
+			<description>
+				Binds a zero-filled blob of the specified length. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="bind_zeroblob64">
+			<return type="int" />
+			<argument index="0" name="index" type="int" />
+			<argument index="1" name="n" type="int" />
+			<description>
+				Binds a large zero-filled blob of the specified length. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="bind_parameter_count">
+			<return type="int" />
+			<description>
+				Returns the number of parameters in the prepared statement.
+			</description>
+		</method>
+		<method name="bind_parameter_name">
+			<return type="String" />
+			<argument index="0" name="index" type="int" />
+			<description>
+				Returns the name of the parameter at the given index.
+			</description>
+		</method>
+		<method name="bind_parameter_index">
+			<return type="int" />
+			<argument index="0" name="name" type="String" />
+			<description>
+				Returns the index of the parameter with the given name.
+			</description>
+		</method>
+		<method name="clear_bindings">
+			<return type="int" />
+			<description>
+				Clears all parameter bindings. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="step">
+			<return type="int" />
+			<description>
+				Evaluates the prepared statement. Returns [code]SQLITE_ROW[/code] if there is another row, [code]SQLITE_DONE[/code] if finished, or an error code.
+			</description>
+		</method>
+		<method name="data_count">
+			<return type="int" />
+			<description>
+				Returns the number of columns in the result set.
+			</description>
+		</method>
+		<method name="finalize">
+			<return type="int" />
+			<description>
+				Destroys the prepared statement. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="reset">
+			<return type="int" />
+			<description>
+				Resets the prepared statement to its initial state. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="column_blob">
+			<return type="PackedByteArray" />
+			<argument index="0" name="iCol" type="int" />
+			<description>
+				Returns the blob value of the specified column.
+			</description>
+		</method>
+		<method name="column_double">
+			<return type="float" />
+			<argument index="0" name="iCol" type="int" />
+			<description>
+				Returns the double value of the specified column.
+			</description>
+		</method>
+		<method name="column_int">
+			<return type="int" />
+			<argument index="0" name="iCol" type="int" />
+			<description>
+				Returns the integer value of the specified column.
+			</description>
+		</method>
+		<method name="column_int64">
+			<return type="int" />
+			<argument index="0" name="iCol" type="int" />
+			<description>
+				Returns the 64-bit integer value of the specified column.
+			</description>
+		</method>
+		<method name="column_text">
+			<return type="String" />
+			<argument index="0" name="iCol" type="int" />
+			<description>
+				Returns the text value of the specified column.
+			</description>
+		</method>
+		<method name="column_text16">
+			<return type="String" />
+			<argument index="0" name="iCol" type="int" />
+			<description>
+				Returns the UTF-16 text value of the specified column.
+			</description>
+		</method>
+		<method name="column_value">
+			<return type="Variant" />
+			<argument index="0" name="iCol" type="int" />
+			<description>
+				Returns the value of the specified column as a variant.
+			</description>
+		</method>
+		<method name="column_bytes">
+			<return type="int" />
+			<argument index="0" name="iCol" type="int" />
+			<description>
+				Returns the size in bytes of the specified column's value.
+			</description>
+		</method>
+		<method name="column_bytes16">
+			<return type="int" />
+			<argument index="0" name="iCol" type="int" />
+			<description>
+				Returns the size in bytes of the specified column's UTF-16 value.
+			</description>
+		</method>
+		<method name="column_type">
+			<return type="int" />
+			<argument index="0" name="iCol" type="int" />
+			<description>
+				Returns the data type of the specified column.
+			</description>
+		</method>
+		<method name="column_count">
+			<return type="int" />
+			<description>
+				Returns the number of columns in the result set.
+			</description>
+		</method>
+		<method name="column_name">
+			<return type="String" />
+			<argument index="0" name="N" type="int" />
+			<description>
+				Returns the name of the specified column.
+			</description>
+		</method>
+		<method name="column_name16">
+			<return type="String" />
+			<argument index="0" name="N" type="int" />
+			<description>
+				Returns the UTF-16 name of the specified column.
+			</description>
+		</method>
+		<method name="column_database_name">
+			<return type="String" />
+			<argument index="0" name="N" type="int" />
+			<description>
+				Returns the database name for the specified column.
+			</description>
+		</method>
+		<method name="column_database_name16">
+			<return type="String" />
+			<argument index="0" name="N" type="int" />
+			<description>
+				Returns the UTF-16 database name for the specified column.
+			</description>
+		</method>
+		<method name="column_table_name">
+			<return type="String" />
+			<argument index="0" name="N" type="int" />
+			<description>
+				Returns the table name for the specified column.
+			</description>
+		</method>
+		<method name="column_table_name16">
+			<return type="String" />
+			<argument index="0" name="N" type="int" />
+			<description>
+				Returns the UTF-16 table name for the specified column.
+			</description>
+		</method>
+		<method name="column_origin_name">
+			<return type="String" />
+			<argument index="0" name="N" type="int" />
+			<description>
+				Returns the origin name for the specified column.
+			</description>
+		</method>
+		<method name="column_origin_name16">
+			<return type="String" />
+			<argument index="0" name="N" type="int" />
+			<description>
+				Returns the UTF-16 origin name for the specified column.
+			</description>
+		</method>
+		<method name="column_decltype">
+			<return type="String" />
+			<argument index="0" name="N" type="int" />
+			<description>
+				Returns the declared type for the specified column.
+			</description>
+		</method>
+		<method name="column_decltype16">
+			<return type="String" />
+			<argument index="0" name="N" type="int" />
+			<description>
+				Returns the UTF-16 declared type for the specified column.
+			</description>
+		</method>
+		<method name="stmt_status">
+			<return type="int" />
+			<argument index="0" name="op" type="int" />
+			<argument index="1" name="reset" type="bool" />
+			<description>
+				Returns status information about the prepared statement.
+			</description>
+		</method>
+	</methods>
+</class>

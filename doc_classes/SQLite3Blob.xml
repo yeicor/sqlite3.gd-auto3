@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SQLite3Blob" inherits="RefCounted" version="4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		SQLite3 blob handle wrapper class.
+	</brief_description>
+	<description>
+		This class wraps the sqlite3_blob* handle and provides methods for incremental reading and writing of large binary objects (BLOBs) in the database.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="reopen">
+			<return type="int" />
+			<argument index="0" name="iRow" type="int" />
+			<description>
+				Moves the blob handle to a different row of the same table. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="read">
+			<return type="PackedByteArray" />
+			<argument index="0" name="n" type="int" />
+			<argument index="1" name="offset" type="int" />
+			<description>
+				Reads up to n bytes from the blob starting at the specified offset. Returns the data as a byte array.
+			</description>
+		</method>
+		<method name="write">
+			<return type="int" />
+			<argument index="0" name="buffer" type="PackedByteArray" />
+			<argument index="1" name="offset" type="int" />
+			<description>
+				Writes the contents of the buffer to the blob starting at the specified offset. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+		<method name="bytes">
+			<return type="int" />
+			<description>
+				Returns the size of the blob in bytes.
+			</description>
+		</method>
+		<method name="close">
+			<return type="int" />
+			<description>
+				Closes the blob handle. Returns [code]SQLITE_OK[/code] on success.
+			</description>
+		</method>
+	</methods>
+</class>
