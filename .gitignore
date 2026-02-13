@@ -19,4 +19,4 @@
 # Ignore library files but not the gdextension file
 /demo/addons/sqlite3.gd/*
 !/demo/addons/sqlite3.gd/sqlite3.gd.gdextension
-/demo/export
+/demo/exports

@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - "main"
+    tags:
+      - "v*"
   pull_request:
     branches:
       - "main"
@@ -153,23 +155,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - export_name: "Linux/X11"
-            os: ubuntu-24.04
-          - export_name: "HTML5"
-            os: ubuntu-24.04
-          - export_name: "Android"
-            os: ubuntu-24.04
-          - export_name: "Windows Desktop"
-            os: windows-2025
-          - export_name: "macOS"
-            os: macos-15
-          - export_name: "iOS"
-            os: macos-15
         mode: ["debug", "release"]
         export_name:
-          ["Linux/X11", "HTML5", "Android", "Windows Desktop", "macOS", "iOS"]
-    runs-on: "${{ matrix.os }}"
+          ["Linux", "HTML5", "Android", "Windows Desktop", "macOS", "iOS"]
+    runs-on: "ubuntu-24.04"
     needs: "build"
     steps:
       - uses: "actions/checkout@v5"
@@ -193,34 +182,39 @@ jobs:
           include-templates: true
       - shell: bash
         run: |
-          godot --editor --path demo --quit  # Editor pass is sometimes required to run/export
-          godot --path demo --quit  # Run the integration test and exit
+          mkdir exports
+          godot --editor --path demo --quit --headless  # Editor pass is sometimes required to run/export
+          godot --path demo --quit --headless  # Run the integration test and exit
           godot --export-${{ matrix.mode }} "${{ matrix.export_name }}" --path demo  # Export to the requested platform
           echo "EXPORT_NAME=$(echo "${{ matrix.export_name }}" | tr '[:upper:]' '[:lower:]' | tr -d ' /')" >> $GITHUB_ENV
       - uses: "actions/upload-artifact@v6"
         with:
-          name: "export-${{ env.EXPORT_NAME }}-${{ matrix.mode }}"
-          path: "demo/export/**"
+          name: "demo-export-${{ env.EXPORT_NAME }}-${{ matrix.mode }}"
+          path: "demo/exports/**"
 
-  merge:
+  export_addon:
     runs-on: "ubuntu-24.04"
     needs: ["build", "test_and_export_demo"]
     steps:
-      - uses: "actions/upload-artifact/merge@v5"
-        with:
-          name: "sqlite3.gd"
-          pattern: "sqlite3.gd-*"
-          # delete-merged: true
-      - uses: "actions/upload-artifact/merge@v5"
-        with:
-          name: "demo-exports"
-          pattern: "export-*"
-          # delete-merged: true
       - uses: "actions/download-artifact@v7"
         with:
-          name: "sqlite3.gd"
+          pattern: "sqlite3.gd-*"
           path: "demo/addons/sqlite3.gd"
       - uses: "actions/upload-artifact@v6"
         with: # This is the one to publish in the asset store (proper paths)
-          name: "sqlite3-addon"
+          name: "addon"
           path: "demo/addons"
+
+  release:
+    runs-on: ubuntu-latest
+    needs: merge
+    if: github.ref_type == 'tag'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: addon
+          path: .
+      - run: zip -r addon.zip addons
+      - run: gh release upload ${{ github.ref_name }} addon.zip
