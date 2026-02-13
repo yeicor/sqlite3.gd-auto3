@@ -35,7 +35,7 @@ jobs:
             { vcpkg_triplet: "arm64-ios", os: "macos-15" },
           ]
         # Note: vcpkg forces building both Debug and Release on a single run. This is not the same as the templates!
-        target-type: ["template_debug"] # , "template_release"
+        target-type: ["template_debug", "template_release"]
         float-precision: ["single"] # TODO: , "double"
 
     runs-on: "${{ matrix.target.os }}"
@@ -138,6 +138,10 @@ jobs:
           name: "sqlite3.gd-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
           path: "demo/addons/sqlite3.gd/**"
       - uses: "actions/upload-artifact@v5"
+        with: # Build demo artifact with the full demo for each platform
+          name: "demo-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
+          path: "demo/**"
+      - uses: "actions/upload-artifact@v5"
         if: "always()"
         with: # Build artifact useful for caching
           name: "vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
@@ -148,22 +152,7 @@ jobs:
           name: "vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
           path: "vcpkg/buildtrees/\ncpkg/packages/"
       # </Cache save and export artifacts>
-  integration_test:
-    runs-on: "ubuntu-24.04"
-    needs: "build"
-    steps:
-      - uses: "actions/checkout@v5"
-        with:
-          submodules: "recursive"
-      - uses: actions/download-artifact@v4
-        with:
-          name: "sqlite3.gd-x64-linux-template_debug-single"
-          path: "demo/addons/sqlite3.gd"
-      - run: |
-          wget -q "https://godot-releases.nbg1.your-objectstorage.com/4.6-stable/Godot_v4.6-stable_linux.x86_64.zip"
-          unzip -q Godot_v4.6-stable_linux.x86_64.zip
-          chmod +x Godot_v4.6-stable_linux.x86_64
-          ./Godot_v4.6-stable_linux.x86_64 --path demo --quit
+
   merge:
     runs-on: "ubuntu-24.04"
     needs: "build"
@@ -184,3 +173,62 @@ jobs:
         with:
           name: sqlite3.gd-releaseonly
           path: release/
+  export_demo:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            platform: Linux
+            triplet: x64-linux
+            export_name: "Linux/X11"
+          - os: ubuntu-24.04
+            platform: Web
+            triplet: wasm32-emscripten-pic
+            export_name: "HTML5"
+          - os: ubuntu-24.04
+            platform: Android
+            triplet: x64-android
+            export_name: "Android"
+          - os: windows-2025
+            platform: "Windows Desktop"
+            triplet: x64-windows-static
+            export_name: "Windows Desktop"
+          - os: macos-15
+            platform: macOS
+            triplet: x64-osx
+            export_name: "macOS"
+          - os: macos-15
+            platform: iOS
+            triplet: arm64-ios
+            export_name: "iOS"
+        mode: ["debug", "release"]
+    runs-on: "${{ matrix.os }}"
+    needs: "build"
+    steps:
+      - uses: "actions/checkout@v5"
+        with:
+          submodules: "recursive"
+      - uses: actions/download-artifact@v4
+        with:
+          name: "demo-${{ matrix.triplet }}-template_debug-single"
+          path: "demo"
+      - if: "matrix.platform == 'Android'"
+        uses: "nttld/setup-ndk@v1"
+        id: "setup-ndk"
+        with:
+          ndk-version: "r23c"
+      - if: "matrix.platform == 'Android'"
+        run: 'echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV'
+      - uses: "michalmarchewczyk/setup-godot@v1"
+        with:
+          version: "4.6.0"
+          export-templates: true
+          export-templates-version: "4.6.0"
+      - run: "godot --editor --path demo --quit"
+      - run: "godot --path demo --quit"
+      - run: 'godot --export-${{ matrix.mode }} "${{ matrix.export_name }}" --path demo'
+      - uses: "actions/upload-artifact@v5"
+        with:
+          name: "export-${{ matrix.platform }}-${{ matrix.mode }}"
+          path: "demo/export/**"
