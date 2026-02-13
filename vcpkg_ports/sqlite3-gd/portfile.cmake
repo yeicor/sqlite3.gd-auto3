@@ -24,17 +24,19 @@ vcpkg_build_cmake(TARGET sqlite3_gd_tests)
 
 vcpkg_build_cmake(TARGET install)
 
-vcpkg_execute_required_process(
-    COMMAND ctest --output-on-failure
-    WORKING_DIRECTORY "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-dbg"
-    LOGNAME test-dbg
-)
+if(NOT VCPKG_CROSSCOMPILING)
+    vcpkg_execute_required_process(
+        COMMAND ctest --output-on-failure
+        WORKING_DIRECTORY "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-dbg"
+        LOGNAME test-dbg
+    )
 
-vcpkg_execute_required_process(
-    COMMAND ctest --output-on-failure
-    WORKING_DIRECTORY "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel"
-    LOGNAME test-rel
-)
+    vcpkg_execute_required_process(
+        COMMAND ctest --output-on-failure
+        WORKING_DIRECTORY "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel"
+        LOGNAME test-rel
+    )
+endif()
 
 set(VCPKG_POLICY_EMPTY_INCLUDE_FOLDER enabled)
 vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/LICENSE")

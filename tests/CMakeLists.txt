@@ -9,6 +9,11 @@ if(NOT BUILD_TESTING)
     return()
 endif()
 
+# Skip tests when cross-compiling, as the test binary cannot run on the host
+if(CMAKE_CROSSCOMPILING)
+    return()
+endif()
+
 # Find GTest
 find_package(GTest CONFIG REQUIRED)
 
@@ -33,6 +38,7 @@ target_include_directories(sqlite3_gd_tests PRIVATE
 target_link_libraries(sqlite3_gd_tests PRIVATE
     ${PROJECT_NAME}
     godot-cpp
+    unofficial::sqlite3::sqlite3
     GTest::gtest_main
 )
 
