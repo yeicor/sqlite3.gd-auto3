@@ -157,3 +157,14 @@ jobs:
           name: "sqlite3.gd"
           pattern: "sqlite3.gd-*"
           # delete-merged: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: sqlite3.gd
+          path: merged
+      - run: |
+          mkdir release
+          find merged -name "*.template_release.release*" -o -name "sqlite3.gd.gdextension" -exec cp {} release/ \;
+      - uses: actions/upload-artifact@v5
+        with:
+          name: sqlite3.gd-releaseonly
+          path: release/

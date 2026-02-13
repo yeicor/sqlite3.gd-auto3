@@ -15,6 +15,7 @@
  */
 
 #include <godot_cpp/classes/object.hpp>
+#include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/variant/string.hpp>
 #include <godot_cpp/variant/packed_byte_array.hpp>
 
@@ -36,83 +37,83 @@ protected:
 
 public:
     // Library version functions
-    static int libversion_number();
-    static String libversion();
-    static String sourceid();
+    static GDE_EXPORT int libversion_number();
+    static GDE_EXPORT String libversion();
+    static GDE_EXPORT String sourceid();
 
     // Initialization and shutdown
-    static int initialize();
-    static int shutdown();
-    static int os_init();
-    static int os_end();
+    static GDE_EXPORT int initialize();
+    static GDE_EXPORT int shutdown();
+    static GDE_EXPORT int os_init();
+    static GDE_EXPORT int os_end();
 
     // Configuration
-    static int config(int op, Variant args = Variant());  // Simplified, varargs hard
+    static GDE_EXPORT int config(int op, Variant args = Variant());  // Simplified, varargs hard
 
     // Memory management
-    static void *malloc(int size);
-    static void *malloc64(uint64_t size);
-    static void *realloc(void *ptr, int size);
-    static void *realloc64(void *ptr, uint64_t size);
-    static void free_ptr(void *ptr);
-    static int64_t msize(void *ptr);
-    static int64_t memory_used();
-    static int64_t memory_highwater(bool reset);
+    static GDE_EXPORT void *malloc(int size);
+    static GDE_EXPORT void *malloc64(uint64_t size);
+    static GDE_EXPORT void *realloc(void *ptr, int size);
+    static GDE_EXPORT void *realloc64(void *ptr, uint64_t size);
+    static GDE_EXPORT void free_ptr(void *ptr);
+    static GDE_EXPORT int64_t msize(void *ptr);
+    static GDE_EXPORT int64_t memory_used();
+    static GDE_EXPORT int64_t memory_highwater(bool reset);
 
     // Status
-    static Array status(int op, bool reset = false);
-    static Array status64(int op, bool reset = false);
+    static GDE_EXPORT Array status(int op, bool reset = false);
+    static GDE_EXPORT Array status64(int op, bool reset = false);
 
     // Randomness
-    static void randomness(int N, PackedByteArray &buffer);
+    static GDE_EXPORT void randomness(int N, PackedByteArray &buffer);
 
     // String formatting
-    static String mprintf(const String &format);  // Simplified
+    static GDE_EXPORT String mprintf(const String &format);  // Simplified
 
     // Error strings
-    static String errstr(int errcode);
+    static GDE_EXPORT String errstr(int errcode);
 
     // Threading
-    static int threadsafe();
+    static GDE_EXPORT int threadsafe();
 
     // Status
-    static int status(int op, int &current, int &highwater, bool reset = false);
+    static GDE_EXPORT int status(int op, int &current, int &highwater, bool reset = false);
 
     // Keyword functions
-    static int keyword_count();
-    static bool keyword_name(int index, String &name, int &length);
-    static bool keyword_check(const String &name, int length = -1);
+    static GDE_EXPORT int keyword_count();
+    static GDE_EXPORT bool keyword_name(int index, String &name, int &length);
+    static GDE_EXPORT bool keyword_check(const String &name, int length = -1);
 
     // Sleep
-    static int sleep(int ms);
+    static GDE_EXPORT int sleep(int ms);
 
     // Temporary directory (get/set)
-    static String get_temp_directory();
-    static void set_temp_directory(const String &dir);
+    static GDE_EXPORT String get_temp_directory();
+    static GDE_EXPORT void set_temp_directory(const String &dir);
 
     // Data directory
-    static String get_data_directory();
-    static void set_data_directory(const String &dir);
+    static GDE_EXPORT String get_data_directory();
+    static GDE_EXPORT void set_data_directory(const String &dir);
 
     // Enable shared cache
-    static int enable_shared_cache(int enable);
+    static GDE_EXPORT int enable_shared_cache(int enable);
 
     // Release memory
-    static int release_memory(int bytes);
+    static GDE_EXPORT int release_memory(int bytes);
 
     // Soft heap limit
-    static int64_t soft_heap_limit64(int64_t limit);
-    static int64_t hard_heap_limit64(int64_t limit);
+    static GDE_EXPORT int64_t soft_heap_limit64(int64_t limit);
+    static GDE_EXPORT int64_t hard_heap_limit64(int64_t limit);
 
     // Test control
-    static int test_control(int op, Variant args = Variant());
+    static GDE_EXPORT int test_control(int op, Variant args = Variant());
 
     // Logging
-    static void log(int errcode, const String &message);
+    static GDE_EXPORT void log(int errcode, const String &message);
 
     // Compile option
-    static bool compileoption_used(const String &opt);
-    static String compileoption_get(int N);
+    static GDE_EXPORT bool compileoption_used(const String &opt);
+    static GDE_EXPORT String compileoption_get(int N);
 
 
 

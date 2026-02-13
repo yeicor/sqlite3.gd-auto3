@@ -35,15 +35,6 @@ if (NOT GODOTCPP_TARGET STREQUAL "template_release" AND
 endif ()
 message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}, "
     "GODOTCPP_TARGET: ${GODOTCPP_TARGET}")
-# No-op when CMAKE_BUILD_TYPE does not match the GODOTCPP_TARGET
-if (CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT GODOTCPP_TARGET STREQUAL "template_release")
-    message(WARNING "CMAKE_BUILD_TYPE is 'Release' but GODOTCPP_TARGET is not 'template_release'. Building anyway.")
-    # No-op installation
-endif ()
-if (CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT GODOTCPP_TARGET STREQUAL "template_debug")
-    message(WARNING "CMAKE_BUILD_TYPE is 'Debug' but GODOTCPP_TARGET is not 'template_debug'. Building anyway.")
-    # No-op installation
-endif ()
 
 # Auto-enable ccache-like functionality if available since we are rebuilding godot-cpp and the bindings frequently
 # If ccache, sccache or similar is found, use it as the CMAKE_{C,CXX}_COMPILER_LAUNCHER
@@ -93,6 +84,23 @@ endif()
 # Fix CMAKE_OSX_SYSROOT for iOS to use full SDK path (overriden incorrectly by godot-cpp due to env SDKROOT)
 set(ENV{SDKROOT} "${CMAKE_OSX_SYSROOT}")
 set(GODOTCPP_DISABLE_EXCEPTIONS OFF)
+
+# Patch godot-cpp/cmake/godotcpp.cmake to include CMAKE_BUILD_TYPE in the suffix if not already patched
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/godot-cpp/cmake/godotcpp.cmake" GODOTCPP_CMAKE_CONTENT)
+message(STATUS "Checking if godot-cpp/cmake/godotcpp.cmake already includes CMAKE_BUILD_TYPE in suffix...")
+if(NOT GODOTCPP_CMAKE_CONTENT MATCHES "\\$<LOWER_CASE:\\$\\{CMAKE_BUILD_TYPE\\}>")
+    message(STATUS "CMAKE_BUILD_TYPE not found in suffix, applying patch...")
+    string(REPLACE
+        "\"\$<1:.\${GODOTCPP_TARGET}>\""
+        "\"\$<1:.\${GODOTCPP_TARGET}>\"\n        \"\$<1:.\$<LOWER_CASE:\${CMAKE_BUILD_TYPE}>>\""
+        GODOTCPP_CMAKE_CONTENT "${GODOTCPP_CMAKE_CONTENT}"
+    )
+    file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/godot-cpp/cmake/godotcpp.cmake" "${GODOTCPP_CMAKE_CONTENT}")
+    message(STATUS "Patch applied successfully.")
+else()
+    message(STATUS "godot-cpp/cmake/godotcpp.cmake already patched.")
+endif()
+
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/godot-cpp")
 
 
@@ -133,7 +141,7 @@ if(SYNTAX_ONLY)
     )
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/") # No-op installation
 else()
-    add_library(${PROJECT_NAME} SHARED ${SOURCES} ${DOC_GEN_FILE})
+    add_library(${PROJECT_NAME} ${SOURCES} ${DOC_GEN_FILE})
     target_link_libraries(${PROJECT_NAME} PRIVATE godot-cpp unofficial::sqlite3::sqlite3)
 
     # Install the complete bindings to the demo project with the correct suffix
