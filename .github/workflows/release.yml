@@ -18,7 +18,7 @@ jobs:
           attempts=0
           max_attempts=$TIMEOUT_MINUTES
           while [ $attempts -lt $max_attempts ]; do
-            run_id=$(gh run list --commit ${{ github.sha }} --workflow main.yml --status completed --conclusion success --json databaseId --jq '.[0].databaseId // empty')
+            run_id=$(gh run list --commit ${{ github.sha }} --workflow main.yml --status completed --json databaseId,conclusion --jq '.[] | select(.conclusion == "success") | .databaseId | first')
             if [ -n "$run_id" ]; then
               echo "Found run ID: $run_id"
               echo "RUN_ID=$run_id" >> $GITHUB_ENV
