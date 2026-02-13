@@ -138,10 +138,6 @@ jobs:
           name: "sqlite3.gd-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
           path: "demo/addons/sqlite3.gd/**"
       - uses: "actions/upload-artifact@v5"
-        with: # Build demo artifact with the full demo for each platform
-          name: "demo-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
-          path: "demo/**"
-      - uses: "actions/upload-artifact@v5"
         if: "always()"
         with: # Build artifact useful for caching
           name: "vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
@@ -179,30 +175,20 @@ jobs:
       matrix:
         include:
           - os: ubuntu-24.04
-            platform: Linux
-            triplet: x64-linux
             export_name: "Linux/X11"
           - os: ubuntu-24.04
-            platform: Web
-            triplet: wasm32-emscripten-pic
             export_name: "HTML5"
           - os: ubuntu-24.04
-            platform: Android
-            triplet: x64-android
             export_name: "Android"
           - os: windows-2025
-            platform: "Windows Desktop"
-            triplet: x64-windows-static
             export_name: "Windows Desktop"
           - os: macos-15
-            platform: macOS
-            triplet: x64-osx
             export_name: "macOS"
           - os: macos-15
-            platform: iOS
-            triplet: arm64-ios
             export_name: "iOS"
         mode: ["debug", "release"]
+        export_name:
+          ["Linux/X11", "HTML5", "Android", "Windows Desktop", "macOS", "iOS"]
     runs-on: "${{ matrix.os }}"
     needs: "build"
     steps:
@@ -211,14 +197,14 @@ jobs:
           submodules: "recursive"
       - uses: actions/download-artifact@v4
         with:
-          name: "demo-${{ matrix.triplet }}-template_debug-single"
-          path: "demo"
-      - if: "matrix.platform == 'Android'"
+          name: "sqlite3.gd-releaseonly"
+          path: "demo/addons/sqlite3.gd"
+      - if: "matrix.export_name == 'Android'"
         uses: "nttld/setup-ndk@v1"
         id: "setup-ndk"
         with:
           ndk-version: "r23c"
-      - if: "matrix.platform == 'Android'"
+      - if: "matrix.export_name == 'Android'"
         run: 'echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV'
       - uses: chickensoft-games/setup-godot@v2
         with:
@@ -232,5 +218,5 @@ jobs:
           godot --export-${{ matrix.mode }} "${{ matrix.export_name }}" --path demo  # Export to the requested platform
       - uses: "actions/upload-artifact@v5"
         with:
-          name: "export-${{ matrix.platform }}-${{ matrix.mode }}"
+          name: "export-${{ toLower(replace(replace(matrix.export_name, ' ', ''), '/', '')) }}-${{ matrix.mode }}"
           path: "demo/export/**"
