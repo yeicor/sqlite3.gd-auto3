@@ -143,7 +143,7 @@ func _ready():
 	# Close database
 	db.close()
 	_log("Database closed")
-	_log("Demo finished successfully in "+str(float(Time.get_ticks_usec() - start_time) / 1000000.0)+"ms!")
+	_log("Demo finished successfully in "+str(float(Time.get_ticks_usec() - start_time) / 1000.0)+"ms!")
 	if OS.get_environment("AUTO_CLOSE") != "":
 		get_tree().quit()
 
