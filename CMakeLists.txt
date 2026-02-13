@@ -88,7 +88,11 @@ else()
         "builds")
 endif()
 
-# Fix CMAKE_OSX_SYSROOT for iOS to use full SDK path
+
+# Godot C++ bindings
+set(GODOTCPP_DISABLE_EXCEPTIONS OFF)
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/godot-cpp")
+# Fix CMAKE_OSX_SYSROOT for iOS to use full SDK path (overriden incorrectly by godot-cpp due to env SDKROOT)
 message(STATUS "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME}")
 message(STATUS "CMAKE_OSX_SYSROOT before: ${CMAKE_OSX_SYSROOT}")
 if(CMAKE_SYSTEM_NAME STREQUAL "iOS" AND CMAKE_OSX_SYSROOT MATCHES "^iphoneos")
@@ -109,10 +113,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "iOS" AND CMAKE_OSX_SYSROOT MATCHES "^iphoneos")
     endif()
 endif()
 message(STATUS "CMAKE_OSX_SYSROOT after: ${CMAKE_OSX_SYSROOT}")
-
-# Godot C++ bindings
-set(GODOTCPP_DISABLE_EXCEPTIONS OFF)
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/godot-cpp")
 
 # Dependencies
 find_package(unofficial-sqlite3 CONFIG REQUIRED)

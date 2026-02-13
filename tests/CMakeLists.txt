@@ -14,11 +14,6 @@ if(CMAKE_CROSSCOMPILING)
     return()
 endif()
 
-# Skip tests for Emscripten (WASM) as GTest requires exceptions which are disabled
-if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
-    return()
-endif()
-
 # Find GTest
 find_package(GTest CONFIG REQUIRED)
 
