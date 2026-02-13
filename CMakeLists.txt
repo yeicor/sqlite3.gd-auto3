@@ -141,7 +141,7 @@ if(SYNTAX_ONLY)
     )
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/") # No-op installation
 else()
-    add_library(${PROJECT_NAME} ${SOURCES} ${DOC_GEN_FILE})
+    add_library(${PROJECT_NAME} SHARED ${SOURCES} ${DOC_GEN_FILE})
     target_link_libraries(${PROJECT_NAME} PRIVATE godot-cpp unofficial::sqlite3::sqlite3)
 
     # Install the complete bindings to the demo project with the correct suffix
