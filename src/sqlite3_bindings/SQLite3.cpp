@@ -212,7 +212,7 @@ void SQLite3::_bind_methods() {
     ClassDB::bind_static_method("SQLite3", D_METHOD("memory_highwater", "reset"), &SQLite3::memory_highwater, DEFVAL(false));
     // ClassDB::bind_static_method("SQLite3", D_METHOD("status", "op", "reset"), &SQLite3::status, DEFVAL(false));
     // ClassDB::bind_static_method("SQLite3", D_METHOD("status64", "op", "reset"), &SQLite3::status64, DEFVAL(false));
-    // ClassDB::bind_static_method("SQLite3", D_METHOD("randomness", "N", "buffer"), &SQLite3::randomness);
+    // ClassDB::bind_static_method("SQLite3", D_METHOD("randomness", "N"), &SQLite3::randomness);
     ClassDB::bind_static_method("SQLite3", D_METHOD("mprintf", "format"), &SQLite3::mprintf);
     ClassDB::bind_static_method("SQLite3", D_METHOD("errstr", "errcode"), &SQLite3::errstr);
     ClassDB::bind_static_method("SQLite3", D_METHOD("threadsafe"), &SQLite3::threadsafe);

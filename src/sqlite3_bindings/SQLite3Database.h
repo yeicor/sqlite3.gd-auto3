@@ -25,6 +25,7 @@ using namespace godot;
 class SQLite3Statement;
 class SQLite3ResultSet;
 class SQLite3Backup;
+class SQLite3Blob;
 
 /**
  * SQLite3Database
@@ -144,7 +145,7 @@ public:
     int overload_function(const String& zFuncName, int nArg);
 
     // Blob operations
-    // Ref<SQLite3Blob> blob_open(const String& zDb, const String& zTable, const String& zColumn, int64_t iRow, int flags);
+    Ref<SQLite3Blob> blob_open(const String& zDb, const String& zTable, const String& zColumn, int64_t iRow, int flags);
 
     // VFS
     int file_control(const String& zDbName, int op, Variant pArg = Variant());
@@ -175,8 +176,11 @@ public:
     // Release memory
     int db_release_memory();
 
-    // Soft heap limit
     int64_t soft_heap_limit64(int64_t N);
+
+    // WAL checkpoint
+    int wal_checkpoint(const String& zDb = String());
+    Array wal_checkpoint_v2(const String& zDb = String(), int eMode = 0);
 
     // Query with iterator
     Ref<SQLite3ResultSet> query(const String& sql);

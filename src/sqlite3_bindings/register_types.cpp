@@ -9,7 +9,7 @@
 #include "SQLite3Statement.h"
 #include "SQLite3ResultSet.h"
 #include "SQLite3Backup.h"
-// #include "SQLite3Blob.h"
+#include "SQLite3Blob.h"
 
 using namespace godot;
 
@@ -24,7 +24,7 @@ void sqlite3_initialize_module(ModuleInitializationLevel p_level) {
     GDREGISTER_CLASS(SQLite3Statement);
     GDREGISTER_CLASS(SQLite3ResultSet);
     GDREGISTER_CLASS(SQLite3Backup);
-    // GDREGISTER_CLASS(SQLite3Blob);
+    GDREGISTER_CLASS(SQLite3Blob);
 }
 
 void sqlite3_uninitialize_module(ModuleInitializationLevel p_level) {

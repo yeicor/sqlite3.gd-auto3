@@ -2,6 +2,7 @@
 #include "SQLite3Statement.h"
 #include "SQLite3ResultSet.h"
 #include "SQLite3Backup.h"
+#include "SQLite3Blob.h"
 
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
@@ -304,17 +305,16 @@ int SQLite3Database::overload_function(const String& zFuncName, int nArg) {
     return _db ? sqlite3_overload_function(_db, zFuncName.utf8().get_data(), nArg) : SQLITE_MISUSE;
 }
 
-// Ref<SQLite3Blob> SQLite3Database::blob_open(const String& zDb, const String& zTable, const String& zColumn, int64_t iRow, int flags) {
-//     // Assume SQLite3Blob exists
-//     if (!_db) return Ref<SQLite3Blob>();
-//     sqlite3_blob* blob;
-//     int rc = sqlite3_blob_open(_db, zDb.utf8().get_data(), zTable.utf8().get_data(), zColumn.utf8().get_data(), iRow, flags, &blob);
-//     if (rc != SQLITE_OK) {
-//         UtilityFunctions::printerr("Blob open error: ", errmsg());
-//     return Ref<SQLite3Blob>();
-//     }
-//     return Ref<SQLite3Blob>(memnew(SQLite3Blob(blob)));
-// }
+Ref<SQLite3Blob> SQLite3Database::blob_open(const String& zDb, const String& zTable, const String& zColumn, int64_t iRow, int flags) {
+    if (!_db) return Ref<SQLite3Blob>();
+    sqlite3_blob* blob;
+    int rc = sqlite3_blob_open(_db, zDb.utf8().get_data(), zTable.utf8().get_data(), zColumn.utf8().get_data(), iRow, flags, &blob);
+    if (rc != SQLITE_OK) {
+        UtilityFunctions::printerr("Blob open error: ", errmsg());
+        return Ref<SQLite3Blob>();
+    }
+    return Ref<SQLite3Blob>(memnew(SQLite3Blob(blob)));
+}
 
 int SQLite3Database::file_control(const String& zDbName, int op, Variant pArg) {
     // Simplified
@@ -401,6 +401,26 @@ int64_t SQLite3Database::soft_heap_limit64(int64_t N) {
     return sqlite3_soft_heap_limit64(N);
 }
 
+int SQLite3Database::wal_checkpoint(const String& zDb) {
+    return _db ? sqlite3_wal_checkpoint(_db, zDb.is_empty() ? nullptr : zDb.utf8().get_data()) : SQLITE_MISUSE;
+}
+
+Array SQLite3Database::wal_checkpoint_v2(const String& zDb, int eMode) {
+    Array result;
+    if (!_db) {
+        result.append(SQLITE_MISUSE);
+        return result;
+    }
+    int pnLog, pnCkpt;
+    int rc = sqlite3_wal_checkpoint_v2(_db, zDb.is_empty() ? nullptr : zDb.utf8().get_data(), eMode, &pnLog, &pnCkpt);
+    result.append(rc);
+    result.append(pnLog);
+    result.append(pnCkpt);
+    return result;
+}
+
+
+
 void SQLite3Database::_bind_methods() {
     ClassDB::bind_static_method("SQLite3Database", D_METHOD("open", "filename", "flags", "vfs"), &SQLite3Database::open, DEFVAL(0), DEFVAL(String()));
     ClassDB::bind_static_method("SQLite3Database", D_METHOD("open_v2", "filename", "flags", "vfs"), &SQLite3Database::open_v2, DEFVAL(0), DEFVAL(String()));
@@ -434,7 +454,7 @@ void SQLite3Database::_bind_methods() {
     ClassDB::bind_method(D_METHOD("backup_init", "zDestName", "destDb", "zSrcName"), &SQLite3Database::backup_init);
     ClassDB::bind_method(D_METHOD("db_config", "op", "args"), &SQLite3Database::db_config, DEFVAL(Variant()));
     ClassDB::bind_method(D_METHOD("get_autocommit"), &SQLite3Database::get_autocommit);
-    // ClassDB::bind_static_method("SQLite3Database", D_METHOD("db_handle", "stmt"), &SQLite3Database::db_handle);
+    ClassDB::bind_static_method("SQLite3Database", D_METHOD("db_handle", "stmt"), &SQLite3Database::db_handle);
     ClassDB::bind_method(D_METHOD("db_name", "N"), &SQLite3Database::db_name);
     ClassDB::bind_method(D_METHOD("db_filename", "zDbName"), &SQLite3Database::db_filename, DEFVAL(String()));
     ClassDB::bind_method(D_METHOD("db_readonly", "zDbName"), &SQLite3Database::db_readonly, DEFVAL(String()));
@@ -444,7 +464,7 @@ void SQLite3Database::_bind_methods() {
     ClassDB::bind_method(D_METHOD("load_extension", "zFile", "zProc"), &SQLite3Database::load_extension, DEFVAL(String()));
     ClassDB::bind_method(D_METHOD("declare_vtab", "zSQL"), &SQLite3Database::declare_vtab);
     ClassDB::bind_method(D_METHOD("overload_function", "zFuncName", "nArg"), &SQLite3Database::overload_function);
-    // ClassDB::bind_method(D_METHOD("blob_open", "zDb", "zTable", "zColumn", "iRow", "flags"), &SQLite3Database::blob_open);
+    ClassDB::bind_method(D_METHOD("blob_open", "zDb", "zTable", "zColumn", "iRow", "flags"), &SQLite3Database::blob_open);
     ClassDB::bind_method(D_METHOD("file_control", "zDbName", "op", "pArg"), &SQLite3Database::file_control, DEFVAL(Variant()));
     ClassDB::bind_method(D_METHOD("db_status", "op", "resetFlg"), &SQLite3Database::db_status, DEFVAL(false));
     ClassDB::bind_method(D_METHOD("db_cacheflush"), &SQLite3Database::db_cacheflush);
@@ -455,4 +475,6 @@ void SQLite3Database::_bind_methods() {
     ClassDB::bind_method(D_METHOD("table_column_metadata", "zDbName", "zTableName", "zColumnName"), &SQLite3Database::table_column_metadata);
     ClassDB::bind_method(D_METHOD("db_release_memory"), &SQLite3Database::db_release_memory);
     ClassDB::bind_method(D_METHOD("soft_heap_limit64", "N"), &SQLite3Database::soft_heap_limit64);
+    ClassDB::bind_method(D_METHOD("wal_checkpoint", "zDb"), &SQLite3Database::wal_checkpoint, DEFVAL(String()));
+    ClassDB::bind_method(D_METHOD("wal_checkpoint_v2", "zDb", "eMode"), &SQLite3Database::wal_checkpoint_v2, DEFVAL(String()), DEFVAL(0));
 }
