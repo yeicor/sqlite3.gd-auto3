@@ -454,7 +454,6 @@ void SQLite3Database::_bind_methods() {
     ClassDB::bind_method(D_METHOD("backup_init", "zDestName", "destDb", "zSrcName"), &SQLite3Database::backup_init);
     ClassDB::bind_method(D_METHOD("db_config", "op", "args"), &SQLite3Database::db_config, DEFVAL(Variant()));
     ClassDB::bind_method(D_METHOD("get_autocommit"), &SQLite3Database::get_autocommit);
-    ClassDB::bind_static_method("SQLite3Database", D_METHOD("db_handle", "stmt"), &SQLite3Database::db_handle);
     ClassDB::bind_method(D_METHOD("db_name", "N"), &SQLite3Database::db_name);
     ClassDB::bind_method(D_METHOD("db_filename", "zDbName"), &SQLite3Database::db_filename, DEFVAL(String()));
     ClassDB::bind_method(D_METHOD("db_readonly", "zDbName"), &SQLite3Database::db_readonly, DEFVAL(String()));

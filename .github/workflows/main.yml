@@ -147,7 +147,23 @@ jobs:
         with: # Build artifact useful for debugging
           name: "vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
           path: "vcpkg/buildtrees/\ncpkg/packages/"
-      # </Export artifacts>
+      # </Cache save and export artifacts>
+  integration_test:
+    runs-on: "ubuntu-24.04"
+    needs: "build"
+    steps:
+      - uses: "actions/checkout@v5"
+        with:
+          submodules: "recursive"
+      - uses: actions/download-artifact@v4
+        with:
+          name: "sqlite3.gd-x64-linux-template_debug-single"
+          path: "demo/addons/sqlite3.gd"
+      - run: |
+          wget -q "https://godot-releases.nbg1.your-objectstorage.com/4.6-stable/Godot_v4.6-stable_linux.x86_64.zip"
+          unzip -q Godot_v4.6-stable_linux.x86_64.zip
+          chmod +x Godot_v4.6-stable_linux.x86_64
+          ./Godot_v4.6-stable_linux.x86_64 --path demo --quit
   merge:
     runs-on: "ubuntu-24.04"
     needs: "build"
