@@ -149,27 +149,7 @@ jobs:
           path: "vcpkg/buildtrees/\ncpkg/packages/"
       # </Cache save and export artifacts>
 
-  merge:
-    runs-on: "ubuntu-24.04"
-    needs: "build"
-    steps:
-      - uses: "actions/upload-artifact/merge@v5"
-        with:
-          name: "sqlite3.gd"
-          pattern: "sqlite3.gd-*"
-          # delete-merged: true
-      - uses: actions/download-artifact@v4
-        with:
-          name: sqlite3.gd
-          path: merged
-      - run: |
-          mkdir release
-          find merged -name "*.template_release.release*" -o -name "sqlite3.gd.gdextension" -exec cp {} release/ \;
-      - uses: actions/upload-artifact@v5
-        with:
-          name: sqlite3.gd-releaseonly
-          path: release/
-  export_demo:
+  test_and_export_demo:
     strategy:
       fail-fast: false
       matrix:
@@ -197,7 +177,7 @@ jobs:
           submodules: "recursive"
       - uses: actions/download-artifact@v4
         with:
-          name: "sqlite3.gd-releaseonly"
+          name: "sqlite3.gd"
           path: "demo/addons/sqlite3.gd"
       - if: "matrix.export_name == 'Android'"
         uses: "nttld/setup-ndk@v1"
@@ -221,3 +201,18 @@ jobs:
         with:
           name: "export-${{ env.EXPORT_NAME }}-${{ matrix.mode }}"
           path: "demo/export/**"
+
+  merge:
+    runs-on: "ubuntu-24.04"
+    needs: ["build", "test_and_export_demo"]
+    steps:
+      - uses: "actions/upload-artifact/merge@v5"
+        with:
+          name: "sqlite3.gd"
+          pattern: "sqlite3.gd-*"
+          # delete-merged: true
+      - uses: "actions/upload-artifact/merge@v5"
+        with:
+          name: "demo-exports"
+          pattern: "export-*"
+          # delete-merged: true
