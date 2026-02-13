@@ -88,6 +88,12 @@ else()
         "builds")
 endif()
 
+# Fix CMAKE_OSX_SYSROOT for iOS to use full SDK path
+if(CMAKE_SYSTEM_NAME STREQUAL "iOS" AND CMAKE_OSX_SYSROOT MATCHES "^iphoneos")
+    execute_process(COMMAND xcrun --sdk iphoneos --show-sdk-path OUTPUT_VARIABLE IOS_SDK_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
+    set(CMAKE_OSX_SYSROOT ${IOS_SDK_PATH})
+endif()
+
 # Godot C++ bindings
 set(GODOTCPP_DISABLE_EXCEPTIONS OFF)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/godot-cpp")
