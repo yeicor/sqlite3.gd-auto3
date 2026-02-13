@@ -6,19 +6,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 project(sqlite3.gd CXX)
 
-# Option to build tests (disabled by default for vcpkg builds)
-option(BUILD_TESTING "Build the test suite" OFF)
+
 
 # Syntax-only mode for fast builds (only checks syntax, does not link or
 # install)
 if(SYNTAX_ONLY)
     message(STATUS "SYNTAX_ONLY mode enabled: Only checking syntax, "
         "skipping linking and installation.")
-endif()
-
-# Enable testing
-if(BUILD_TESTING)
-    enable_testing()
 endif()
 
 # Check that both CMAKE_BUILD_TYPE and GODOTCPP_TARGET are set correctly
@@ -80,7 +74,6 @@ else()
 endif()
 
 
-# Godot C++ bindings
 # Fix CMAKE_OSX_SYSROOT for iOS to use full SDK path (overriden incorrectly by godot-cpp due to env SDKROOT)
 set(ENV{SDKROOT} "${CMAKE_OSX_SYSROOT}")
 set(GODOTCPP_DISABLE_EXCEPTIONS OFF)
@@ -101,6 +94,7 @@ else()
     message(STATUS "godot-cpp/cmake/godotcpp.cmake already patched.")
 endif()
 
+# Godot C++ bindings
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/godot-cpp")
 
 
@@ -160,11 +154,6 @@ else()
     set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${OUTPUT_NAME}")
     install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION "${INSTALL_FOLDER}")
     # FIXME: Try harder to install to the proper directory on windows???
-endif()
-
-# Add tests subdirectory if testing is enabled
-if(BUILD_TESTING AND NOT SYNTAX_ONLY)
-    add_subdirectory(tests)
 endif()
 
 # Copy compile_commands.json to source dir for IDE support

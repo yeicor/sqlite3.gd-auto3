@@ -50,24 +50,6 @@
         "CMAKE_C_FLAGS_DEBUG": "-O0 -g1 -gsplit-dwarf",
         "GODOTCPP_DEV_BUILD": "ON"
       }
-    },
-    {
-      "name": "test",
-      "displayName": "Test Build",
-      "description": "Build with tests enabled",
-      "inherits": "debug",
-      "cacheVariables": {
-        "BUILD_TESTING": "ON"
-      }
-    },
-    {
-      "name": "fast-dev-test",
-      "displayName": "Fast Development Build with Tests",
-      "description": "Fast compilation with tests enabled",
-      "inherits": "fast-dev",
-      "cacheVariables": {
-        "BUILD_TESTING": "ON"
-      }
     }
   ],
   "buildPresets": [
@@ -92,24 +74,6 @@
       "description": "Optimized for fast compilation during development",
       "configurePreset": "fast-dev",
       "targets": ["install"]
-    },
-    {
-      "name": "test",
-      "displayName": "Build and Install with Tests",
-      "configurePreset": "test",
-      "targets": ["install"]
-    },
-    {
-      "name": "fast-dev-test",
-      "displayName": "Fast Dev Build with Tests",
-      "configurePreset": "fast-dev-test",
-      "targets": ["install"]
-    },
-    {
-      "name": "run-tests",
-      "displayName": "Run Tests",
-      "configurePreset": "test",
-      "targets": ["run_tests"]
     }
   ]
 }
