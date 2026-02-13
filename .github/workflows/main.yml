@@ -122,11 +122,6 @@ jobs:
           "$VCPKG_ROOT/bootstrap-vcpkg${{matrix.target.os == 'windows-2025' && '.bat' || '.sh'}}"
           "$VCPKG_ROOT/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" remove sqlite3-gd --classic || true  # Avoid caching too much
           "$VCPKG_ROOT/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" install sqlite3-gd --classic
-          # For some unknown reason, cmake + windows does not install the dll to the proper folder, do it here...
-          if [ "${{ matrix.target.os }}" == "windows-2025" ]; then
-            find vcpkg/ demo/ -name "*.dll"
-            cp "vcpkg/packages/sqlite3-gd_${{ matrix.target.vcpkg_triplet }}/${{ matrix.target-type == 'template_debug' && 'debug/' || '' }}bin"/*.dll "demo/addons/sqlite3.gd/" || true
-          fi
         env:
           VCPKG_ROOT: "vcpkg"
           VCPKG_DISABLE_METRICS: "1"

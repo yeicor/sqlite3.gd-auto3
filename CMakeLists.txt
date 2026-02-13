@@ -13,6 +13,11 @@ if(SYNTAX_ONLY)
     message(STATUS "SYNTAX_ONLY mode enabled: Only checking syntax, skipping linking and installation.")
 endif()
 
+# Enable testing
+if(BUILD_TESTING)
+    enable_testing()
+endif()
+
 # Check that both CMAKE_BUILD_TYPE and GODOTCPP_TARGET are set correctly (always required)
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(FATAL_ERROR "CMAKE_BUILD_TYPE must be either 'Release' or 'Debug'. Current value: ${CMAKE_BUILD_TYPE}")
@@ -23,14 +28,12 @@ endif ()
 message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}, GODOTCPP_TARGET: ${GODOTCPP_TARGET}")
 # No-op when CMAKE_BUILD_TYPE does not match the GODOTCPP_TARGET
 if (CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT GODOTCPP_TARGET STREQUAL "template_release")
-    message(WARNING "CMAKE_BUILD_TYPE is 'Release' but GODOTCPP_TARGET is not 'template_release'. Ignoring this build to speed up the build process.")
-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/") # No-op installation
-    return()
+    message(WARNING "CMAKE_BUILD_TYPE is 'Release' but GODOTCPP_TARGET is not 'template_release'. Building anyway.")
+    # No-op installation
 endif ()
 if (CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT GODOTCPP_TARGET STREQUAL "template_debug")
-    message(WARNING "CMAKE_BUILD_TYPE is 'Debug' but GODOTCPP_TARGET is not 'template_debug'. Ignoring this build to speed up the build process.")
-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/") # No-op installation
-    return()
+    message(WARNING "CMAKE_BUILD_TYPE is 'Debug' but GODOTCPP_TARGET is not 'template_debug'. Building anyway.")
+    # No-op installation
 endif ()
 
 # Auto-enable ccache-like functionality if available since we are rebuilding godot-cpp and the bindings frequently
