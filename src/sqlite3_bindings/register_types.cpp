@@ -3,7 +3,7 @@
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/core/class_db.hpp>
 
-#include "SQLite3.h"
+#include "SQLite3Binding.h"
 #include "SQLite3Database.h"
 // Include other classes as they are created
 #include "SQLite3Statement.h"
@@ -35,7 +35,7 @@ void sqlite3_uninitialize_module(ModuleInitializationLevel p_level) {
 }
 
 extern "C" {
-    GDExtensionBool GDE_EXPORT sqlite3_library_init(
+    GDExtensionBool GDE_EXPORT sqlite3_gd_library_init(
         GDExtensionInterfaceGetProcAddress p_get_proc_address,
         const GDExtensionClassLibraryPtr p_library,
         GDExtensionInitialization *r_initialization

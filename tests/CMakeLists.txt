@@ -12,12 +12,10 @@ endif()
 # Find GTest
 find_package(GTest CONFIG REQUIRED)
 
+# Find SQLite3
+find_package(unofficial-sqlite3 CONFIG REQUIRED)
+
 # The main library target is ${PROJECT_NAME}
-
-
-
-# Find GTest
-find_package(GTest CONFIG REQUIRED)
 
 # Collect all test source files
 file(GLOB TEST_SOURCES "*.cpp")
@@ -29,6 +27,7 @@ target_include_directories(sqlite3_gd_tests PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/sqlite3_bindings
     ${CMAKE_CURRENT_SOURCE_DIR}/../godot-cpp/include
     ${CMAKE_BINARY_DIR}/godot-cpp/gen/include
+    ${unofficial-sqlite3_INCLUDE_DIRS}
 )
 
 target_link_libraries(sqlite3_gd_tests PRIVATE

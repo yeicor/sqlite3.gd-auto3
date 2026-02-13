@@ -1,4 +1,4 @@
-#include "SQLite3.h"
+#include "SQLite3Binding.h"
 
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>

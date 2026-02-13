@@ -123,7 +123,6 @@ jobs:
           "$VCPKG_ROOT/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" remove sqlite3-gd --classic || true  # Avoid caching too much
           "$VCPKG_ROOT/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" install sqlite3-gd --classic
         env:
-          VCPKG_ROOT: "vcpkg"
           VCPKG_DISABLE_METRICS: "1"
           VCPKG_DEFAULT_TRIPLET: "${{ matrix.target.vcpkg_triplet }}"
           VCPKG_OVERLAY_TRIPLETS: "vcpkg_triplets"

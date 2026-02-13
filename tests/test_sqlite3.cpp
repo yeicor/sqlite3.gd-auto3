@@ -2,7 +2,7 @@
 
 #include <sqlite3.h>
 
-#include "SQLite3.h"
+#include "SQLite3Binding.h"
 
 TEST(SQLite3GlobalFunctions, LibraryVersion) {
     // Test that binding calls the correct raw function

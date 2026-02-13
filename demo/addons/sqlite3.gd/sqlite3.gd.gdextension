@@ -1,6 +1,6 @@
 [configuration]
 
-entry_symbol = "sqlite3_library_init"
+entry_symbol = "sqlite3_gd_library_init"
 compatibility_minimum = "4.1"
 
 [libraries] ; See the workflow for build instructions (or simply download the prebuilt libraries)
