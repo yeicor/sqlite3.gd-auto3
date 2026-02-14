@@ -105,15 +105,17 @@ jobs:
           [[ -d .cache ]] || mkdir -p .cache
           [[ -d .cache/sccache ]] || mkdir -p .cache/sccache
           echo "SCCACHE_DIR=$(pwd)/.cache/sccache" >> $GITHUB_ENV # Does this work with windows paths?
-          echo "SCCACHE_CACHE_SIZE=5G" >> $GITHUB_ENV # More than enough to keep the most recent project cached (as vcpkg's installed directory is copied directly)
+          echo "SCCACHE_CACHE_SIZE=2G" >> $GITHUB_ENV # More than enough to keep the most recent project cached (as vcpkg's installed directory is copied directly)
 
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
           last_workflow_id=$(gh run list --workflow="${{ github.workflow }}" --branch="${{ github.ref_name }}" --status=completed --json databaseId,conclusion --limit 1 --jq '[.[] | select(.conclusion != "cancelled" and .conclusion != "")][0].databaseId')
           gh run download "$last_workflow_id" --name "vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}" || \
               echo "::warning ::Failed to download and extract previous vcpkg installed artifacts, skipping cache..."
+          gh run download "$last_workflow_id" --name "vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}" || \
+              echo "::warning ::Failed to download and extract previous vcpkg installed artifacts, skipping cache..."
 
-          find vcpkg/installed/ || echo "vcpkg/installed/ not found"  # For debugging purposes, to see if the cache was restored
-          find .cache/sccache/ || echo ".cache/sccache/ not found"  # For debugging purposes, to see if the cache was restored
+          find vcpkg/installed/ || echo "::warning ::vcpkg/installed/ not found"  # For debugging purposes, to see if the cache was restored
+          find $SCCACHE_DIR || echo "::warning ::$SCCACHE_DIR not found"  # For debugging purposes, to see if the cache was restored
       # </Cache restore>
       # <Install and build>
       - shell: "bash"
@@ -143,14 +145,14 @@ jobs:
           path: "demo/addons/sqlite3.gd/**"
       - uses: "actions/upload-artifact@v6"
         if: "always()"
-        with: # Build artifact useful for caching
+        with: # Build artifact useful for caching/debugging
           name: "vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
           path: "vcpkg/installed/\n${{ env.SCCACHE_DIR }}"
       - uses: "actions/upload-artifact@v6"
         if: "always()"
-        with: # Build artifact useful for debugging
+        with: # Build artifact useful for caching/debugging
           name: "vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
-          path: "vcpkg/buildtrees/\ncpkg/packages/"
+          path: "vcpkg/buildtrees/\nvcpkg/packages/"
       # </Cache save and export artifacts>
 
   test_and_export_addon_and_demo:
