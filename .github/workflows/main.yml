@@ -96,6 +96,8 @@ jobs:
 
       # <Cache restore>
       - uses: "mozilla-actions/sccache-action@v0.0.9"
+        with:
+          disable_annotations: true
       - shell: "bash"
         run:
           | # Installed packages and caches are exported for use as a cache in the next workflow run
@@ -106,11 +108,20 @@ jobs:
           echo "SCCACHE_CACHE_SIZE=2G" >> $GITHUB_ENV # More than enough to keep the most recent project cached (as vcpkg's installed directory is copied directly)
 
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
-          last_workflow_id=$(gh run list --workflow="${{ github.workflow }}" --branch="${{ github.ref_name }}" --status=completed --json databaseId,conclusion --limit 1 --jq '[.[] | select(.conclusion != "cancelled" and .conclusion != "")][0].databaseId')
-          gh run download "$last_workflow_id" --name "vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}" || \
-              echo "::warning ::Failed to download and extract previous vcpkg installed artifacts, skipping cache..."
-          gh run download "$last_workflow_id" --name "vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}" || \
-              echo "::warning ::Failed to download and extract previous vcpkg installed artifacts, skipping cache..."
+          workflow_ids=$(gh run list --workflow="${{ github.workflow }}" --branch="${{ github.ref_name }}" --json databaseId --limit 10 --jq '[.[] | .databaseId]')
+          for workflow_id in $(echo "$workflow_ids" | jq -r '.[]'); do
+            echo "Attempting to download artifacts from workflow $workflow_id..."
+            if gh run download "$workflow_id" --name "vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}" && \
+               gh run download "$workflow_id" --name "vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"; then
+              echo "Successfully downloaded artifacts from workflow $workflow_id."
+              break
+            else
+              echo "Failed to download artifacts from workflow $workflow_id, trying next..."
+            fi
+          done
+          if [ -z "$workflow_id" ] || ! gh run download "$workflow_id" --name "vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}" >/dev/null 2>&1; then
+            echo "::warning ::Failed to download and extract previous vcpkg installed artifacts from any of the last 10 workflows, skipping cache..."
+          fi
 
           find vcpkg/installed/ || echo "::warning ::vcpkg/installed/ not found"  # For debugging purposes, to see if the cache was restored
           find $SCCACHE_DIR || echo "::warning ::$SCCACHE_DIR not found"  # For debugging purposes, to see if the cache was restored
