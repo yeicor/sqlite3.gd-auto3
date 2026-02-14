@@ -206,12 +206,10 @@ jobs:
         run: |
           find demo/addons/sqlite3.gd
           mkdir exports
-          godot --editor --path demo --quit --headless  # Editor pass is sometimes required to run/export
           godot --path demo --quit --headless
       - shell: bash
         if: "matrix.export_name != ''"
         run: |
-          godot --editor --path demo --quit --headless  # Editor pass is sometimes required to run/export
           godot --export-${{ matrix.mode }} "${{ matrix.export_name }}" --path demo --headless  # Export to the requested platform
           echo "EXPORT_NAME=$(echo "${{ matrix.export_name }}" | tr '[:upper:]' '[:lower:]' | tr -d ' /')" >> $GITHUB_ENV
       - uses: "actions/upload-artifact@v6"
