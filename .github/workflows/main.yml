@@ -159,22 +159,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        export_target:
+          [
+            { os: "ubuntu-24.04", export_name: "Linux" },
+            { os: "ubuntu-24.04", export_name: "HTML5" },
+            { os: "ubuntu-24.04", export_name: "Android" },
+            { os: "windows-2025", export_name: "Windows Desktop" },
+            { os: "macos-15", export_name: "macOS" },
+            { os: "macos-15", export_name: "iOS" },
+          ]
         mode: ["debug", "release"]
-        include:
-          # Ubuntu exports
-          - runs_on: ubuntu-24.04
-            export_name: Linux
-          - runs_on: ubuntu-24.04
-            export_name: HTML5
-          - runs_on: ubuntu-24.04
-            export_name: Android
-          - runs_on: windows-2025
-            export_name: "Windows Desktop"
-          - runs_on: macos-15
-            export_name: macOS
-          - runs_on: macos-15
-            export_name: iOS
-    runs-on: "${{ matrix.runs_on }}"
+    runs-on: "${{ matrix.export_target.os }}"
     needs: "build"
     steps:
       - uses: "actions/checkout@v5"
@@ -185,38 +180,34 @@ jobs:
           pattern: "sqlite3.gd-*"
           path: "demo/addons/sqlite3.gd"
           merge-multiple: true
-      - if: "matrix.export_name == 'Android'"
+      - if: "matrix.export_target.export_name == 'Android'"
         uses: "nttld/setup-ndk@v1"
         id: "setup-ndk"
         with:
           ndk-version: "r23c"
-      - if: "matrix.export_name == 'Android'"
+      - if: "matrix.export_target.export_name == 'Android'"
         run: 'echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV'
       - uses: chickensoft-games/setup-godot@v2
         with:
           version: 4.6.0
           use-dotnet: false
           include-templates: true
-      - if: "matrix.export_name == 'Android'"
+      - if: "matrix.export_target.export_name == 'Android'"
         run: 'echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV'
       - shell: bash
-        if: "matrix.export_name == '' || matrix.export_name == 'Linux'" # Once per platform run demo/test
-        run: |
-          find demo/addons/sqlite3.gd
-          mkdir exports
-          godot --path demo --quit --headless
+        if: "matrix.export_target.export_name == 'Linux' || matrix.export_target.export_name == 'Windows Desktop' || matrix.export_target.export_name == 'macOS'" # Once per platform run demo/test
+        run: godot --path demo --quit --headless
       - shell: bash
-        if: "matrix.export_name != ''"
         run: |
-          godot --export-${{ matrix.mode }} "${{ matrix.export_name }}" --path demo --headless  # Export to the requested platform
-          echo "EXPORT_NAME=$(echo "${{ matrix.export_name }}" | tr '[:upper:]' '[:lower:]' | tr -d ' /')" >> $GITHUB_ENV
+          mkdir exports
+          godot --export-${{ matrix.mode }} "${{ matrix.export_target.export_name }}" --path demo --headless  # Export to the requested platform
+          echo "EXPORT_NAME=$(echo "${{ matrix.export_target.export_name }}" | tr '[:upper:]' '[:lower:]' | tr -d ' /')" >> $GITHUB_ENV
       - uses: "actions/upload-artifact@v6"
-        if: "matrix.export_name != ''"
         with:
           name: "demo-export-${{ env.EXPORT_NAME }}-${{ matrix.mode }}"
           path: "demo/exports/**"
       - uses: "actions/upload-artifact@v6"
-        if: "matrix.export_name == 'Linux'" # Once
+        if: "matrix.export_target.export_name == 'Linux' && matrix.mode == 'release'" # Once
         with: # This is the one to publish in the asset store (proper paths)
           name: "addon"
           path: "demo/addons"
