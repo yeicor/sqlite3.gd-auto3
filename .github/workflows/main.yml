@@ -96,8 +96,6 @@ jobs:
 
       # <Cache restore>
       - uses: "mozilla-actions/sccache-action@v0.0.9"
-        with:
-          disable_annotations: "true"
       - shell: "bash"
         run:
           | # Installed packages and caches are exported for use as a cache in the next workflow run
@@ -131,7 +129,7 @@ jobs:
           VCPKG_DEFAULT_TRIPLET: "${{ matrix.target.vcpkg_triplet }}"
           VCPKG_OVERLAY_TRIPLETS: "vcpkg_triplets"
           VCPKG_OVERLAY_PORTS: "vcpkg_ports"
-          GD_CMAKE_ARGS: "-DGODOTCPP_TARGET=${{ matrix.target-type }} -DGODOTCPP_PRECISION=${{ matrix.float-precision }} ${{ env.cmake_extra_args }}"
+          GD_CMAKE_ARGS: "-DGODOTCPP_TARGET=${{ matrix.target-type }} -DGODOTCPP_PRECISION=${{ matrix.float-precision }} -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache ${{ env.cmake_extra_args }}"
       - if: "matrix.target.os == 'windows-2025'"
         shell: "bash" # For some unknown reason, cmake + windows does not install the dll to the proper folder, do it here...
         run: find vcpkg/buildtrees/sqlite3-gd -name "*.dll" -print -exec cp {} "demo/addons/sqlite3.gd/" \;
