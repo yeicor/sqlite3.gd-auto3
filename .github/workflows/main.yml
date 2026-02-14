@@ -229,8 +229,8 @@ jobs:
           path: "demo/addons"
 
   release:
-    runs-on: ubuntu-latest
-    needs: export_addon
+    runs-on: "ubuntu-24.04"
+    needs: "test_and_export_addon_and_demo"
     if: github.ref_type == 'tag'
     permissions:
       contents: write
