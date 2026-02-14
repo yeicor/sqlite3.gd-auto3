@@ -131,11 +131,8 @@ jobs:
           VCPKG_OVERLAY_PORTS: "vcpkg_ports"
           GD_CMAKE_ARGS: "-DGODOTCPP_TARGET=${{ matrix.target-type }} -DGODOTCPP_PRECISION=${{ matrix.float-precision }} ${{ env.cmake_extra_args }}"
       - if: "matrix.target.os == 'windows-2025'"
-        shell: "bash"
-        run:
-          | # For some unknown reason, cmake + windows does not install the dll to the proper folder, do it here...
-          find vcpkg/ demo/ -name "*.dll"
-          cp vcpkg/buildtrees/sqlite3-gd/*/*.dll "demo/addons/sqlite3.gd/" || true
+        shell: "bash" # For some unknown reason, cmake + windows does not install the dll to the proper folder, do it here...
+        run: find vcpkg/buildtrees/sqlite3-gd -name "*.dll" -print -exec cp {} "demo/addons/sqlite3.gd/" \;
       # </Install and build>
       # <Cache save and export artifacts>
       - shell: "bash" # Print cache statistics
