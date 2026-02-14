@@ -193,6 +193,8 @@ jobs:
       - if: "matrix.export_target.export_name == 'Android'"
         run: 'echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV'
       - shell: bash
+        run: godot --path demo --editor --quit --headless # An editor run is always needed for proper imports
+      - shell: bash
         if: "matrix.export_target.export_name == 'Linux' || matrix.export_target.export_name == 'Windows Desktop' || matrix.export_target.export_name == 'macOS'" # Once per platform run demo/test
         run: godot --path demo --quit --headless
       - shell: bash
