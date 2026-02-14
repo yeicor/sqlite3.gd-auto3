@@ -151,14 +151,30 @@ jobs:
           path: "vcpkg/buildtrees/\ncpkg/packages/"
       # </Cache save and export artifacts>
 
-  test_and_export_demo:
+  test_and_export_addon_and_demo:
     strategy:
       fail-fast: false
       matrix:
         mode: ["debug", "release"]
-        export_name:
-          ["Linux", "HTML5", "Android", "Windows Desktop", "macOS", "iOS"]
-    runs-on: "ubuntu-24.04"
+        runs_on: ["ubuntu-24.04", "windows-2025", "macos-15"]
+        include:
+          - runs_on: ubuntu-24.04
+            export_name: Linux
+          - runs_on: ubuntu-24.04
+            export_name: HTML5
+          - runs_on: ubuntu-24.04
+            export_name: Android
+          - runs_on: ubuntu-24.04
+            export_name: "Windows Desktop"
+          - runs_on: ubuntu-24.04
+            export_name: macOS
+          - runs_on: ubuntu-24.04
+            export_name: iOS
+          - runs_on: windows-2025
+            export_name: "" # Just test
+          - runs_on: macos-15
+            export_name: "" # Just test
+    runs-on: "${{ matrix.runs_on }}"
     needs: "build"
     steps:
       - uses: "actions/checkout@v5"
@@ -168,6 +184,7 @@ jobs:
         with:
           pattern: "sqlite3.gd-*"
           path: "demo/addons/sqlite3.gd"
+          merge-multiple: true
       - if: "matrix.export_name == 'Android'"
         uses: "nttld/setup-ndk@v1"
         id: "setup-ndk"
@@ -180,27 +197,28 @@ jobs:
           version: 4.6.0
           use-dotnet: false
           include-templates: true
+      - if: "matrix.export_name == 'Android'"
+        run: 'echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV'
       - shell: bash
+        if: "matrix.export_name == '' || matrix.export_name == 'Linux'" # Once per platform run demo/test
         run: |
+          find demo/addons/sqlite3.gd
           mkdir exports
           godot --editor --path demo --quit --headless  # Editor pass is sometimes required to run/export
-          godot --path demo --quit --headless  # Run the integration test and exit
-          godot --export-${{ matrix.mode }} "${{ matrix.export_name }}" --path demo  # Export to the requested platform
+          godot --path demo --quit --headless
+      - shell: bash
+        if: "matrix.export_name != ''"
+        run: |
+          godot --editor --path demo --quit --headless  # Editor pass is sometimes required to run/export
+          godot --export-${{ matrix.mode }} "${{ matrix.export_name }}" --path demo --headless  # Export to the requested platform
           echo "EXPORT_NAME=$(echo "${{ matrix.export_name }}" | tr '[:upper:]' '[:lower:]' | tr -d ' /')" >> $GITHUB_ENV
       - uses: "actions/upload-artifact@v6"
+        if: "matrix.export_name != ''"
         with:
           name: "demo-export-${{ env.EXPORT_NAME }}-${{ matrix.mode }}"
           path: "demo/exports/**"
-
-  export_addon:
-    runs-on: "ubuntu-24.04"
-    needs: ["build", "test_and_export_demo"]
-    steps:
-      - uses: "actions/download-artifact@v7"
-        with:
-          pattern: "sqlite3.gd-*"
-          path: "demo/addons/sqlite3.gd"
       - uses: "actions/upload-artifact@v6"
+        if: "matrix.export_name == 'Linux'" # Once
         with: # This is the one to publish in the asset store (proper paths)
           name: "addon"
           path: "demo/addons"
