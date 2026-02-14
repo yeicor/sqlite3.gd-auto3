@@ -158,24 +158,20 @@ jobs:
       fail-fast: false
       matrix:
         mode: ["debug", "release"]
-        runs_on: ["ubuntu-24.04", "windows-2025", "macos-15"]
         include:
+          # Ubuntu exports
           - runs_on: ubuntu-24.04
             export_name: Linux
           - runs_on: ubuntu-24.04
             export_name: HTML5
           - runs_on: ubuntu-24.04
             export_name: Android
-          - runs_on: ubuntu-24.04
-            export_name: "Windows Desktop"
-          - runs_on: ubuntu-24.04
-            export_name: macOS
-          - runs_on: ubuntu-24.04
-            export_name: iOS
           - runs_on: windows-2025
-            export_name: "" # Just test
+            export_name: "Windows Desktop"
           - runs_on: macos-15
-            export_name: "" # Just test
+            export_name: macOS
+          - runs_on: macos-15
+            export_name: iOS
     runs-on: "${{ matrix.runs_on }}"
     needs: "build"
     steps:
@@ -236,3 +232,26 @@ jobs:
           path: .
       - run: zip -r addon.zip addons
       - run: gh release upload ${{ github.ref_name }} addon.zip
+
+  deploy-pages:
+    runs-on: "ubuntu-24.04"
+    needs: "test_and_export_addon_and_demo"
+    if: github.ref_type == 'tag'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: demo-export-html5-release
+          path: html5
+      - uses: peaceiris/actions-gh-pages@v4
+        id: deployment
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: html5
+          publish_branch: gh-pages

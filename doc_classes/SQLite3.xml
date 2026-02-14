@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SQLite3" inherits="Object" version="4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		SQLite3 library wrapper class.
+	</brief_description>
+	<description>
+		This class provides static methods for SQLite3 library initialization, version information, and other global operations.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="libversion_number" qualifiers="static">
+			<return type="int" />
+			<description>
+				Returns the version number of the SQLite library.
+			</description>
+		</method>
+		<method name="libversion" qualifiers="static">
+			<return type="String" />
+			<description>
+				Returns the version string of the SQLite library.
+			</description>
+		</method>
+		<method name="sourceid" qualifiers="static">
+			<return type="String" />
+			<description>
+				Returns the source ID of the SQLite library.
+			</description>
+		</method>
+		<method name="initialize" qualifiers="static">
+			<return type="int" />
+			<description>
+				Initializes the SQLite library. Returns SQLITE_OK on success.
+			</description>
+		</method>
+		<method name="shutdown" qualifiers="static">
+			<return type="int" />
+			<description>
+				Shuts down the SQLite library. Returns SQLITE_OK on success.
+			</description>
+		</method>
+		<method name="os_init" qualifiers="static">
+			<return type="int" />
+			<description>
+				Initializes the SQLite OS interface. Returns SQLITE_OK on success.
+			</description>
+		</method>
+		<method name="os_end" qualifiers="static">
+			<return type="int" />
+			<description>
+				Shuts down the SQLite OS interface. Returns SQLITE_OK on success.
+			</description>
+		</method>
+		<method name="config" qualifiers="static">
+			<return type="int" />
+			<argument index="0" name="op" type="int" />
+			<argument index="1" name="args" type="Variant" />
+			<description>
+				Configures the SQLite library. The operation and arguments depend on the specific configuration.
+			</description>
+		</method>
+		<method name="memory_used" qualifiers="static">
+			<return type="int" />
+			<description>
+				Returns the amount of memory currently in use by SQLite.
+			</description>
+		</method>
+		<method name="memory_highwater" qualifiers="static">
+			<return type="int" />
+			<argument index="0" name="reset" type="bool" />
+			<description>
+				Returns the maximum amount of memory used by SQLite. If reset is true, resets the highwater mark.
+			</description>
+		</method>
+		<method name="mprintf" qualifiers="static">
+			<return type="String" />
+			<argument index="0" name="format" type="String" />
+			<description>
+				Formats a string using SQLite's printf function.
+			</description>
+		</method>
+		<method name="errstr" qualifiers="static">
+			<return type="String" />
+			<argument index="0" name="errcode" type="int" />
+			<description>
+				Returns a string describing the given error code.
+			</description>
+		</method>
+		<method name="threadsafe" qualifiers="static">
+			<return type="int" />
+			<description>
+				Returns true if SQLite was compiled with thread safety enabled.
+			</description>
+		</method>
+		<method name="keyword_count" qualifiers="static">
+			<return type="int" />
+			<description>
+				Returns the number of reserved keywords in SQLite.
+			</description>
+		</method>
+		<method name="keyword_check" qualifiers="static">
+			<return type="bool" />
+			<argument index="0" name="name" type="String" />
+			<argument index="1" name="length" type="int" />
+			<description>
+				Returns true if the given string is a reserved keyword in SQLite.
+			</description>
+		</method>
+		<method name="sleep" qualifiers="static">
+			<return type="int" />
+			<argument index="0" name="ms" type="int" />
+			<description>
+				Causes the current thread to sleep for the specified number of milliseconds.
+			</description>
+		</method>
+		<method name="get_temp_directory" qualifiers="static">
+			<return type="String" />
+			<description>
+				Returns the temporary directory used by SQLite.
+			</description>
+		</method>
+		<method name="set_temp_directory" qualifiers="static">
+			<return type="void" />
+			<argument index="0" name="dir" type="String" />
+			<description>
+				Sets the temporary directory used by SQLite.
+			</description>
+		</method>
+		<method name="get_data_directory" qualifiers="static">
+			<return type="String" />
+			<description>
+				Returns the data directory used by SQLite.
+			</description>
+		</method>
+		<method name="set_data_directory" qualifiers="static">
+			<return type="void" />
+			<argument index="0" name="dir" type="String" />
+			<description>
+				Sets the data directory used by SQLite.
+			</description>
+		</method>
+		<method name="enable_shared_cache" qualifiers="static">
+			<return type="int" />
+			<argument index="0" name="enable" type="int" />
+			<description>
+				Enables or disables the shared cache mode. Returns SQLITE_OK on success.
+			</description>
+		</method>
+		<method name="release_memory" qualifiers="static">
+			<return type="int" />
+			<argument index="0" name="bytes" type="int" />
+			<description>
+				Attempts to free the specified amount of memory from SQLite's heap. Returns the amount actually freed.
+			</description>
+		</method>
+		<method name="soft_heap_limit64" qualifiers="static">
+			<return type="int" />
+			<argument index="0" name="limit" type="int" />
+			<description>
+				Sets the soft heap limit for SQLite. Returns the previous limit.
+			</description>
+		</method>
+		<method name="hard_heap_limit64" qualifiers="static">
+			<return type="int" />
+			<argument index="0" name="limit" type="int" />
+			<description>
+				Sets the hard heap limit for SQLite. Returns the previous limit.
+			</description>
+		</method>
+		<method name="compileoption_used" qualifiers="static">
+			<return type="bool" />
+			<argument index="0" name="opt" type="String" />
+			<description>
+				Returns true if the given compile option was used when building SQLite.
+			</description>
+		</method>
+		<method name="compileoption_get" qualifiers="static">
+			<return type="String" />
+			<argument index="0" name="N" type="int" />
+			<description>
+				Returns the N-th compile option used when building SQLite.
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

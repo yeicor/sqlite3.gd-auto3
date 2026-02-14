@@ -50,10 +50,10 @@ macos.arm64.double.debug = "./libsqlite3.gd.macos.template_debug.debug.arm64.dou
 macos.arm64.single.release = "./libsqlite3.gd.macos.template_release.release.arm64.dylib"
 macos.arm64.double.release = "./libsqlite3.gd.macos.template_release.release.arm64.double.dylib"
 
-web.wasm32.single.debug = "./libsqlite3.gd.web.template_debug.debug.wasm32.nothreads.wasm"
-web.wasm32.double.debug = "./libsqlite3.gd.web.template_debug.debug.wasm32.double.nothreads.wasm"
-web.wasm32.single.release = "./libsqlite3.gd.web.template_release.release.wasm32.nothreads.wasm"
-web.wasm32.double.release = "./libsqlite3.gd.web.template_release.release.wasm32.double.nothreads.wasm"
+web.wasm32.single.debug = "./libsqlite3.gd.web.template_debug.debug.wasm32.nothreads.so"
+web.wasm32.double.debug = "./libsqlite3.gd.web.template_debug.debug.wasm32.double.nothreads.so"
+web.wasm32.single.release = "./libsqlite3.gd.web.template_release.release.wasm32.nothreads.so"
+web.wasm32.double.release = "./libsqlite3.gd.web.template_release.release.wasm32.double.nothreads.so"
 
 android.x86_64.single.debug = "./libsqlite3.gd.android.template_debug.debug.x86_64.so"
 android.x86_64.double.debug = "./libsqlite3.gd.android.template_debug.debug.x86_64.double.so"
