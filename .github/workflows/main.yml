@@ -97,8 +97,8 @@ jobs:
       # </Triplet-specific setup>
       #
       # <Cache restore>
-      - shell: "bash"
-        run: | # Set up ccache directory and restore from previous artifacts
+      - shell: "bash" # Restore from previous artifacts that are used as caches due to size limitations of caches
+        run: |
           set -ex
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
           workflow_ids=$(gh run list --workflow="${{ github.workflow }}" --branch="${{ github.ref_name }}" --json databaseId --limit 10 --jq '[.[] | .databaseId]')
@@ -117,24 +117,17 @@ jobs:
           if [ "$success" != "true" ]; then
             echo "::warning ::Failed to download and extract previous vcpkg installed artifacts from any of the last 10 workflows, skipping cache..."
           fi
-      - uses: "Chocobo1/setup-ccache-action@v1"
+      - uses: mozilla-actions/sccache-action
         with:
-          update_packager_index: true
-          install_ccache: true
-          prepend_symlinks_to_path: true
-          restore_cache: false # Artifacts instead of cache due to size and stricter limits on caches.
-          store_cache: false
-          windows_compile_environment: "msvc" # installs ccache via Chocolatey (works for both MSVC and MinGW builds??)
-          ccache_options: |
-            cache_dir=${{ github.workspace }}/.cache/ccache
-            max_size=2G
-            compression=true
-            compression_level=9
+          disable_annotations: true
       - shell: "bash"
         run: | # Check and warn
-          ccache --version || echo "::warning ::ccache not found in PATH"
-          ccache --zero-stats || true
-          ccache -p || true
+          echo "SCCACHE_DIR=.cache/sccache" >> $GITHUB_ENV
+          echo "SCCACHE_CACHE_SIZE=2G" >> $GITHUB_ENV
+          which sccache
+          sccache --version || echo "::warning ::sccache not found in PATH"
+          sccache --zero-stats || true
+          sccache --show-stats || true
           [ -d vcpkg/installed/ ] || echo "::warning ::vcpkg/installed/ directory not found (no cache available)"
           [ -d ".cache/ccache" ] || echo "::warning ::.cache/ccache directory not found (no cache available)"
       # </Cache restore>

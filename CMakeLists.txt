@@ -30,22 +30,17 @@ endif ()
 message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}, "
     "GODOTCPP_TARGET: ${GODOTCPP_TARGET}")
 
-# Auto-enable ccache if available since we are rebuilding godot-cpp and the bindings frequently
-# If ccache is found, use it as the CMAKE_{C,CXX}_COMPILER_LAUNCHER
+# Auto-enable sccache if available since we are rebuilding godot-cpp and the bindings frequently
+# If sccache is found, use it as the CMAKE_{C,CXX}_COMPILER_LAUNCHER
 set(CMAKE_FIND_DEBUG_MODE TRUE)
-find_program(CCACHE_EXECUTABLE ccache)
+find_program(SCCACHE_EXECUTABLE sccache)
 set(CMAKE_FIND_DEBUG_MODE FALSE)
-if(CCACHE_EXECUTABLE)
-    message(STATUS "Using ccache as compiler launcher: ${CCACHE_EXECUTABLE}")
-    set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE_EXECUTABLE})
-    set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_EXECUTABLE})
-    # For MSVC, ccache requires /Z7 debug info format instead of /Zi
-    if(MSVC)
-        message(STATUS "Setting MSVC debug information format to Embedded for ccache compatibility")
-        set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<$<CONFIG:Debug,RelWithDebInfo>:Embedded>")
-    endif()
+if(SCCACHE_EXECUTABLE)
+    message(STATUS "Using sccache as compiler launcher: ${SCCACHE_EXECUTABLE}")
+    set(CMAKE_C_COMPILER_LAUNCHER ${SCCACHE_EXECUTABLE})
+    set(CMAKE_CXX_COMPILER_LAUNCHER ${SCCACHE_EXECUTABLE})
 else()
-    message(STATUS "ccache not found, not using a compiler launcher")
+    message(STATUS "sccache not found, not using a compiler launcher")
 endif()
 
 # Auto-force full LTO in release builds if available
