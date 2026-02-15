@@ -32,7 +32,9 @@ message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}, "
 
 # Auto-enable ccache if available since we are rebuilding godot-cpp and the bindings frequently
 # If ccache is found, use it as the CMAKE_{C,CXX}_COMPILER_LAUNCHER
+set(CMAKE_FIND_DEBUG_MODE TRUE)
 find_program(CCACHE_EXECUTABLE ccache)
+set(CMAKE_FIND_DEBUG_MODE FALSE)
 if(CCACHE_EXECUTABLE)
     message(STATUS "Using ccache as compiler launcher: ${CCACHE_EXECUTABLE}")
     set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE_EXECUTABLE})
