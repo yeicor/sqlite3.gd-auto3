@@ -120,7 +120,7 @@ jobs:
           if [ "$success" != "true" ]; then
             echo "::warning ::Failed to download and extract previous vcpkg installed artifacts from any of the last 10 workflows, skipping cache..."
           fi
-      - uses: mozilla-actions/sccache-action@0.0.9
+      - uses: Mozilla-Actions/sccache-action@v0.0.9
         with:
           disable_annotations: true
       - shell: "bash"
