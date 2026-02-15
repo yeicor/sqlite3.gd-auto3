@@ -139,12 +139,6 @@ jobs:
           ccache -p || true
           [ -d vcpkg/installed/ ] || echo "::warning ::vcpkg/installed/ directory not found (no cache available)"
           [ -d ".cache/ccache" ] || echo "::warning ::.cache/ccache directory not found (no cache available)"
-      - if: "matrix.target.os == 'windows-2025'"
-        shell: "bash" # Convert Windows path to Unix-style for CMake (otherwise bash works but cmake does not detect ccache.exe)
-        run: |
-          CCACHE_DIR_WIN=$(dirname "${{ env.ccache_symlinks_path }}")
-          CCACHE_DIR_UNIX=$(echo "$CCACHE_DIR_WIN" | sed 's|\\|/|g')
-          echo "CMAKE_PROGRAM_PATH=$CCACHE_DIR_UNIX" >> $GITHUB_ENV
       # </Cache restore>
       #
       # <Install and build>
@@ -195,14 +189,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        export_target:
-          [
+        export_target: [
             { os: "ubuntu-24.04", export_name: "Linux" },
             { os: "ubuntu-24.04", export_name: "Web" },
             { os: "ubuntu-24.04", export_name: "Android" },
             { os: "windows-2025", export_name: "Windows Desktop" },
             { os: "macos-15", export_name: "macOS" },
-            { os: "macos-15", export_name: "iOS" },
+            { os: "ubuntu-24.04", export_name: "iOS" }, # I do not have a developer account (which is required to actually build the app on macos), instead use ubuntu and just export the code to compile.
           ]
         mode: ["debug", "release"]
     runs-on: "${{ matrix.export_target.os }}"
@@ -223,6 +216,13 @@ jobs:
           ndk-version: "r23c"
       - if: "matrix.export_target.export_name == 'Android'"
         run: 'echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV'
+      - if: "matrix.export_target.export_name == 'Android' && matrix.mode == 'release'"
+        run: |
+          sudo apt-get update && sudo apt-get install -y openjdk-17-jdk
+          keytool -genkeypair -v -storetype PKCS12 -keystore demo/android_keystore.p12 -alias androidkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Unknown, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown"
+          echo "GODOT_ANDROID_KEYSTORE_RELEASE_PATH=demo/android_keystore.p12" >> $GITHUB_ENV
+          echo "GODOT_ANDROID_KEYSTORE_RELEASE_USER=androidkey" >> $GITHUB_ENV
+          echo "GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD=android" >> $GITHUB_ENV
       - uses: chickensoft-games/setup-godot@v2
         with:
           version: 4.6.0
@@ -238,7 +238,7 @@ jobs:
       - shell: bash
         run: |
           mkdir demo/exports
-          godot --export-${{ matrix.mode }} "${{ matrix.export_target.export_name }}" --path demo --headless  # Export to the requested platform
+          godot --export-${{ matrix.mode }} "${{ matrix.export_target.export_name }}" --path demo --headless
           echo "EXPORT_NAME=$(echo "${{ matrix.export_target.export_name }}" | tr '[:upper:]' '[:lower:]' | tr -d ' /')" >> $GITHUB_ENV
       - uses: "actions/upload-artifact@v6"
         with:
