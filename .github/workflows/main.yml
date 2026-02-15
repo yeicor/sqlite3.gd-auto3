@@ -139,6 +139,12 @@ jobs:
           ccache -p || true
           [ -d vcpkg/installed/ ] || echo "::warning ::vcpkg/installed/ directory not found (no cache available)"
           [ -d ".cache/ccache" ] || echo "::warning ::.cache/ccache directory not found (no cache available)"
+      - if: "matrix.target.os == 'windows-2025'"
+        shell: "bash" # Convert Windows path to Unix-style for CMake (otherwise bash works but cmake does not detect ccache.exe)
+        run: |
+          CCACHE_DIR_WIN=$(dirname "${{ env.ccache_symlinks_path }}")
+          CCACHE_DIR_UNIX=$(echo "$CCACHE_DIR_WIN" | sed 's|\\|/|g')
+          echo "CMAKE_PROGRAM_PATH=$CCACHE_DIR_UNIX" >> $GITHUB_ENV
       # </Cache restore>
       #
       # <Install and build>
