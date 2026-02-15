@@ -24,12 +24,12 @@ jobs:
             # { vcpkg_triplet: "x64-mingw-static", os: "windows-2025" },
             # { vcpkg_triplet: "x86-mingw-static", os: "windows-2025" },
             # { vcpkg_triplet: "arm64-mingw-static", os: "windows-2025" },
-            # { vcpkg_triplet: "x64-windows-static", os: "windows-2025" }, # MSVC instead of mingw
+            { vcpkg_triplet: "x64-windows-static", os: "windows-2025" }, # MSVC instead of mingw
             # { vcpkg_triplet: "x86-windows-static", os: "windows-2025" }, # MSVC instead of mingw
             # { vcpkg_triplet: "arm64-windows-static", os: "windows-2025" }, # MSVC instead of mingw
             # { vcpkg_triplet: "arm64-osx", os: "macos-15" },
             # { vcpkg_triplet: "x64-osx", os: "macos-15" },
-            { vcpkg_triplet: "wasm32-emscripten-pic", os: "ubuntu-24.04" },
+            # { vcpkg_triplet: "wasm32-emscripten-pic", os: "ubuntu-24.04" },
             # { vcpkg_triplet: "x64-android", os: "ubuntu-24.04" },
             # { vcpkg_triplet: "x86-android", os: "ubuntu-24.04" },
             # { vcpkg_triplet: "arm64-android", os: "ubuntu-24.04" },
@@ -125,14 +125,13 @@ jobs:
           disable_annotations: true
       - shell: "bash"
         run: | # Check and warn
-          echo "SCCACHE_DIR=.cache/sccache" >> $GITHUB_ENV
-          echo "SCCACHE_CACHE_SIZE=2G" >> $GITHUB_ENV
+          SCCACHE_DIR="${{ github.workspace }}/.cache/sccache" && echo "SCCACHE_DIR=$SCCACHE_DIR" >> $GITHUB_ENV
+          SCCACHE_CACHE_SIZE=2G && echo "SCCACHE_CACHE_SIZE=$SCCACHE_CACHE_SIZE" >> $GITHUB_ENV
           which sccache
-          sccache --version || echo "::warning ::sccache not found in PATH"
-          sccache --zero-stats || true
-          sccache --show-stats || true
+          sccache --version
+          sccache --zero-stats
           [ -d vcpkg/installed/ ] || echo "::warning ::vcpkg/installed/ directory not found (no cache available)"
-          [ -d ".cache/ccache" ] || echo "::warning ::.cache/ccache directory not found (no cache available)"
+          [ -d "$SCCACHE_DIR" ] || echo "::warning ::$SCCACHE_DIR directory not found (no cache available)"
       # </Cache restore>
       #
       # <Install and build>
@@ -153,6 +152,8 @@ jobs:
       - if: "matrix.target.os == 'windows-2025'"
         shell: "bash" # For some unknown reason, cmake + windows does not install the dll to the proper folder, do it here...
         run: find vcpkg/buildtrees/sqlite3-gd -name "*.dll" -print -exec cp {} "demo/addons/sqlite3.gd/" \;
+      - shell: "bash"
+        run: sccache --show-stats
       # </Install and build>
       #
       # <Cache save and export artifacts>
@@ -181,11 +182,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        export_target: [
+        export_target: # TODO: All architectures (although this is just a demo)
+          [
             # { os: "ubuntu-24.04", export_name: "Linux" },
-            { os: "ubuntu-24.04", export_name: "Web" },
+            # { os: "ubuntu-24.04", export_name: "Web" },
             # { os: "ubuntu-24.04", export_name: "Android" },
-            # { os: "windows-2025", export_name: "Windows Desktop" },
+            { os: "windows-2025", export_name: "Windows Desktop" },
             # { os: "macos-15", export_name: "macOS" },
             # { os: "ubuntu-24.04", export_name: "iOS" }, # I do not have a developer account (which is required to actually build the app on macos), instead use ubuntu and just export the code to compile.
           ]
