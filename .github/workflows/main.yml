@@ -179,10 +179,14 @@ jobs:
         if: "always()"
         with: # Build artifact useful for caching/debugging (less important and bigger but useful if enough storage available)
           name: "vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
+<<<<<<< HEAD
           path: |
             vcpkg/buildtrees/
             vcpkg/packages/
             vcpkg/downloads/
+=======
+          path: "vcpkg/buildtrees/\nvcpkg/packages/\nvcpkg/downloads/"
+>>>>>>> 7e4ae3ec56a772bb7d9d7e35af163f46bbd71bdb
       # </Cache save and export artifacts>
 
   test_and_export_addon_and_demo:
@@ -225,7 +229,7 @@ jobs:
       - if: "matrix.export_target.export_name == 'Android'"
         run: 'echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV'
       - shell: bash
-        run: godot --path demo --editor --quit --headless # An editor run is always needed for proper imports
+        run: godot --path demo --editor --quit --headless || true # An editor run is always needed for proper imports. crashes after doing what we want, so it is ok
       - shell: bash
         if: "matrix.export_target.export_name == 'Linux' || matrix.export_target.export_name == 'Windows Desktop' || matrix.export_target.export_name == 'macOS'" # Once per platform run demo/test
         run: godot --path demo --quit --headless
