@@ -104,22 +104,25 @@ jobs:
           set -ex
           [[ -d .cache ]] || mkdir -p .cache
           [[ -d .cache/sccache ]] || mkdir -p .cache/sccache
-          echo "SCCACHE_DIR=$(pwd)/.cache/sccache" >> $GITHUB_ENV # Does this work with windows paths?
+          export SCCACHE_DIR=$(pwd)/.cache/sccache
+          echo "SCCACHE_DIR=$SCCACHE_DIR" >> $GITHUB_ENV # Does this work with windows paths?
           echo "SCCACHE_CACHE_SIZE=2G" >> $GITHUB_ENV # More than enough to keep the most recent project cached (as vcpkg's installed directory is copied directly)
 
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
           workflow_ids=$(gh run list --workflow="${{ github.workflow }}" --branch="${{ github.ref_name }}" --json databaseId --limit 10 --jq '[.[] | .databaseId]')
-          for workflow_id in $(echo "$workflow_ids" | jq -r '.[]'); do
+          success=false
+          for workflow_id in $(echo "$workflow_ids" | jq -r '.[]' | tr -d '\r'); do
             echo "Attempting to download artifacts from workflow $workflow_id..."
             if gh run download "$workflow_id" --name "vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}" && \
                gh run download "$workflow_id" --name "vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"; then
               echo "Successfully downloaded artifacts from workflow $workflow_id."
+              success=true
               break
             else
               echo "Failed to download artifacts from workflow $workflow_id, trying next..."
             fi
           done
-          if [ -z "$workflow_id" ] || ! gh run download "$workflow_id" --name "vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}" >/dev/null 2>&1; then
+          if [ "$success" != "true" ]; then
             echo "::warning ::Failed to download and extract previous vcpkg installed artifacts from any of the last 10 workflows, skipping cache..."
           fi
 
