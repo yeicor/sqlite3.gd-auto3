@@ -215,8 +215,8 @@ jobs:
       - if: "matrix.export_target.export_name == 'Android' && matrix.mode == 'release'"
         run: |
           sudo apt-get update && sudo apt-get install -y openjdk-17-jdk
-          keytool -genkeypair -v -storetype PKCS12 -keystore demo/android_keystore.p12 -alias androidkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Unknown, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown"
-          echo "GODOT_ANDROID_KEYSTORE_RELEASE_PATH=demo/android_keystore.p12" >> $GITHUB_ENV
+          keytool -genkeypair -v -storetype PKCS12 -keystore ${{ github.workspace }}/demo/android_keystore.p12 -alias androidkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Unknown, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown"
+          echo "GODOT_ANDROID_KEYSTORE_RELEASE_PATH=${{ github.workspace }}/demo/android_keystore.p12" >> $GITHUB_ENV
           echo "GODOT_ANDROID_KEYSTORE_RELEASE_USER=androidkey" >> $GITHUB_ENV
           echo "GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD=android" >> $GITHUB_ENV
       - uses: chickensoft-games/setup-godot@v2
