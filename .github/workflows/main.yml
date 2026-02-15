@@ -240,11 +240,13 @@ jobs:
         with:
           name: "demo-export-${{ env.EXPORT_NAME }}-${{ matrix.mode }}"
           path: "demo/exports/**"
+      - if: "matrix.export_target.export_name == 'Linux' && matrix.mode == 'release'" # Once
+        run: mkdir -p addon-export && cp -r demo/addons addon-export
       - uses: "actions/upload-artifact@v6"
         if: "matrix.export_target.export_name == 'Linux' && matrix.mode == 'release'" # Once
         with: # This is the one to publish in the asset store (proper paths)
           name: "addon"
-          path: "demo/addons"
+          path: "addon-export"
 
   release:
     runs-on: "ubuntu-24.04"
