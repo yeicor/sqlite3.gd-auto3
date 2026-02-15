@@ -75,7 +75,9 @@ jobs:
         with:
           version: "12.2.0" # It seems like newer versions are broken (follow godot-cpp)
       - if: "matrix.target.os == 'windows-2025'"
-        run: "echo 'LDFLAGS=-Wl,-allow-multiple-definition' >> $GITHUB_ENV"
+        run: |
+          echo 'LDFLAGS=-Wl,-allow-multiple-definition' >> $GITHUB_ENV
+          echo "cmake_extra_args='-DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=Embedded'" >> $GITHUB_ENV
       - if: "matrix.target.os == 'macos-15'"
         run: "brew install autoconf automake autoconf-archive"
       - if: "matrix.target.vcpkg_triplet == 'wasm32-emscripten-pic'"
@@ -83,7 +85,9 @@ jobs:
         with:
           version: "4.0.12" # More recent than Godot's default, since we need allow-multiple-definition support
       - if: "matrix.target.vcpkg_triplet == 'wasm32-emscripten-pic'"
-        run: 'echo "cmake_extra_args=''-DGODOTCPP_THREADS=OFF''" >> $GITHUB_ENV && echo ''LDFLAGS=-Wl,-allow-multiple-definition'' >> $GITHUB_ENV'
+        run: |
+          echo "cmake_extra_args='-DGODOTCPP_THREADS=OFF'" >> $GITHUB_ENV
+          echo 'LDFLAGS=-Wl,-allow-multiple-definition' >> $GITHUB_ENV
       - if: "contains(matrix.target.vcpkg_triplet, '-android')"
         uses: "nttld/setup-ndk@v1"
         id: "setup-ndk"
@@ -91,23 +95,13 @@ jobs:
           ndk-version: "r23c" # Same as https://github.com/godotengine/godot/blob/<GODOT_VERSION>/platform/android/detect.py
           link-to-sdk: true
       - if: "contains(matrix.target.vcpkg_triplet, '-android')"
-        run: 'echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV' # && echo \"cmake_extra_args='-DANDROID_ABI=${{ matrix.target.cmake_sys_proc }}', '-UCMAKE_SYSTEM_PROCESSOR'\"
+        run: 'echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV'
       # </Triplet-specific setup>
-
+      #
       # <Cache restore>
-      - uses: "mozilla-actions/sccache-action@v0.0.9"
-        with:
-          disable_annotations: true
       - shell: "bash"
-        run:
-          | # Installed packages and caches are exported for use as a cache in the next workflow run
+        run: | # Set up ccache directory and restore from previous artifacts
           set -ex
-          [[ -d .cache ]] || mkdir -p .cache
-          [[ -d .cache/sccache ]] || mkdir -p .cache/sccache
-          export SCCACHE_DIR=$(pwd)/.cache/sccache
-          echo "SCCACHE_DIR=$SCCACHE_DIR" >> $GITHUB_ENV # Does this work with windows paths?
-          echo "SCCACHE_CACHE_SIZE=2G" >> $GITHUB_ENV # More than enough to keep the most recent project cached (as vcpkg's installed directory is copied directly)
-
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
           workflow_ids=$(gh run list --workflow="${{ github.workflow }}" --branch="${{ github.ref_name }}" --json databaseId --limit 10 --jq '[.[] | .databaseId]')
           success=false
@@ -125,10 +119,28 @@ jobs:
           if [ "$success" != "true" ]; then
             echo "::warning ::Failed to download and extract previous vcpkg installed artifacts from any of the last 10 workflows, skipping cache..."
           fi
-
-          find vcpkg/installed/ || echo "::warning ::vcpkg/installed/ not found"  # For debugging purposes, to see if the cache was restored
-          find $SCCACHE_DIR || echo "::warning ::$SCCACHE_DIR not found"  # For debugging purposes, to see if the cache was restored
+      - uses: "Chocobo1/setup-ccache-action@v1"
+        with:
+          update_packager_index: true
+          install_ccache: true
+          prepend_symlinks_to_path: true
+          restore_cache: false # Artifacts instead of cache due to size and stricter limits on caches.
+          store_cache: false
+          windows_compile_environment: "msvc" # installs ccache via Chocolatey (works for both MSVC and MinGW builds??)
+          ccache_options: |
+            cache_dir=${{ github.workspace }}/.cache/ccache
+            max_size=2G
+            compression=true
+            compression_level=9
+      - shell: "bash"
+        run: | # Check and warn
+          ccache --version || echo "::warning ::ccache not found in PATH"
+          ccache --zero-stats || true
+          ccache -p || true
+          [ -d vcpkg/installed/ ] || echo "::warning ::vcpkg/installed/ directory not found (no cache available)"
+          [ -d ".cache/ccache" ] || echo "::warning ::.cache/ccache directory not found (no cache available)"
       # </Cache restore>
+      #
       # <Install and build>
       - shell: "bash"
         run:
@@ -143,14 +155,15 @@ jobs:
           VCPKG_DEFAULT_TRIPLET: "${{ matrix.target.vcpkg_triplet }}"
           VCPKG_OVERLAY_TRIPLETS: "vcpkg_triplets"
           VCPKG_OVERLAY_PORTS: "vcpkg_ports"
-          GD_CMAKE_ARGS: "-DGODOTCPP_TARGET=${{ matrix.target-type }} -DGODOTCPP_PRECISION=${{ matrix.float-precision }} -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache ${{ env.cmake_extra_args }}"
+          GD_CMAKE_ARGS: "-DGODOTCPP_TARGET=${{ matrix.target-type }} -DGODOTCPP_PRECISION=${{ matrix.float-precision }} ${{ env.cmake_extra_args }}"
       - if: "matrix.target.os == 'windows-2025'"
         shell: "bash" # For some unknown reason, cmake + windows does not install the dll to the proper folder, do it here...
         run: find vcpkg/buildtrees/sqlite3-gd -name "*.dll" -print -exec cp {} "demo/addons/sqlite3.gd/" \;
       # </Install and build>
+      #
       # <Cache save and export artifacts>
       - shell: "bash" # Print cache statistics
-        run: "sccache --show-stats || true"
+        run: "ccache --show-stats --verbose || ccache --show-stats || true"
       - uses: "actions/upload-artifact@v6"
         with: # Build main artifact with only the addon files
           name: "sqlite3.gd-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
@@ -159,12 +172,17 @@ jobs:
         if: "always()"
         with: # Build artifact useful for caching/debugging
           name: "vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
-          path: "vcpkg/installed/\n${{ env.SCCACHE_DIR }}"
+          path: |
+            vcpkg/installed/
+            .cache/ccache/
       - uses: "actions/upload-artifact@v6"
         if: "always()"
-        with: # Build artifact useful for caching/debugging
+        with: # Build artifact useful for caching/debugging (less important and bigger but useful if enough storage available)
           name: "vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
-          path: "vcpkg/buildtrees/\nvcpkg/packages/"
+          path: |
+            vcpkg/buildtrees/
+            vcpkg/packages/
+            vcpkg/downloads/
       # </Cache save and export artifacts>
 
   test_and_export_addon_and_demo:
@@ -174,7 +192,7 @@ jobs:
         export_target:
           [
             { os: "ubuntu-24.04", export_name: "Linux" },
-            { os: "ubuntu-24.04", export_name: "HTML5" },
+            { os: "ubuntu-24.04", export_name: "Web" },
             { os: "ubuntu-24.04", export_name: "Android" },
             { os: "windows-2025", export_name: "Windows Desktop" },
             { os: "macos-15", export_name: "macOS" },
@@ -213,7 +231,7 @@ jobs:
         run: godot --path demo --quit --headless
       - shell: bash
         run: |
-          mkdir exports
+          mkdir demo/exports
           godot --export-${{ matrix.mode }} "${{ matrix.export_target.export_name }}" --path demo --headless  # Export to the requested platform
           echo "EXPORT_NAME=$(echo "${{ matrix.export_target.export_name }}" | tr '[:upper:]' '[:lower:]' | tr -d ' /')" >> $GITHUB_ENV
       - uses: "actions/upload-artifact@v6"
@@ -241,8 +259,8 @@ jobs:
       - run: gh release upload ${{ github.ref_name }} addon.zip
 
   deploy-pages:
-    runs-on: "ubuntu-24.04"
-    needs: "test_and_export_addon_and_demo"
+    runs-on: ubuntu-24.04
+    needs: test_and_export_addon_and_demo
     if: github.ref_type == 'tag'
     permissions:
       contents: read
@@ -254,11 +272,9 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: demo-export-html5-release
-          path: html5
-      - uses: peaceiris/actions-gh-pages@v4
-        id: deployment
+          name: demo-export-web-release
+          path: web
+      - uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: html5
-          publish_branch: gh-pages
+          path: web
+      - uses: actions/deploy-pages@v4

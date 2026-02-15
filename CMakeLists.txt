@@ -30,31 +30,15 @@ endif ()
 message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}, "
     "GODOTCPP_TARGET: ${GODOTCPP_TARGET}")
 
-# Auto-enable ccache-like functionality if available since we are rebuilding godot-cpp and the bindings frequently
-# If ccache, sccache or similar is found, use it as the CMAKE_{C,CXX}_COMPILER_LAUNCHER
+# Auto-enable ccache if available since we are rebuilding godot-cpp and the bindings frequently
+# If ccache is found, use it as the CMAKE_{C,CXX}_COMPILER_LAUNCHER
 find_program(CCACHE_EXECUTABLE ccache)
 if(CCACHE_EXECUTABLE)
-    message(STATUS "Using ccache as compiler launcher: "
-        "${CCACHE_EXECUTABLE}")
-    set(CMAKE_C_COMPILER_LAUNCHER
-        ${CCACHE_EXECUTABLE})
+    message(STATUS "Using ccache as compiler launcher: ${CCACHE_EXECUTABLE}")
+    set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE_EXECUTABLE})
     set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_EXECUTABLE})
-endif()
-file(GLOB HELPER_PATHS_WIN_SCCACHE_GITHUB_ACTIONS "C:/hostedtoolcache/windows/sccache/*/*")
-message("Looking for sccache in: "
-    "${HELPER_PATHS_WIN_SCCACHE_GITHUB_ACTIONS}")
-find_program(SCCACHE_EXECUTABLE sccache
-    PATHS ${HELPER_PATHS_WIN_SCCACHE_GITHUB_ACTIONS})
-if(SCCACHE_EXECUTABLE)
-    message(STATUS "Using sccache as compiler launcher: "
-        "${SCCACHE_EXECUTABLE}")
-    set(CMAKE_C_COMPILER_LAUNCHER
-        ${SCCACHE_EXECUTABLE})
-    set(CMAKE_CXX_COMPILER_LAUNCHER ${SCCACHE_EXECUTABLE})
-endif()
-if(NOT CCACHE_EXECUTABLE AND NOT SCCACHE_EXECUTABLE)
-    message(STATUS "No ccache or sccache found, not using a compiler "
-        "launcher")
+else()
+    message(STATUS "ccache not found, not using a compiler launcher")
 endif()
 
 # Auto-force full LTO in release builds if available
