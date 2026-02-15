@@ -75,9 +75,7 @@ jobs:
         with:
           version: "12.2.0" # It seems like newer versions are broken (follow godot-cpp)
       - if: "matrix.target.os == 'windows-2025'"
-        run: |
-          echo 'LDFLAGS=-Wl,-allow-multiple-definition' >> $GITHUB_ENV
-          echo "cmake_extra_args='-DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=Embedded'" >> $GITHUB_ENV
+        run: "echo 'LDFLAGS=-Wl,-allow-multiple-definition' >> $GITHUB_ENV"
       - if: "matrix.target.os == 'macos-15'"
         run: "brew install autoconf automake autoconf-archive"
       - if: "matrix.target.vcpkg_triplet == 'wasm32-emscripten-pic'"
@@ -162,8 +160,6 @@ jobs:
       # </Install and build>
       #
       # <Cache save and export artifacts>
-      - shell: "bash" # Print cache statistics
-        run: "ccache --show-stats --verbose || ccache --show-stats || true"
       - uses: "actions/upload-artifact@v6"
         with: # Build main artifact with only the addon files
           name: "sqlite3.gd-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
