@@ -164,7 +164,7 @@ jobs:
         if: "always()"
         with: # Build artifact useful for caching/debugging
           name: "vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
-          path: "vcpkg/buildtrees/\nvcpkg/packages/"
+          path: "vcpkg/buildtrees/\nvcpkg/packages/\nvcpkg/downloads/"
       # </Cache save and export artifacts>
 
   test_and_export_addon_and_demo:
