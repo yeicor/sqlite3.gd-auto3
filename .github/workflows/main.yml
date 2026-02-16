@@ -152,8 +152,8 @@ jobs:
             workflow_ids=$(gh run list --workflow="${{ github.workflow }}" --branch="$branch" --json databaseId --limit 10 --jq '[.[] | .databaseId]')
             for workflow_id in $(echo "$workflow_ids" | jq -r '.[]' | tr -d '\r'); do
               if [ "$success" != "true" ] && \
-                 gh run download "$workflow_id" --name "$ARTIFACT_INSTALLED" && \
-                 gh run download "$workflow_id" --name "$ARTIFACT_BUILDTREES"; then
+                 gh run download "$workflow_id" --name "$ARTIFACT_INSTALLED" --dir "$HOME" && \
+                 gh run download "$workflow_id" --name "$ARTIFACT_BUILDTREES" --dir vcpkg; then
                 echo "Successfully downloaded artifacts from workflow $workflow_id on branch $branch."
                 success=true
               elif [ "$success" == "true" ] && [ "$delete_artifacts" = "true" ]; then
