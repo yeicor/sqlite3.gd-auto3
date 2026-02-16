@@ -149,15 +149,15 @@ jobs:
           mkdir -p sccache-shim
           for tool in cl clang-cl rc; do
             cat >"sccache-shim/${tool}.cmd" <<EOF
-            @echo off
-            if defined SCCACHE_WRAPPER_ACTIVE (
-              ${tool}.exe %*
-              exit /b %errorlevel%
-            )
-            set SCCACHE_WRAPPER_ACTIVE=1
-            sccache.exe ${tool}.exe %*
+          @echo off
+          if defined SCCACHE_WRAPPER_ACTIVE (
+            ${tool}.exe %*
             exit /b %errorlevel%
-            EOF
+          )
+          set SCCACHE_WRAPPER_ACTIVE=1
+          sccache.exe ${tool}.exe %*
+          exit /b %errorlevel%
+          EOF
           done
           echo "$PWD/sccache-shim" >> $GITHUB_PATH
       - shell: "bash"
