@@ -128,7 +128,7 @@ jobs:
           set -ex
           SCCACHE_DIR="$(realpath "${{ github.workspace }}/.cache/sccache")" && echo "SCCACHE_DIR=$SCCACHE_DIR" >> $GITHUB_ENV
           SCCACHE_CACHE_SIZE=2G && echo "SCCACHE_CACHE_SIZE=$SCCACHE_CACHE_SIZE" >> $GITHUB_ENV
-          _M_SCCACHE_BIN_DIR=$(dirname $(which sccache)) && echo "CMAKE_PROGRAM_PATH=$_M_SCCACHE_BIN_DIR" >> $GITHUB_ENV
+          _M_SCCACHE_BIN_DIR=$(dirname $(which sccache)) && echo "cmake_extra_args=${{ env.cmake_extra_args }} -DCMAKE_PROGRAM_PATH=$_M_SCCACHE_BIN_DIR" >> $GITHUB_ENV
           which sccache
           sccache --version
           sccache --zero-stats
