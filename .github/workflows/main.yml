@@ -140,6 +140,7 @@ jobs:
           set -e
           ARTIFACT_INSTALLED="vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
           ARTIFACT_BUILDTREES="vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
+          touch /tmp/.empty  # See upload below
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
           success=false
           delete_artifacts=true
@@ -244,7 +245,7 @@ jobs:
           path: | # /tmp/ forces consistant root directory to /
             vcpkg/installed/
             ${{ env.SCCACHE_DIR }}
-            /tmp/
+            /tmp/.empty
 
       - name: Upload vcpkg buildtrees artifact
         uses: actions/upload-artifact@v6
@@ -255,7 +256,7 @@ jobs:
             vcpkg/buildtrees/
             vcpkg/packages/
             vcpkg/downloads/
-            /tmp/
+            /tmp/.empty
       # </Cache save and export artifacts>
 
   test_and_export_addon_and_demo:
