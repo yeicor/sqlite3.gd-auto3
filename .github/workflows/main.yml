@@ -202,8 +202,8 @@ jobs:
           set -e
           echo "$GD_CMAKE_ARGS" >__GD_CMAKE_ARGS
           "vcpkg/bootstrap-vcpkg${{matrix.target.os == 'windows-2025' && '.bat' || '.sh'}}"
-          "vcpkg/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" remove sqlite3-gd --classic || true
-          "vcpkg/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" install sqlite3-gd --classic
+          "vcpkg/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" remove gdext --classic || true
+          "vcpkg/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" install gdext --classic
         env:
           VCPKG_DISABLE_METRICS: 1
           VCPKG_DEFAULT_TRIPLET: ${{ matrix.target.vcpkg_triplet }}
@@ -216,7 +216,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          find vcpkg/buildtrees/sqlite3-gd -name "*.dll" -print -exec cp {} "demo/addons/sqlite3.gd/" \;
+          find vcpkg/buildtrees/gdext -name "*.dll" -print -exec cp {} "demo/addons/*/" \;
 
       - name: Clean sccache
         shell: bash
@@ -233,8 +233,8 @@ jobs:
         uses: actions/upload-artifact@v6
         if: ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')
         with:
-          name: sqlite3.gd-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}
-          path: demo/addons/sqlite3.gd/**
+          name: gdext-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}
+          path: demo/addons/gdext/**
 
       - name: Upload vcpkg installed artifact
         uses: actions/upload-artifact@v6
@@ -286,8 +286,8 @@ jobs:
       - name: Download addon artifacts
         uses: actions/download-artifact@v7
         with:
-          pattern: sqlite3.gd-*
-          path: demo/addons/sqlite3.gd
+          pattern: gdext-*
+          path: demo/addons/gdext
           merge-multiple: true
 
       - name: Setup Android NDK

@@ -16,7 +16,6 @@
 
 # Godot auto generated files
 /demo/.godot/
-# Ignore library files but not the gdextension file
-/demo/addons/sqlite3.gd/*
-!/demo/addons/sqlite3.gd/sqlite3.gd.gdextension
+/demo/addons/*/*
+!/demo/addons/*/gdext.gdextension*
 /demo/exports

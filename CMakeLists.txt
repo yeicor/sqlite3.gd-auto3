@@ -19,14 +19,8 @@ endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-project(sqlite3.gd CXX)
-
-# Syntax-only mode for fast builds (only checks syntax, does not link or
-# install)
-if(SYNTAX_ONLY)
-    message(STATUS "SYNTAX_ONLY mode enabled: Only checking syntax, "
-        "skipping linking and installation.")
-endif()
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+project(sqlite3.gd CXX)  # TODO: Change to your project name, e.g., project(my_extension CXX)
 
 # Check that both CMAKE_BUILD_TYPE and GODOTCPP_TARGET are set correctly
 # (always required)
@@ -85,7 +79,7 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/godot-cpp")
 
 
 # Dependencies
-find_package(unofficial-sqlite3 CONFIG REQUIRED)
+find_package(unofficial-sqlite3 CONFIG REQUIRED)  # TODO: Replace with your dependencies
 
 # Define the documentation sources (the godot-cpp cmake version does not
 # work?)
@@ -111,45 +105,22 @@ endif()
 
 # Define the shared library target
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/**/*.cpp")
-if(SYNTAX_ONLY)
-    # Syntax-only mode: Compile sources as OBJECT library, do not link or install
-    add_library(${PROJECT_NAME}_syntax_only OBJECT ${SOURCES} ${DOC_GEN_FILE})
-    target_link_libraries(${PROJECT_NAME}_syntax_only PRIVATE godot-cpp unofficial::sqlite3::sqlite3)
-    target_compile_options(${PROJECT_NAME}_syntax_only PRIVATE
-        $<$<CXX_COMPILER_ID:GNU,Clang>:-fsyntax-only>
-        $<$<CXX_COMPILER_ID:MSVC>:/Zs>
-    )
-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/") # No-op installation
+if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+    add_library(${PROJECT_NAME} MODULE ${SOURCES} ${DOC_GEN_FILE})
+    target_link_options(${PROJECT_NAME} PRIVATE "-sSIDE_MODULE=1")
 else()
-    if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
-        add_library(${PROJECT_NAME} MODULE ${SOURCES} ${DOC_GEN_FILE})
-        target_link_options(${PROJECT_NAME} PRIVATE "-sSIDE_MODULE=1")
-    else()
-        add_library(${PROJECT_NAME} SHARED ${SOURCES} ${DOC_GEN_FILE})
-    endif()
-    target_link_libraries(${PROJECT_NAME} PRIVATE godot-cpp unofficial::sqlite3::sqlite3)
-
-    # Install the complete bindings to the demo project with the correct suffix
-    get_target_property(GODOTCPP_SUFFIX godot-cpp GODOTCPP_SUFFIX)
-    set(OUTPUT_NAME "${PROJECT_NAME}${GODOTCPP_SUFFIX}")
-    if (NOT DEFINED _INSTALL_TO_ROOT)
-        set(_INSTALL_TO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
-    endif ()
-    set(INSTALL_FOLDER "${_INSTALL_TO_ROOT}/demo/addons/${PROJECT_NAME}")
-    message("Will install shared library to: ${INSTALL_FOLDER}")
-    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${OUTPUT_NAME}")
-    install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION "${INSTALL_FOLDER}")
-    # FIXME: Try harder to install to the proper directory on windows???
+    add_library(${PROJECT_NAME} SHARED ${SOURCES} ${DOC_GEN_FILE})
 endif()
+target_link_libraries(${PROJECT_NAME} PRIVATE godot-cpp unofficial::sqlite3::sqlite3)
 
-# Copy compile_commands.json to source dir for IDE support
-if(CMAKE_EXPORT_COMPILE_COMMANDS)
-    add_custom_command(
-        OUTPUT ${CMAKE_SOURCE_DIR}/compile_commands.json
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json
-        DEPENDS ${CMAKE_BINARY_DIR}/compile_commands.json
-        COMMENT "Copying compile_commands.json to source directory"
-    )
-    add_custom_target(copy_compile_commands
-        DEPENDS ${CMAKE_SOURCE_DIR}/compile_commands.json)
-endif()
+# Install the complete bindings to the demo project with the correct suffix
+get_target_property(GODOTCPP_SUFFIX godot-cpp GODOTCPP_SUFFIX)
+set(OUTPUT_NAME "gdext${GODOTCPP_SUFFIX}")
+if (NOT DEFINED _INSTALL_TO_ROOT)
+    set(_INSTALL_TO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
+endif ()
+set(INSTALL_FOLDER "${_INSTALL_TO_ROOT}/demo/addons/${PROJECT_NAME}")
+message("Will install shared library to: ${INSTALL_FOLDER}")
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${OUTPUT_NAME}")
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION "${INSTALL_FOLDER}")
+# FIXME: Try harder to install to the proper directory on windows???

@@ -1,5 +1,5 @@
 {
-  "name": "sqlite3-gd",
+  "name": "gdext",
   "version": "0.0.1",
   "dependencies": ["sqlite3", "gtest"]
 }

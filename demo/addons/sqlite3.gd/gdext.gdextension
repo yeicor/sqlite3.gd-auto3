@@ -1,0 +1,81 @@
+[configuration]
+
+entry_symbol = "gdext_library_init"
+compatibility_minimum = "4.1"
+
+[libraries] ; See the workflow for build instructions (or simply download the prebuilt libraries)
+
+linux.x86_64.single.debug = "./libgdext.linux.template_debug.debug.x86_64.so"
+linux.x86_64.double.debug = "./libgdext.linux.template_debug.debug.x86_64.double.so"
+linux.x86_64.single.release = "./libgdext.linux.template_release.release.x86_64.so"
+linux.x86_64.double.release = "./libgdext.linux.template_release.release.x86_64.double.so"
+
+linux.x86_32.single.debug = "./libgdext.linux.template_debug.debug.x86_32.so"
+linux.x86_32.double.debug = "./libgdext.linux.template_debug.debug.x86_32.double.so"
+linux.x86_32.single.release = "./libgdext.linux.template_release.release.x86_32.so"
+linux.x86_32.double.release = "./libgdext.linux.template_release.release.x86_32.double.so"
+
+linux.arm64.single.debug = "./libgdext.linux.template_debug.debug.arm64.so"
+linux.arm64.double.debug = "./libgdext.linux.template_debug.debug.arm64.double.so"
+linux.arm64.single.release = "./libgdext.linux.template_release.release.arm64.so"
+linux.arm64.double.release = "./libgdext.linux.template_release.release.arm64.double.so"
+
+linux.arm32.single.debug = "./libgdext.linux.template_debug.debug.arm32.so"
+linux.arm32.double.debug = "./libgdext.linux.template_debug.debug.arm32.double.so"
+linux.arm32.single.release = "./libgdext.linux.template_release.release.arm32.so"
+linux.arm32.double.release = "./libgdext.linux.template_release.release.arm32.double.so"
+
+windows.x86_64.single.debug = "./gdext.windows.template_debug.debug.x86_64.dll"
+windows.x86_64.double.debug = "./gdext.windows.template_debug.debug.x86_64.double.dll"
+windows.x86_64.single.release = "./gdext.windows.template_release.release.x86_64.dll"
+windows.x86_64.double.release = "./gdext.windows.template_release.release.x86_64.double.dll"
+
+windows.x86_32.single.debug = "./gdext.windows.template_debug.debug.x86_32.dll"
+windows.x86_32.double.debug = "./gdext.windows.template_debug.debug.x86_32.double.dll"
+windows.x86_32.single.release = "./gdext.windows.template_release.release.x86_32.dll"
+windows.x86_32.double.release = "./gdext.windows.template_release.release.x86_32.double.dll"
+
+windows.arm64.single.debug = "./gdext.windows.template_debug.debug.arm64.dll"
+windows.arm64.double.debug = "./gdext.windows.template_debug.debug.arm64.double.dll"
+windows.arm64.single.release = "./gdext.windows.template_release.release.arm64.dll"
+windows.arm64.double.release = "./gdext.windows.template_release.release.arm64.double.dll"
+
+macos.x86_64.single.debug = "./libgdext.macos.template_debug.debug.x86_64.dylib"
+macos.x86_64.double.debug = "./libgdext.macos.template_debug.debug.x86_64.double.dylib"
+macos.x86_64.single.release = "./libgdext.macos.template_release.release.x86_64.dylib"
+macos.x86_64.double.release = "./libgdext.macos.template_release.release.x86_64.double.dylib"
+
+macos.arm64.single.debug = "./libgdext.macos.template_debug.debug.arm64.dylib"
+macos.arm64.double.debug = "./libgdext.macos.template_debug.debug.arm64.double.dylib"
+macos.arm64.single.release = "./libgdext.macos.template_release.release.arm64.dylib"
+macos.arm64.double.release = "./libgdext.macos.template_release.release.arm64.double.dylib"
+
+web.wasm32.single.debug = "./libgdext.web.template_debug.debug.wasm32.nothreads.so"
+web.wasm32.double.debug = "./libgdext.web.template_debug.debug.wasm32.double.nothreads.so"
+web.wasm32.single.release = "./libgdext.web.template_release.release.wasm32.nothreads.so"
+web.wasm32.double.release = "./libgdext.web.template_release.release.wasm32.double.nothreads.so"
+
+android.x86_64.single.debug = "./libgdext.android.template_debug.debug.x86_64.so"
+android.x86_64.double.debug = "./libgdext.android.template_debug.debug.x86_64.double.so"
+android.x86_64.single.release = "./libgdext.android.template_release.release.x86_64.so"
+android.x86_64.double.release = "./libgdext.android.template_release.release.x86_64.double.so"
+
+android.x86_32.single.debug = "./libgdext.android.template_debug.debug.x86_32.so"
+android.x86_32.double.debug = "./libgdext.android.template_debug.debug.x86_32.double.so"
+android.x86_32.single.release = "./libgdext.android.template_release.release.x86_32.so"
+android.x86_32.double.release = "./libgdext.android.template_release.release.x86_32.double.so"
+
+android.arm64.single.debug = "./libgdext.android.template_debug.debug.arm64.so"
+android.arm64.double.debug = "./libgdext.android.template_debug.debug.arm64.double.so"
+android.arm64.single.release = "./libgdext.android.template_release.release.arm64.so"
+android.arm64.double.release = "./libgdext.android.template_release.release.arm64.double.so"
+
+android.arm32.single.debug = "./libgdext.android.template_debug.debug.arm32.so"
+android.arm32.double.debug = "./libgdext.android.template_debug.debug.arm32.double.so"
+android.arm32.single.release = "./libgdext.android.template_release.release.arm32.so"
+android.arm32.double.release = "./libgdext.android.template_release.release.arm32.double.so"
+
+ios.arm64.single.debug = "./libgdext.ios.template_debug.debug.arm64.dylib"
+ios.arm64.double.debug = "./libgdext.ios.template_debug.debug.arm64.double.dylib"
+ios.arm64.single.release = "./libgdext.ios.template_release.release.arm64.dylib"
+ios.arm64.double.release = "./libgdext.ios.template_release.release.arm64.double.dylib"

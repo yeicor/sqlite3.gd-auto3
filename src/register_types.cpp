@@ -13,7 +13,7 @@
 
 using namespace godot;
 
-void sqlite3_gd_initialize_module(ModuleInitializationLevel p_level) {
+void gdext_initialize_module(ModuleInitializationLevel p_level) {
     if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
         return;
     }
@@ -27,7 +27,7 @@ void sqlite3_gd_initialize_module(ModuleInitializationLevel p_level) {
     GDREGISTER_CLASS(SQLite3Blob);
 }
 
-void sqlite3_gd_uninitialize_module(ModuleInitializationLevel p_level) {
+void gdext_uninitialize_module(ModuleInitializationLevel p_level) {
     if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
         return;
     }
@@ -35,7 +35,7 @@ void sqlite3_gd_uninitialize_module(ModuleInitializationLevel p_level) {
 }
 
 extern "C" {
-    GDExtensionBool GDE_EXPORT sqlite3_gd_library_init(
+    GDExtensionBool GDE_EXPORT gdext_library_init(
         GDExtensionInterfaceGetProcAddress p_get_proc_address,
         const GDExtensionClassLibraryPtr p_library,
         GDExtensionInitialization *r_initialization
@@ -44,8 +44,8 @@ extern "C" {
             p_get_proc_address, p_library, r_initialization
         );
 
-        init_obj.register_initializer(sqlite3_gd_initialize_module);
-        init_obj.register_terminator(sqlite3_gd_uninitialize_module);
+        init_obj.register_initializer(gdext_initialize_module);
+        init_obj.register_terminator(gdext_uninitialize_module);
         init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_SCENE);
 
         return init_obj.init();
