@@ -152,8 +152,8 @@ jobs:
             workflow_ids=$(gh run list --workflow="${{ github.workflow }}" --branch="$branch" --json databaseId --limit 10 --jq '[.[] | .databaseId]')
             for workflow_id in $(echo "$workflow_ids" | jq -r '.[]' | tr -d '\r'); do
               if [ "$success" != "true" ] && \
-                 gh run download "$workflow_id" --name "$ARTIFACT_INSTALLED" --dir "$HOME" && \
-                 gh run download "$workflow_id" --name "$ARTIFACT_BUILDTREES" --dir vcpkg; then
+                 gh run download "$workflow_id" --name "$ARTIFACT_INSTALLED" --dir / && \
+                 gh run download "$workflow_id" --name "$ARTIFACT_BUILDTREES" --dir /; then
                 echo "Successfully downloaded artifacts from workflow $workflow_id on branch $branch."
                 success=true
               elif [ "$success" == "true" ] && [ "$delete_artifacts" = "true" ]; then
@@ -241,19 +241,21 @@ jobs:
         if: always() && ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')
         with:
           name: vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}
-          path: |
+          path: | # /tmp/ forces consistant root directory to /
             vcpkg/installed/
             ${{ env.SCCACHE_DIR }}
+            /tmp/
 
       - name: Upload vcpkg buildtrees artifact
         uses: actions/upload-artifact@v6
         if: always() && ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')
         with:
           name: vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}
-          path: |
+          path: | # /tmp/ forces consistant root directory to /
             vcpkg/buildtrees/
             vcpkg/packages/
             vcpkg/downloads/
+            /tmp/
       # </Cache save and export artifacts>
 
   test_and_export_addon_and_demo:
