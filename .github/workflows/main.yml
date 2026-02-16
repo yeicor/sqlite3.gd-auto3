@@ -173,26 +173,15 @@ jobs:
             echo "::warning ::Failed to download and extract previous vcpkg installed artifacts from any of the last 10 workflows on current branch or main branch, skipping cache..."
           fi
 
-      - name: Setup sccache
-        uses: Mozilla-Actions/sccache-action@v0.0.9
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@v1.2
         with:
-          disable_annotations: true
-
-      - name: Configure sccache
-        shell: bash
-        run: |
-          set -e
-          export SCCACHE_DIR="$(sccache --show-stats | grep "Cache location" | cut -d '"' -f2 | sed 's/\\\\/\\/g')"
-          export SCCACHE_DIR="$(echo "$SCCACHE_DIR" | sed -E 's#([A-Za-z]):#/\L\1#g; s#\\\\#/#g; s#\\#/#g')"
-          echo "SCCACHE_DIR=$SCCACHE_DIR" >> $GITHUB_ENV
-          export SCCACHE_CACHE_SIZE=2G && echo "SCCACHE_CACHE_SIZE=$SCCACHE_CACHE_SIZE" >> $GITHUB_ENV
-          sccache --zero-stats
-          if [ ! -d vcpkg/installed/ ]; then
-            echo "::warning ::vcpkg/installed/ directory not found (no cache available)"
-          fi
-          if [ ! -d "$HOME/.cache/sccache" ]; then
-            echo "::warning ::$HOME/.cache/sccache directory not found (no cache available)"
-          fi
+          variant: ccache # sccache also supported and may be better on some platforms.
+          max-size: 2G
+          save: false
+          restore: false
+          create-symlink: false
+          job-summary: ""
 
       - name: Install and build with vcpkg
         shell: bash
@@ -217,20 +206,20 @@ jobs:
           set -e
           find vcpkg/buildtrees/gdext -name "*.dll" -print -exec cp {} "demo/addons/*/" \;
 
-      - name: Clean sccache
+      - name: Print ccache stats
         shell: bash
         run: |
           set -e
-          sccache --show-stats
-          DELETED_COUNT=$(find "$SCCACHE_DIR" -type f ! -anewer vcpkg/vcpkg -delete -print | wc -l) || { echo "Find failed"; DELETED_COUNT=0; }
-          if [ "$DELETED_COUNT" -gt 0 ]; then
-            echo " ==> Deleted $DELETED_COUNT files from sccache that were not read during this build. New stats:"
-            sccache --show-stats
-          fi
+          ccache --show-stats || sccache --show-stats
+          start_time=$(date -r vcpkg/vcpkg +%s 2>/dev/null || date +%s)
+          current_time=$(date +%s)
+          elapsed=$((current_time - start_time))
+          ccache --evict-older-than ${elapsed}s
+          ccache --show-stats || sccache --show-stats
 
       - name: Upload addon artifact
         uses: actions/upload-artifact@v6
-        if: ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')
+        if: "! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')"
         with:
           name: gdext-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}
           path: demo/addons/gdext/**
@@ -242,7 +231,8 @@ jobs:
           name: vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}
           path: | # /tmp/ forces consistant root directory to /
             vcpkg/installed/
-            ${{ env.SCCACHE_DIR }}
+            .ccache/
+            .sccache/
             /.fake-path-to-force-root-directory
 
       - name: Upload vcpkg buildtrees artifact
