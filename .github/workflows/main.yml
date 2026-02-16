@@ -2,12 +2,12 @@ on:
   workflow_call:
   push:
     branches:
-      - "main"
+      - main
     tags:
-      - "v*"
+      - v*
   pull_request:
     branches:
-      - "main"
+      - main
   merge_group:
 
 jobs:
@@ -17,53 +17,71 @@ jobs:
       matrix:
         target: [
             # https://docs.godotengine.org/en/stable/about/system_requirements.html
-            { vcpkg_triplet: "x64-linux", os: "ubuntu-24.04" },
-            # { vcpkg_triplet: "x86-linux", os: "ubuntu-24.04" },
-            # { vcpkg_triplet: "arm64-linux", os: "ubuntu-24.04-arm" },
-            # { vcpkg_triplet: "arm-linux", os: "ubuntu-24.04-arm" },
-            { vcpkg_triplet: "x64-mingw-static", os: "windows-2025" },
-            # { vcpkg_triplet: "x86-mingw-static", os: "windows-2025" },
-            # { vcpkg_triplet: "arm64-mingw-static", os: "windows-2025" },
-            { vcpkg_triplet: "x64-windows-static", os: "windows-2025" }, # MSVC instead of mingw
-            # { vcpkg_triplet: "x86-windows-static", os: "windows-2025" }, # MSVC instead of mingw
-            # { vcpkg_triplet: "arm64-windows-static", os: "windows-2025" }, # MSVC instead of mingw
-            # { vcpkg_triplet: "arm64-osx", os: "macos-15" },
-            # { vcpkg_triplet: "x64-osx", os: "macos-15" },
-            { vcpkg_triplet: "wasm32-emscripten-pic", os: "ubuntu-24.04" },
-            # { vcpkg_triplet: "x64-android", os: "ubuntu-24.04" },
-            # { vcpkg_triplet: "x86-android", os: "ubuntu-24.04" },
-            { vcpkg_triplet: "arm64-android", os: "ubuntu-24.04" },
-            # { vcpkg_triplet: "arm-android", os: "ubuntu-24.04" },
-            { vcpkg_triplet: "arm64-ios", os: "macos-15" },
+            { vcpkg_triplet: x64-linux, os: ubuntu-24.04 },
+            # { vcpkg_triplet: x86-linux, os: ubuntu-24.04 },
+            # { vcpkg_triplet: arm64-linux, os: ubuntu-24.04-arm },
+            # { vcpkg_triplet: arm-linux, os: ubuntu-24.04-arm },
+            { vcpkg_triplet: x64-mingw-static, os: windows-2025 },
+            # { vcpkg_triplet: x86-mingw-static, os: windows-2025 },
+            # { vcpkg_triplet: arm64-mingw-static, os: windows-2025 },
+            { vcpkg_triplet: x64-windows-static, os: windows-2025 }, # MSVC instead of mingw
+            # { vcpkg_triplet: x86-windows-static, os: windows-2025 }, # MSVC instead of mingw
+            # { vcpkg_triplet: arm64-windows-static, os: windows-2025 }, # MSVC instead of mingw
+            { vcpkg_triplet: arm64-osx, os: macos-15 },
+            { vcpkg_triplet: x64-osx, os: macos-15 },
+            { vcpkg_triplet: wasm32-emscripten-pic, os: ubuntu-24.04 },
+            # { vcpkg_triplet: x64-android, os: ubuntu-24.04 },
+            # { vcpkg_triplet: x86-android, os: ubuntu-24.04 },
+            { vcpkg_triplet: arm64-android, os: ubuntu-24.04 },
+            # { vcpkg_triplet: arm-android, os: ubuntu-24.04 },
+            { vcpkg_triplet: arm64-ios, os: macos-15 },
           ]
         # Note: vcpkg forces building both Debug and Release on a single run. This is not the same as the templates!
         target-type: [
-            "template_debug",
-            # "template_release",
+            # template_debug,
+            template_release,
           ]
-        float-precision: ["single"] # TODO: , "double"
-    runs-on: "${{ matrix.target.os }}"
+        float-precision: [single] # TODO: , "double"
+    runs-on: ${{ matrix.target.os }}
     permissions:
       actions: write
     steps:
-      - if: "matrix.target.os == 'ubuntu-24.04' || matrix.target.os == 'ubuntu-24.04-arm'"
-        run: | # Free a bunch of disk space
+      - name: Free disk space (Ubuntu)
+        if: matrix.target.os == 'ubuntu-24.04' || matrix.target.os == 'ubuntu-24.04-arm'
+        shell: bash
+        run: |
+          set -e
           sudo rm -rf /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
           sudo docker image prune --all --force
           sudo docker builder prune -a
 
-      - uses: "actions/checkout@v5"
+      - name: Checkout repository
+        uses: actions/checkout@v5
         with:
-          submodules: "recursive"
+          submodules: recursive
 
-      # <Triplet-specific setup>
-      - if: "matrix.target.vcpkg_triplet == 'x86-linux'"
-        run: "sudo apt-get update && sudo apt-get install -y gcc-multilib g++-multilib"
-      - if: "matrix.target.vcpkg_triplet == 'arm-linux'"
-        run: 'sudo apt-get update && sudo apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf && echo "cmake_extra_args=''-DCMAKE_C_COMPILER=arm-linux-gnueabihf-gcc'', ''-DCMAKE_CXX_COMPILER=arm-linux-gnueabihf-g++''" >> $GITHUB_ENV'
-      - if: "matrix.target.os == 'ubuntu-24.04' || matrix.target.os == 'ubuntu-24.04-arm'"
-        run: | # Install system deps for target platform
-          set -ex
+      - name: Setup for x86 Linux
+        if: matrix.target.vcpkg_triplet == 'x86-linux'
+        shell: bash
+        run: |
+          set -e
+          sudo apt-get update
+          sudo apt-get install -y gcc-multilib g++-multilib
+
+      - name: Setup for ARM Linux
+        if: matrix.target.vcpkg_triplet == 'arm-linux'
+        shell: bash
+        run: |
+          set -e
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+          echo "cmake_extra_args='-DCMAKE_C_COMPILER=arm-linux-gnueabihf-gcc', '-DCMAKE_CXX_COMPILER=arm-linux-gnueabihf-g++'" >> $GITHUB_ENV
+
+      - name: Install system dependencies (Ubuntu)
+        if: matrix.target.os == 'ubuntu-24.04' || matrix.target.os == 'ubuntu-24.04-arm'
+        shell: bash
+        run: |
+          set -e
           arch_selector=""
           if [ "${{ matrix.target.vcpkg_triplet }}" == "x86-linux" ]; then
             arch_selector=":i386"
@@ -71,36 +89,62 @@ jobs:
           elif [ "${{ matrix.target.vcpkg_triplet }}" == "arm-linux" ]; then
             arch_selector=":armhf"
             sudo dpkg --add-architecture armhf
-          fi # Others use the native architecture
-          sudo apt-get update && sudo apt-get install -y "libx11-dev${arch_selector}" "libgl1-mesa-dev${arch_selector}" "libfontconfig-dev${arch_selector}"
-      - if: "matrix.target.os == 'windows-2025' && contains(matrix.target.vcpkg_triplet, '-mingw')"
-        uses: "egor-tensin/setup-mingw@v2"
+          fi
+          sudo apt-get update
+          sudo apt-get install -y "libx11-dev${arch_selector}" "libgl1-mesa-dev${arch_selector}" "libfontconfig-dev${arch_selector}"
+
+      - name: Setup MinGW (Windows)
+        if: matrix.target.os == 'windows-2025' && contains(matrix.target.vcpkg_triplet, '-mingw')
+        uses: egor-tensin/setup-mingw@v2
         with:
-          version: "12.2.0" # It seems like newer versions are broken (follow godot-cpp)
-      - if: "matrix.target.os == 'windows-2025'"
-        run: "echo 'LDFLAGS=-Wl,-allow-multiple-definition' >> $GITHUB_ENV"
-      - if: "matrix.target.os == 'macos-15'"
-        run: "brew install autoconf automake autoconf-archive"
-      - if: "matrix.target.vcpkg_triplet == 'wasm32-emscripten-pic'"
-        uses: "mymindstorm/setup-emsdk@v14"
-        with:
-          version: "4.0.12" # More recent than Godot's default, since we need allow-multiple-definition support
-      - if: "matrix.target.vcpkg_triplet == 'wasm32-emscripten-pic'"
-        run: echo "cmake_extra_args='-DGODOTCPP_THREADS=OFF'" >> $GITHUB_ENV
-      - if: "contains(matrix.target.vcpkg_triplet, '-android')"
-        uses: "nttld/setup-ndk@v1"
-        id: "setup-ndk"
-        with:
-          ndk-version: "r23c" # Same as https://github.com/godotengine/godot/blob/<GODOT_VERSION>/platform/android/detect.py
-          link-to-sdk: true
-      - if: "contains(matrix.target.vcpkg_triplet, '-android')"
-        run: 'echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV'
-      # </Triplet-specific setup>
-      #
-      # <Cache restore>
-      - shell: "bash" # Restore from previous artifacts that are used as caches due to size limitations of caches
+          version: 12.2.0 # It seems like newer versions are broken (follow godot-cpp)
+
+      - name: Set LDFLAGS (Windows)
+        if: matrix.target.os == 'windows-2025'
+        shell: bash
         run: |
-          set -ex
+          set -e
+          echo 'LDFLAGS=-Wl,-allow-multiple-definition' >> $GITHUB_ENV
+
+      - name: Install build tools (macOS)
+        if: matrix.target.os == 'macos-15'
+        shell: bash
+        run: |
+          set -e
+          brew install autoconf automake autoconf-archive
+
+      - name: Setup Emscripten
+        if: matrix.target.vcpkg_triplet == 'wasm32-emscripten-pic'
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 4.0.12 # More recent than Godot's default, since we need allow-multiple-definition support
+
+      - name: Configure Emscripten CMake args
+        if: matrix.target.vcpkg_triplet == 'wasm32-emscripten-pic'
+        shell: bash
+        run: |
+          set -e
+          echo "cmake_extra_args='-DGODOTCPP_THREADS=OFF'" >> $GITHUB_ENV
+
+      - name: Setup Android NDK
+        if: contains(matrix.target.vcpkg_triplet, '-android')
+        uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          ndk-version: r23c # Same as https://github.com/godotengine/godot/blob/<GODOT_VERSION>/platform/android/detect.py
+          link-to-sdk: true
+
+      - name: Set Android NDK path
+        if: contains(matrix.target.vcpkg_triplet, '-android')
+        shell: bash
+        run: |
+          set -e
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+
+      - name: Restore vcpkg cache
+        shell: bash
+        run: |
+          set -e
           ARTIFACT_INSTALLED="vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
           ARTIFACT_BUILDTREES="vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
@@ -119,7 +163,7 @@ jobs:
                  gh run download "$workflow_id" --name "$ARTIFACT_BUILDTREES"; then
                 echo "Successfully downloaded artifacts from workflow $workflow_id on branch $branch."
                 success=true
-              elif [ "$success" == "true" ] && [ "$delete_artifacts" = "true" ]; then # Delete artifacts from this older workflow
+              elif [ "$success" == "true" ] && [ "$delete_artifacts" = "true" ]; then
                 echo "Deleting artifacts with matching names from older workflow $workflow_id on branch $branch"
                 artifact_ids=$(gh api repos/${{ github.repository }}/actions/runs/$workflow_id/artifacts --jq '.artifacts[] | select(.name == "'"$ARTIFACT_INSTALLED"'" or .name == "'"$ARTIFACT_BUILDTREES"'") | .id')
                 for id in $artifact_ids; do
@@ -130,70 +174,89 @@ jobs:
                 echo "Failed to download artifacts from workflow $workflow_id on branch $branch, trying next..."
               fi
             done
-            delete_artifacts=false # Disable deletion for subsequent branches (fallback)
+            delete_artifacts=false
           done
           if [ "$success" != "true" ]; then
             echo "::warning ::Failed to download and extract previous vcpkg installed artifacts from any of the last 10 workflows on current branch or main branch, skipping cache..."
           fi
-      - uses: Mozilla-Actions/sccache-action@v0.0.9
+
+      - name: Setup sccache
+        uses: Mozilla-Actions/sccache-action@v0.0.9
         with:
           disable_annotations: true
-      - shell: "bash"
-        run: | # Check and warn
-          set -ex
+
+      - name: Configure sccache
+        shell: bash
+        run: |
+          set -e
           export SCCACHE_DIR="$(sccache --show-stats | grep "Cache location" | cut -d '"' -f2 | sed 's/\\\\/\\/g')"
-          export SCCACHE_DIR="$(echo "$SCCACHE_DIR" | sed -E 's#([A-Za-z]):#/\L\1#g; s#\\\\#/#g; s#\\#/#g')"  # win -> posix
+          export SCCACHE_DIR="$(echo "$SCCACHE_DIR" | sed -E 's#([A-Za-z]):#/\L\1#g; s#\\\\#/#g; s#\\#/#g')"
           echo "SCCACHE_DIR=$SCCACHE_DIR" >> $GITHUB_ENV
-          export SCCACHE_CACHE_SIZE=2G && echo "SCCACHE_CACHE_SIZE=$SCCACHE_CACHE_SIZE" >> $GITHUB_ENV  # Ignored??
-          sccache --show-stats # Check location?
+          export SCCACHE_CACHE_SIZE=2G && echo "SCCACHE_CACHE_SIZE=$SCCACHE_CACHE_SIZE" >> $GITHUB_ENV
+          sccache --show-stats
           sccache --zero-stats
-          [ -d vcpkg/installed/ ] || echo "::warning ::vcpkg/installed/ directory not found (no cache available)"
-          [ -d "$HOME/.cache/sccache" ] || echo "::warning ::$$HOME/.cache/sccache directory not found (no cache available)"
-      # </Cache restore>
-      #
-      # <Install and build>
-      - shell: "bash"
-        if: "! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')" # Skip msvc for non-release due to no cache support...
-        run:
-          | # HACK: Customize the vcpkg install of the main repo package with custom CMAKE_ARGS
-          set -ex
-          echo "$GD_CMAKE_ARGS" >__GD_CMAKE_ARGS # Alternative way to pass the variable (required for windows?)
+          if [ ! -d vcpkg/installed/ ]; then
+            echo "::warning ::vcpkg/installed/ directory not found (no cache available)"
+          fi
+          if [ ! -d "$HOME/.cache/sccache" ]; then
+            echo "::warning ::$HOME/.cache/sccache directory not found (no cache available)"
+          fi
+
+      - name: Install and build with vcpkg
+        shell: bash
+        if: "! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')"
+        run: |
+          set -e
+          echo "$GD_CMAKE_ARGS" >__GD_CMAKE_ARGS
           "vcpkg/bootstrap-vcpkg${{matrix.target.os == 'windows-2025' && '.bat' || '.sh'}}"
-          "vcpkg/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" remove sqlite3-gd --classic || true  # Avoid caching too much
+          "vcpkg/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" remove sqlite3-gd --classic || true
           "vcpkg/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" install sqlite3-gd --classic
         env:
-          VCPKG_DISABLE_METRICS: "1"
-          VCPKG_DEFAULT_TRIPLET: "${{ matrix.target.vcpkg_triplet }}"
-          VCPKG_OVERLAY_TRIPLETS: "vcpkg_triplets"
-          VCPKG_OVERLAY_PORTS: "vcpkg_ports"
-          GD_CMAKE_ARGS: "-DGODOTCPP_TARGET=${{ matrix.target-type }} -DGODOTCPP_PRECISION=${{ matrix.float-precision }} ${{ env.cmake_extra_args }}"
-      - if: "matrix.target.os == 'windows-2025' && ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')" # Skip msvc for non-release due to no cache support...
-        shell: "bash" # For some unknown reason, cmake + windows does not install the dll to the proper folder, do it here...
-        run: find vcpkg/buildtrees/sqlite3-gd -name "*.dll" -print -exec cp {} "demo/addons/sqlite3.gd/" \;
-      - shell: "bash"
-        run: | # Clean the cache by removing unaccessed files during this build.
+          VCPKG_DISABLE_METRICS: 1
+          VCPKG_DEFAULT_TRIPLET: ${{ matrix.target.vcpkg_triplet }}
+          VCPKG_OVERLAY_TRIPLETS: vcpkg_triplets
+          VCPKG_OVERLAY_PORTS: vcpkg_ports
+          GD_CMAKE_ARGS: -DGODOTCPP_TARGET=${{ matrix.target-type }} -DGODOTCPP_PRECISION=${{ matrix.float-precision }} ${{ env.cmake_extra_args }}
+
+      - name: Copy DLLs (Windows MinGW)
+        if: matrix.target.os == 'windows-2025' && ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')
+        shell: bash
+        run: |
+          set -e
+          find vcpkg/buildtrees/sqlite3-gd -name "*.dll" -print -exec cp {} "demo/addons/sqlite3.gd/" \;
+
+      - name: Clean sccache
+        shell: bash
+        run: |
+          set -e
           sccache --show-stats
-          find "$SCCACHE_DIR" -type f ! -anewer README.md -delete -print | wc -l || echo "Find failed"
-          sccache --show-stats
-      # </Install and build>
-      #
-      # <Cache save and export artifacts>
-      - uses: "actions/upload-artifact@v6"
-        if: "! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')" # Skip msvc for non-release due to no cache support...
-        with: # Build main artifact with only the addon files
-          name: "sqlite3.gd-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
-          path: "demo/addons/sqlite3.gd/**"
-      - uses: "actions/upload-artifact@v6"
-        if: "always() && ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')" # Skip msvc for non-release due to no cache support...
-        with: # Build artifact useful for caching/debugging
-          name: "vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
+          DELETED_COUNT=$(find "$SCCACHE_DIR" -type f ! -anewer README.md -delete -print | wc -l) || { echo "Find failed"; DELETED_COUNT=0; }
+          if [ "$DELETED_COUNT" -gt 0 ]; then
+            echo " ==> Deleted $DELETED_COUNT files from sccache that were not read during this build. New stats:"
+            sccache --show-stats
+          fi
+
+      - name: Upload addon artifact
+        uses: actions/upload-artifact@v6
+        if: ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')
+        with:
+          name: sqlite3.gd-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}
+          path: demo/addons/sqlite3.gd/**
+
+      - name: Upload vcpkg installed artifact
+        uses: actions/upload-artifact@v6
+        if: always() && ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')
+        with:
+          name: vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}
           path: |
             vcpkg/installed/
             ${{ env.SCCACHE_DIR }}
-      - uses: "actions/upload-artifact@v6"
-        if: "always() && ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')" # Skip msvc for non-release due to no cache support...
-        with: # Build artifact useful for caching/debugging (less important and bigger but useful if enough storage available)
-          name: "vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
+
+      - name: Upload vcpkg buildtrees artifact
+        uses: actions/upload-artifact@v6
+        if: always() && ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')
+        with:
+          name: vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}
           path: |
             vcpkg/buildtrees/
             vcpkg/packages/
@@ -206,84 +269,137 @@ jobs:
       matrix:
         export_target: # TODO: All architectures (although this is just a demo)
           [
-            # { os: "ubuntu-24.04", export_name: "Linux" },
-            { os: "ubuntu-24.04", export_name: "Web" },
-            # { os: "ubuntu-24.04", export_name: "Android" },
-            { os: "windows-2025", export_name: "Windows Desktop" },
-            # { os: "macos-15", export_name: "macOS" },
-            # { os: "ubuntu-24.04", export_name: "iOS" }, # I do not have a developer account (which is required to actually build the app on macos), instead use ubuntu and just export the code to compile.
+            { os: ubuntu-24.04, export_name: Linux },
+            { os: ubuntu-24.04, export_name: Web },
+            { os: ubuntu-24.04, export_name: Android },
+            { os: windows-2025, export_name: "Windows Desktop" },
+            { os: macos-15, export_name: macOS },
+            { os: ubuntu-24.04, export_name: iOS }, # I do not have a developer account (which is required to actually build the app on macos), instead use ubuntu and just export the code to compile.
           ]
         mode: [
-            # "debug",
-            "release",
+            # debug,
+            release,
           ]
-    runs-on: "${{ matrix.export_target.os }}"
-    needs: "build"
+    runs-on: ${{ matrix.export_target.os }}
+    needs: build
     steps:
-      - uses: "actions/checkout@v5"
+      - name: Checkout repository
+        uses: actions/checkout@v5
         with:
-          submodules: "recursive"
-      - uses: "actions/download-artifact@v7"
+          submodules: recursive
+
+      - name: Download addon artifacts
+        uses: actions/download-artifact@v7
         with:
-          pattern: "sqlite3.gd-*"
-          path: "demo/addons/sqlite3.gd"
+          pattern: sqlite3.gd-*
+          path: demo/addons/sqlite3.gd
           merge-multiple: true
-      - if: "matrix.export_target.export_name == 'Android'"
-        uses: "nttld/setup-ndk@v1"
-        id: "setup-ndk"
+
+      - name: Setup Android NDK
+        if: matrix.export_target.export_name == 'Android'
+        uses: nttld/setup-ndk@v1
+        id: setup-ndk
         with:
-          ndk-version: "r23c"
-      - if: "matrix.export_target.export_name == 'Android'"
-        run: 'echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV'
-      - if: "matrix.export_target.export_name == 'Android' && matrix.mode == 'release'"
+          ndk-version: r23c
+
+      - name: Set Android NDK path
+        if: matrix.export_target.export_name == 'Android'
+        shell: bash
         run: |
-          sudo apt-get update && sudo apt-get install -y openjdk-17-jdk
+          set -e
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+
+      - name: Setup Android keystore
+        if: matrix.export_target.export_name == 'Android' && matrix.mode == 'release'
+        shell: bash
+        run: |
+          set -e
+          sudo apt-get update
+          sudo apt-get install -y openjdk-17-jdk
           keytool -genkeypair -v -storetype PKCS12 -keystore ${{ github.workspace }}/demo/android_keystore.p12 -alias androidkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Unknown, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown"
           echo "GODOT_ANDROID_KEYSTORE_RELEASE_PATH=${{ github.workspace }}/demo/android_keystore.p12" >> $GITHUB_ENV
           echo "GODOT_ANDROID_KEYSTORE_RELEASE_USER=androidkey" >> $GITHUB_ENV
           echo "GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD=android" >> $GITHUB_ENV
-      - uses: chickensoft-games/setup-godot@v2
+
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v2
         with:
           version: 4.6.0
           use-dotnet: false
           include-templates: true
-      - if: "matrix.export_target.export_name == 'Android'"
-        run: 'echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV'
-      - shell: bash
-        run: godot --path demo --editor --quit --headless || true # An editor run is always needed for proper imports. crashes after doing what we want, so it is ok
-      - shell: bash
-        if: "matrix.export_target.export_name == 'Linux' || matrix.export_target.export_name == 'Windows Desktop' || matrix.export_target.export_name == 'macOS'" # Once per platform run demo/test
-        run: godot --path demo --quit --headless
-      - shell: bash
+
+      - name: Ensure Android NDK path
+        if: matrix.export_target.export_name == 'Android'
+        shell: bash
         run: |
+          set -e
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+
+      - name: Run Godot editor
+        shell: bash
+        run: |
+          set -e
+          godot --path demo --editor --quit --headless || true
+
+      - name: Run demo test
+        shell: bash
+        if: matrix.export_target.export_name == 'Linux' || matrix.export_target.export_name == 'Windows Desktop' || matrix.export_target.export_name == 'macOS'
+        run: |
+          set -e
+          godot --path demo --quit --headless
+
+      - name: Export demo
+        shell: bash
+        run: |
+          set -e
           mkdir demo/exports
           godot --export-${{ matrix.mode }} "${{ matrix.export_target.export_name }}" --path demo --headless
           echo "EXPORT_NAME=$(echo "${{ matrix.export_target.export_name }}" | tr '[:upper:]' '[:lower:]' | tr -d ' /')" >> $GITHUB_ENV
-      - uses: "actions/upload-artifact@v6"
+
+      - name: Upload demo export artifact
+        uses: actions/upload-artifact@v6
         with:
-          name: "demo-export-${{ env.EXPORT_NAME }}-${{ matrix.mode }}"
-          path: "demo/exports/**"
-      - if: "matrix.export_target.export_name == 'Linux' && matrix.mode == 'release'" # Once
-        run: mkdir -p addon-export && cp -r demo/addons addon-export
-      - uses: "actions/upload-artifact@v6"
-        if: "matrix.export_target.export_name == 'Linux' && matrix.mode == 'release'" # Once
-        with: # This is the one to publish in the asset store (proper paths)
-          name: "addon"
-          path: "addon-export"
+          name: demo-export-${{ env.EXPORT_NAME }}-${{ matrix.mode }}
+          path: demo/exports/**
+
+      - name: Prepare addon export
+        if: matrix.export_target.export_name == 'Linux' && matrix.mode == 'release'
+        shell: bash
+        run: |
+          set -e
+          mkdir -p addon-export && cp -r demo/addons addon-export
+
+      - name: Upload addon artifact
+        uses: actions/upload-artifact@v6
+        if: matrix.export_target.export_name == 'Linux' && matrix.mode == 'release'
+        with:
+          name: addon
+          path: addon-export
 
   release:
-    runs-on: "ubuntu-24.04"
-    needs: "test_and_export_addon_and_demo"
+    runs-on: ubuntu-24.04
+    needs: test_and_export_addon_and_demo
     if: github.ref_type == 'tag'
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Download addon artifact
+        uses: actions/download-artifact@v4
         with:
           name: addon
           path: .
-      - run: zip -r addon.zip addons
-      - run: gh release upload ${{ github.ref_name }} addon.zip
+
+      - name: Create addon zip
+        shell: bash
+        run: |
+          set -e
+          zip -r addon.zip addons
+
+      - name: Upload to release
+        shell: bash
+        run: |
+          set -e
+          gh release upload ${{ github.ref_name }} addon.zip
 
   deploy-pages:
     runs-on: ubuntu-24.04
@@ -297,11 +413,16 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Download web demo artifact
+        uses: actions/download-artifact@v4
         with:
           name: demo-export-web-release
           path: web
-      - uses: actions/upload-pages-artifact@v3
+
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: web
-      - uses: actions/deploy-pages@v4
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
