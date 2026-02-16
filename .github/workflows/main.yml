@@ -186,7 +186,6 @@ jobs:
           export SCCACHE_DIR="$(echo "$SCCACHE_DIR" | sed -E 's#([A-Za-z]):#/\L\1#g; s#\\\\#/#g; s#\\#/#g')"
           echo "SCCACHE_DIR=$SCCACHE_DIR" >> $GITHUB_ENV
           export SCCACHE_CACHE_SIZE=2G && echo "SCCACHE_CACHE_SIZE=$SCCACHE_CACHE_SIZE" >> $GITHUB_ENV
-          sccache --show-stats
           sccache --zero-stats
           if [ ! -d vcpkg/installed/ ]; then
             echo "::warning ::vcpkg/installed/ directory not found (no cache available)"
@@ -223,7 +222,7 @@ jobs:
         run: |
           set -e
           sccache --show-stats
-          DELETED_COUNT=$(find "$SCCACHE_DIR" -type f ! -anewer README.md -delete -print | wc -l) || { echo "Find failed"; DELETED_COUNT=0; }
+          DELETED_COUNT=$(find "$SCCACHE_DIR" -type f ! -anewer vcpkg/vcpkg -delete -print | wc -l) || { echo "Find failed"; DELETED_COUNT=0; }
           if [ "$DELETED_COUNT" -gt 0 ]; then
             echo " ==> Deleted $DELETED_COUNT files from sccache that were not read during this build. New stats:"
             sccache --show-stats
