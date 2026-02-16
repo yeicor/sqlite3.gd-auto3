@@ -142,7 +142,7 @@ jobs:
         run: | # Check and warn
           set -ex
           export SCCACHE_DIR="$(sccache --show-stats | grep "Cache location" | cut -d '"' -f2 | sed 's/\\\\/\\/g')"
-          export SCCACHE_DIR="$(echo "$SCCACHE_DIR" | sed -E 's#([A-Za-z]):#/\L\1#g; s#\\\\#/#g')"  # win -> posix
+          export SCCACHE_DIR="$(echo "$SCCACHE_DIR" | sed -E 's#([A-Za-z]):#/\L\1#g; s#\\\\#/#g; s#\\#/#g')"  # win -> posix
           echo "SCCACHE_DIR=$SCCACHE_DIR" >> $GITHUB_ENV
           export SCCACHE_CACHE_SIZE=2G && echo "SCCACHE_CACHE_SIZE=$SCCACHE_CACHE_SIZE" >> $GITHUB_ENV  # Ignored??
           sccache --show-stats # Check location?
