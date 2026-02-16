@@ -17,11 +17,11 @@ jobs:
       matrix:
         target: [
             # https://docs.godotengine.org/en/stable/about/system_requirements.html
-            # { vcpkg_triplet: "x64-linux", os: "ubuntu-24.04" },
+            { vcpkg_triplet: "x64-linux", os: "ubuntu-24.04" },
             # { vcpkg_triplet: "x86-linux", os: "ubuntu-24.04" },
             # { vcpkg_triplet: "arm64-linux", os: "ubuntu-24.04-arm" },
             # { vcpkg_triplet: "arm-linux", os: "ubuntu-24.04-arm" },
-            # { vcpkg_triplet: "x64-mingw-static", os: "windows-2025" },
+            { vcpkg_triplet: "x64-mingw-static", os: "windows-2025" },
             # { vcpkg_triplet: "x86-mingw-static", os: "windows-2025" },
             # { vcpkg_triplet: "arm64-mingw-static", os: "windows-2025" },
             { vcpkg_triplet: "x64-windows-static", os: "windows-2025" }, # MSVC instead of mingw
@@ -29,21 +29,21 @@ jobs:
             # { vcpkg_triplet: "arm64-windows-static", os: "windows-2025" }, # MSVC instead of mingw
             # { vcpkg_triplet: "arm64-osx", os: "macos-15" },
             # { vcpkg_triplet: "x64-osx", os: "macos-15" },
-            # { vcpkg_triplet: "wasm32-emscripten-pic", os: "ubuntu-24.04" },
+            { vcpkg_triplet: "wasm32-emscripten-pic", os: "ubuntu-24.04" },
             # { vcpkg_triplet: "x64-android", os: "ubuntu-24.04" },
             # { vcpkg_triplet: "x86-android", os: "ubuntu-24.04" },
-            # { vcpkg_triplet: "arm64-android", os: "ubuntu-24.04" },
+            { vcpkg_triplet: "arm64-android", os: "ubuntu-24.04" },
             # { vcpkg_triplet: "arm-android", os: "ubuntu-24.04" },
-            # { vcpkg_triplet: "arm64-ios", os: "macos-15" },
+            { vcpkg_triplet: "arm64-ios", os: "macos-15" },
           ]
         # Note: vcpkg forces building both Debug and Release on a single run. This is not the same as the templates!
         target-type: [
-            # "template_debug",
-            "template_release",
+            "template_debug",
+            # "template_release",
           ]
         float-precision: ["single"] # TODO: , "double"
-
     runs-on: "${{ matrix.target.os }}"
+    if: "! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')" # Skip msvc for non-release due to no cache support...
     permissions:
       actions: write
     steps:
@@ -58,20 +58,12 @@ jobs:
           submodules: "recursive"
 
       # <Triplet-specific setup>
-      - id: triplet_parts
-        shell: bash
-        run: |
-          IFS='-' read -ra parts <<< "${{ matrix.target.vcpkg_triplet }}"
-          for i in "${!parts[@]}"; do
-            echo "_$i=${parts[$i]}" >> $GITHUB_OUTPUT
-          done
       - if: "matrix.target.vcpkg_triplet == 'x86-linux'"
         run: "sudo apt-get update && sudo apt-get install -y gcc-multilib g++-multilib"
       - if: "matrix.target.vcpkg_triplet == 'arm-linux'"
         run: 'sudo apt-get update && sudo apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf && echo "cmake_extra_args=''-DCMAKE_C_COMPILER=arm-linux-gnueabihf-gcc'', ''-DCMAKE_CXX_COMPILER=arm-linux-gnueabihf-g++''" >> $GITHUB_ENV'
       - if: "matrix.target.os == 'ubuntu-24.04' || matrix.target.os == 'ubuntu-24.04-arm'"
-        run:
-          | # Need to install some system dependencies (for the target platform! not the host)
+        run: | # Install system deps for target platform
           set -ex
           arch_selector=""
           if [ "${{ matrix.target.vcpkg_triplet }}" == "x86-linux" ]; then
@@ -86,10 +78,6 @@ jobs:
         uses: "egor-tensin/setup-mingw@v2"
         with:
           version: "12.2.0" # It seems like newer versions are broken (follow godot-cpp)
-      - if: "matrix.target.os == 'windows-2025' && contains(matrix.target.vcpkg_triplet, '-windows')" # msvc
-        uses: "microsoft/setup-msbuild@v2"
-        with:
-          msbuild-architecture: ${{ steps.triplet_parts.outputs._0 }}
       - if: "matrix.target.os == 'windows-2025'"
         run: "echo 'LDFLAGS=-Wl,-allow-multiple-definition' >> $GITHUB_ENV"
       - if: "matrix.target.os == 'macos-15'"
@@ -99,9 +87,7 @@ jobs:
         with:
           version: "4.0.12" # More recent than Godot's default, since we need allow-multiple-definition support
       - if: "matrix.target.vcpkg_triplet == 'wasm32-emscripten-pic'"
-        run: |
-          echo "cmake_extra_args='-DGODOTCPP_THREADS=OFF'" >> $GITHUB_ENV
-          echo 'LDFLAGS=-Wl,-allow-multiple-definition' >> $GITHUB_ENV
+        run: echo "cmake_extra_args='-DGODOTCPP_THREADS=OFF'" >> $GITHUB_ENV
       - if: "contains(matrix.target.vcpkg_triplet, '-android')"
         uses: "nttld/setup-ndk@v1"
         id: "setup-ndk"
@@ -113,78 +99,51 @@ jobs:
       # </Triplet-specific setup>
       #
       # <Cache restore>
-      # - shell: "bash" # Restore from previous artifacts that are used as caches due to size limitations of caches
-      #   run: |
-      #     set -ex
-      #     ARTIFACT_INSTALLED="vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
-      #     ARTIFACT_BUILDTREES="vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
-      #     echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
-      #     success=false
-      #     delete_artifacts=true
-      #     branches=("${{ github.ref_name }}")
-      #     if [ "${{ github.ref_name }}" != "main" ]; then
-      #       branches+=("main")
-      #     fi
-      #     for branch in "${branches[@]}"; do
-      #       if [ "$success" = "true" ]; then break; fi
-      #       workflow_ids=$(gh run list --workflow="${{ github.workflow }}" --branch="$branch" --json databaseId --limit 10 --jq '[.[] | .databaseId]')
-      #       for workflow_id in $(echo "$workflow_ids" | jq -r '.[]' | tr -d '\r'); do
-      #         if [ "$success" != "true" ] && \
-      #            gh run download "$workflow_id" --name "$ARTIFACT_INSTALLED" && \
-      #            gh run download "$workflow_id" --name "$ARTIFACT_BUILDTREES"; then
-      #           echo "Successfully downloaded artifacts from workflow $workflow_id on branch $branch."
-      #           success=true
-      #         elif [ "$success" == "true" ] && [ "$delete_artifacts" = "true" ]; then # Delete artifacts from this older workflow
-      #           echo "Deleting artifacts with matching names from older workflow $workflow_id on branch $branch"
-      #           artifact_ids=$(gh api repos/${{ github.repository }}/actions/runs/$workflow_id/artifacts --jq '.artifacts[] | select(.name == "'"$ARTIFACT_INSTALLED"'" or .name == "'"$ARTIFACT_BUILDTREES"'") | .id')
-      #           for id in $artifact_ids; do
-      #             echo "- Deleting artifact $id"
-      #             gh api -X DELETE repos/${{ github.repository }}/actions/artifacts/$id || true
-      #           done
-      #         else
-      #           echo "Failed to download artifacts from workflow $workflow_id on branch $branch, trying next..."
-      #         fi
-      #       done
-      #       delete_artifacts=false # Disable deletion for subsequent branches (fallback)
-      #     done
-      #     if [ "$success" != "true" ]; then
-      #       echo "::warning ::Failed to download and extract previous vcpkg installed artifacts from any of the last 10 workflows on current branch or main branch, skipping cache..."
-      #     fi
+      - shell: "bash" # Restore from previous artifacts that are used as caches due to size limitations of caches
+        run: |
+          set -ex
+          ARTIFACT_INSTALLED="vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
+          ARTIFACT_BUILDTREES="vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+          success=false
+          delete_artifacts=true
+          branches=("${{ github.ref_name }}")
+          if [ "${{ github.ref_name }}" != "main" ]; then
+            branches+=("main")
+          fi
+          for branch in "${branches[@]}"; do
+            if [ "$success" = "true" ]; then break; fi
+            workflow_ids=$(gh run list --workflow="${{ github.workflow }}" --branch="$branch" --json databaseId --limit 10 --jq '[.[] | .databaseId]')
+            for workflow_id in $(echo "$workflow_ids" | jq -r '.[]' | tr -d '\r'); do
+              if [ "$success" != "true" ] && \
+                 gh run download "$workflow_id" --name "$ARTIFACT_INSTALLED" && \
+                 gh run download "$workflow_id" --name "$ARTIFACT_BUILDTREES"; then
+                echo "Successfully downloaded artifacts from workflow $workflow_id on branch $branch."
+                success=true
+              elif [ "$success" == "true" ] && [ "$delete_artifacts" = "true" ]; then # Delete artifacts from this older workflow
+                echo "Deleting artifacts with matching names from older workflow $workflow_id on branch $branch"
+                artifact_ids=$(gh api repos/${{ github.repository }}/actions/runs/$workflow_id/artifacts --jq '.artifacts[] | select(.name == "'"$ARTIFACT_INSTALLED"'" or .name == "'"$ARTIFACT_BUILDTREES"'") | .id')
+                for id in $artifact_ids; do
+                  echo "- Deleting artifact $id"
+                  gh api -X DELETE repos/${{ github.repository }}/actions/artifacts/$id || true
+                done
+              else
+                echo "Failed to download artifacts from workflow $workflow_id on branch $branch, trying next..."
+              fi
+            done
+            delete_artifacts=false # Disable deletion for subsequent branches (fallback)
+          done
+          if [ "$success" != "true" ]; then
+            echo "::warning ::Failed to download and extract previous vcpkg installed artifacts from any of the last 10 workflows on current branch or main branch, skipping cache..."
+          fi
       - uses: Mozilla-Actions/sccache-action@v0.0.9
         with:
           disable_annotations: true
-      - shell: bash
-        if: matrix.target.os == 'windows-2025'
-        run: |
-          set -e
-          mkdir -p sccache-shim
-          for tool in cl clang-cl rc; do
-            cat >"sccache-shim/${tool}.cmd" <<EOF
-          @echo off
-          if defined SCCACHE_WRAPPER_ACTIVE (
-            ${tool}.exe %*
-            exit /b %errorlevel%
-          )
-          set SCCACHE_WRAPPER_ACTIVE=1
-          sccache.exe ${tool}.exe %*
-          exit /b %errorlevel%
-          EOF
-          done
-          echo "$PWD/sccache-shim" >> $GITHUB_PATH
       - shell: "bash"
         run: | # Check and warn
           set -ex
           SCCACHE_DIR="${{ github.workspace }}/.cache/sccache" && echo "SCCACHE_DIR=$SCCACHE_DIR" >> $GITHUB_ENV
           SCCACHE_CACHE_SIZE=2G && echo "SCCACHE_CACHE_SIZE=$SCCACHE_CACHE_SIZE" >> $GITHUB_ENV
-          _M_SCCACHE_BIN_DIR=$(dirname $(which sccache))
-          cmake_extra_args=${{ env.cmake_extra_args }}
-          if [ "${{ matrix.target.os }}" == "windows-2025" ]; then
-            choco install ninja -y
-            cmake_extra_args="$cmake_extra_args -G Ninja -DCMAKE_GENERATOR_PLATFORM="
-            _M_SCCACHE_BIN_DIR=$(echo $_M_SCCACHE_BIN_DIR | sed 's|^/\([a-z]\)/|\U\1:/|')
-          fi
-          cmake_extra_args="$cmake_extra_args -DCMAKE_PROGRAM_PATH=$_M_SCCACHE_BIN_DIR"
-          echo "cmake_extra_args=$cmake_extra_args" >> $GITHUB_ENV
           which sccache
           sccache --version
           sccache --zero-stats
@@ -243,7 +202,7 @@ jobs:
         export_target: # TODO: All architectures (although this is just a demo)
           [
             # { os: "ubuntu-24.04", export_name: "Linux" },
-            # { os: "ubuntu-24.04", export_name: "Web" },
+            { os: "ubuntu-24.04", export_name: "Web" },
             # { os: "ubuntu-24.04", export_name: "Android" },
             { os: "windows-2025", export_name: "Windows Desktop" },
             # { os: "macos-15", export_name: "macOS" },
