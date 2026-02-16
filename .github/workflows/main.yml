@@ -58,11 +58,13 @@ jobs:
           submodules: "recursive"
 
       # <Triplet-specific setup>
-      - uses: winterjung/split@v2
-        id: triplet_parts
-        with:
-          msg: ${{ matrix.target.vcpkg_triplet }}
-          separator: "-"
+      - id: triplet_parts
+        shell: bash
+        run: |
+          IFS='-' read -ra parts <<< "${{ matrix.target.vcpkg_triplet }}"
+          for i in "${!parts[@]}"; do
+            echo "_$i=${parts[$i]}" >> $GITHUB_OUTPUT
+          done
       - if: "matrix.target.vcpkg_triplet == 'x86-linux'"
         run: "sudo apt-get update && sudo apt-get install -y gcc-multilib g++-multilib"
       - if: "matrix.target.vcpkg_triplet == 'arm-linux'"
