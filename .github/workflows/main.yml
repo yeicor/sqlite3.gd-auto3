@@ -43,7 +43,6 @@ jobs:
           ]
         float-precision: ["single"] # TODO: , "double"
     runs-on: "${{ matrix.target.os }}"
-    if: "! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')" # Skip msvc for non-release due to no cache support...
     permissions:
       actions: write
     steps:
@@ -153,6 +152,7 @@ jobs:
       #
       # <Install and build>
       - shell: "bash"
+        if: "! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')" # Skip msvc for non-release due to no cache support...
         run:
           | # HACK: Customize the vcpkg install of the main repo package with custom CMAKE_ARGS
           set -ex
@@ -166,7 +166,7 @@ jobs:
           VCPKG_OVERLAY_TRIPLETS: "vcpkg_triplets"
           VCPKG_OVERLAY_PORTS: "vcpkg_ports"
           GD_CMAKE_ARGS: "-DGODOTCPP_TARGET=${{ matrix.target-type }} -DGODOTCPP_PRECISION=${{ matrix.float-precision }} ${{ env.cmake_extra_args }}"
-      - if: "matrix.target.os == 'windows-2025'"
+      - if: "matrix.target.os == 'windows-2025' && ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')" # Skip msvc for non-release due to no cache support...
         shell: "bash" # For some unknown reason, cmake + windows does not install the dll to the proper folder, do it here...
         run: find vcpkg/buildtrees/sqlite3-gd -name "*.dll" -print -exec cp {} "demo/addons/sqlite3.gd/" \;
       - shell: "bash"
@@ -175,18 +175,19 @@ jobs:
       #
       # <Cache save and export artifacts>
       - uses: "actions/upload-artifact@v6"
+        if: "! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')" # Skip msvc for non-release due to no cache support...
         with: # Build main artifact with only the addon files
           name: "sqlite3.gd-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
           path: "demo/addons/sqlite3.gd/**"
       - uses: "actions/upload-artifact@v6"
-        if: "always()"
+        if: "always() && ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')" # Skip msvc for non-release due to no cache support...
         with: # Build artifact useful for caching/debugging
           name: "vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
           path: |
             vcpkg/installed/
             ${{ env.SCCACHE_DIR }}
       - uses: "actions/upload-artifact@v6"
-        if: "always()"
+        if: "always() && ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')" # Skip msvc for non-release due to no cache support...
         with: # Build artifact useful for caching/debugging (less important and bigger but useful if enough storage available)
           name: "vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
           path: |
