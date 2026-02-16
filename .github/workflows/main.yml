@@ -134,13 +134,6 @@ jobs:
           ndk-version: r23c # Same as https://github.com/godotengine/godot/blob/<GODOT_VERSION>/platform/android/detect.py
           link-to-sdk: true
 
-      - name: Set Android NDK path
-        if: contains(matrix.target.vcpkg_triplet, '-android')
-        shell: bash
-        run: |
-          set -e
-          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
-
       - name: Restore vcpkg cache
         shell: bash
         run: |
@@ -327,13 +320,6 @@ jobs:
           version: 4.6.0
           use-dotnet: false
           include-templates: true
-
-      - name: Ensure Android NDK path
-        if: matrix.export_target.export_name == 'Android'
-        shell: bash
-        run: |
-          set -e
-          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
 
       - name: Run Godot editor
         shell: bash
