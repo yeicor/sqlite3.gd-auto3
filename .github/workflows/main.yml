@@ -166,11 +166,13 @@ jobs:
           SCCACHE_DIR="${{ github.workspace }}/.cache/sccache" && echo "SCCACHE_DIR=$SCCACHE_DIR" >> $GITHUB_ENV
           SCCACHE_CACHE_SIZE=2G && echo "SCCACHE_CACHE_SIZE=$SCCACHE_CACHE_SIZE" >> $GITHUB_ENV
           _M_SCCACHE_BIN_DIR=$(dirname $(which sccache))
+          cmake_extra_args=${{ env.cmake_extra_args }}
           if [ "${{ matrix.target.os }}" == "windows-2025" ]; then
-            echo "cmake_extra_args=${{ env.cmake_extra_args }} -G Ninja" >> $GITHUB_ENV
+            cmake_extra_args="$cmake_extra_args -G Ninja"
             _M_SCCACHE_BIN_DIR=$(echo $_M_SCCACHE_BIN_DIR | sed 's|^/\([a-z]\)/|\U\1:/|')
           fi
-          echo "cmake_extra_args=${{ env.cmake_extra_args }} -DCMAKE_PROGRAM_PATH=$_M_SCCACHE_BIN_DIR" >> $GITHUB_ENV
+          cmake_extra_args="$cmake_extra_args -DCMAKE_PROGRAM_PATH=$_M_SCCACHE_BIN_DIR"
+          echo "cmake_extra_args=$cmake_extra_args" >> $GITHUB_ENV
           which sccache
           sccache --version
           sccache --zero-stats
