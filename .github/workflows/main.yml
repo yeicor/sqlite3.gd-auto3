@@ -145,44 +145,21 @@ jobs:
       - shell: bash
         if: matrix.target.os == 'windows-2025'
         run: |
-          set -ex
+          set -e
           mkdir -p sccache-shim
-          # ---- cl.exe wrapper ----
-          cat > sccache-shim/cl.cmd << 'EOF'
-          @echo off
-          if defined SCCACHE_WRAPPER_ACTIVE (
-            cl.exe %*
+          for tool in cl clang-cl rc; do
+            cat >"sccache-shim/${tool}.cmd" <<EOF
+            @echo off
+            if defined SCCACHE_WRAPPER_ACTIVE (
+              ${tool}.exe %*
+              exit /b %errorlevel%
+            )
+            set SCCACHE_WRAPPER_ACTIVE=1
+            sccache.exe ${tool}.exe %*
             exit /b %errorlevel%
-          )
-          set SCCACHE_WRAPPER_ACTIVE=1
-          sccache.exe cl.exe %*
-          exit /b %errorlevel%
-          EOF
-          # ---- clang-cl.exe wrapper ----
-          cat > sccache-shim/clang-cl.cmd << 'EOF'
-          @echo off
-          if defined SCCACHE_WRAPPER_ACTIVE (
-            clang-cl.exe %*
-            exit /b %errorlevel%
-          )
-          set SCCACHE_WRAPPER_ACTIVE=1
-          sccache.exe clang-cl.exe %*
-          exit /b %errorlevel%
-          EOF
-          # ---- rc.exe wrapper (resource compiler) ----
-          cat > sccache-shim/rc.cmd << 'EOF'
-          @echo off
-          if defined SCCACHE_WRAPPER_ACTIVE (
-            rc.exe %*
-            exit /b %errorlevel%
-          )
-          set SCCACHE_WRAPPER_ACTIVE=1
-          sccache.exe rc.exe %*
-          exit /b %errorlevel%
-          EOF
-          # Prepend shim directory to PATH
+            EOF
+          done
           echo "$PWD/sccache-shim" >> $GITHUB_PATH
-          echo "Shim installed. cl/clang-cl/rc now routed through sccache."
       - shell: "bash"
         run: | # Check and warn
           set -ex
@@ -190,7 +167,8 @@ jobs:
           SCCACHE_CACHE_SIZE=2G && echo "SCCACHE_CACHE_SIZE=$SCCACHE_CACHE_SIZE" >> $GITHUB_ENV
           _M_SCCACHE_BIN_DIR=$(dirname $(which sccache))
           if [ "${{ matrix.target.os }}" == "windows-2025" ]; then
-          _M_SCCACHE_BIN_DIR=$(echo $_M_SCCACHE_BIN_DIR | sed 's|^/\([a-z]\)/|\U\1:/|')
+            echo "cmake_extra_args=${{ env.cmake_extra_args }} -G Ninja" >> $GITHUB_ENV
+            _M_SCCACHE_BIN_DIR=$(echo $_M_SCCACHE_BIN_DIR | sed 's|^/\([a-z]\)/|\U\1:/|')
           fi
           echo "cmake_extra_args=${{ env.cmake_extra_args }} -DCMAKE_PROGRAM_PATH=$_M_SCCACHE_BIN_DIR" >> $GITHUB_ENV
           which sccache
