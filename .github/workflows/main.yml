@@ -58,6 +58,11 @@ jobs:
           submodules: "recursive"
 
       # <Triplet-specific setup>
+      - uses: winterjung/split@v2
+        id: triplet_parts
+        with:
+          msg: ${{ matrix.target.vcpkg_triplet }}
+          separator: "-"
       - if: "matrix.target.vcpkg_triplet == 'x86-linux'"
         run: "sudo apt-get update && sudo apt-get install -y gcc-multilib g++-multilib"
       - if: "matrix.target.vcpkg_triplet == 'arm-linux'"
@@ -79,6 +84,10 @@ jobs:
         uses: "egor-tensin/setup-mingw@v2"
         with:
           version: "12.2.0" # It seems like newer versions are broken (follow godot-cpp)
+      - if: "matrix.target.os == 'windows-2025' && contains(matrix.target.vcpkg_triplet, '-windows')" # msvc
+        uses: "microsoft/setup-msbuild@v2"
+        with:
+          msbuild-architecture: ${{ steps.triplet_parts.outputs._0 }}
       - if: "matrix.target.os == 'windows-2025'"
         run: "echo 'LDFLAGS=-Wl,-allow-multiple-definition' >> $GITHUB_ENV"
       - if: "matrix.target.os == 'macos-15'"
@@ -169,7 +178,6 @@ jobs:
           cmake_extra_args=${{ env.cmake_extra_args }}
           if [ "${{ matrix.target.os }}" == "windows-2025" ]; then
             choco install ninja -y
-            ninja -v
             cmake_extra_args="$cmake_extra_args -G Ninja -DCMAKE_GENERATOR_PLATFORM="
             _M_SCCACHE_BIN_DIR=$(echo $_M_SCCACHE_BIN_DIR | sed 's|^/\([a-z]\)/|\U\1:/|')
           fi
