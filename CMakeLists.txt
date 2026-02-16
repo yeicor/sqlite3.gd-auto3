@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.25)
 
 message(STATUS "Using toolchain file: " "${CMAKE_TOOLCHAIN_FILE}")
 
@@ -11,6 +11,8 @@ if(SCCACHE_EXECUTABLE)
     message(STATUS "Using sccache as compiler launcher: ${SCCACHE_EXECUTABLE}")
     set(CMAKE_C_COMPILER_LAUNCHER ${SCCACHE_EXECUTABLE})
     set(CMAKE_CXX_COMPILER_LAUNCHER ${SCCACHE_EXECUTABLE})
+    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<$<CONFIG:Debug,RelWithDebInfo>:Embedded>")
+    cmake_policy(SET CMP0141 NEW)
 else()
     message(STATUS "sccache not found, not using a compiler launcher")
 endif()

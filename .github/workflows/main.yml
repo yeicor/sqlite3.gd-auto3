@@ -102,43 +102,43 @@ jobs:
       # </Triplet-specific setup>
       #
       # <Cache restore>
-      - shell: "bash" # Restore from previous artifacts that are used as caches due to size limitations of caches
-        run: |
-          set -ex
-          ARTIFACT_INSTALLED="vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
-          ARTIFACT_BUILDTREES="vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
-          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
-          success=false
-          delete_artifacts=true
-          branches=("${{ github.ref_name }}")
-          if [ "${{ github.ref_name }}" != "main" ]; then
-            branches+=("main")
-          fi
-          for branch in "${branches[@]}"; do
-            if [ "$success" = "true" ]; then break; fi
-            workflow_ids=$(gh run list --workflow="${{ github.workflow }}" --branch="$branch" --json databaseId --limit 10 --jq '[.[] | .databaseId]')
-            for workflow_id in $(echo "$workflow_ids" | jq -r '.[]' | tr -d '\r'); do
-              if [ "$success" != "true" ] && \
-                 gh run download "$workflow_id" --name "$ARTIFACT_INSTALLED" && \
-                 gh run download "$workflow_id" --name "$ARTIFACT_BUILDTREES"; then
-                echo "Successfully downloaded artifacts from workflow $workflow_id on branch $branch."
-                success=true
-              elif [ "$success" == "true" ] && [ "$delete_artifacts" = "true" ]; then # Delete artifacts from this older workflow
-                echo "Deleting artifacts with matching names from older workflow $workflow_id on branch $branch"
-                artifact_ids=$(gh api repos/${{ github.repository }}/actions/runs/$workflow_id/artifacts --jq '.artifacts[] | select(.name == "'"$ARTIFACT_INSTALLED"'" or .name == "'"$ARTIFACT_BUILDTREES"'") | .id')
-                for id in $artifact_ids; do
-                  echo "- Deleting artifact $id"
-                  gh api -X DELETE repos/${{ github.repository }}/actions/artifacts/$id || true
-                done
-              else
-                echo "Failed to download artifacts from workflow $workflow_id on branch $branch, trying next..."
-              fi
-            done
-            delete_artifacts=false # Disable deletion for subsequent branches (fallback)
-          done
-          if [ "$success" != "true" ]; then
-            echo "::warning ::Failed to download and extract previous vcpkg installed artifacts from any of the last 10 workflows on current branch or main branch, skipping cache..."
-          fi
+      # - shell: "bash" # Restore from previous artifacts that are used as caches due to size limitations of caches
+      #   run: |
+      #     set -ex
+      #     ARTIFACT_INSTALLED="vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
+      #     ARTIFACT_BUILDTREES="vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
+      #     echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+      #     success=false
+      #     delete_artifacts=true
+      #     branches=("${{ github.ref_name }}")
+      #     if [ "${{ github.ref_name }}" != "main" ]; then
+      #       branches+=("main")
+      #     fi
+      #     for branch in "${branches[@]}"; do
+      #       if [ "$success" = "true" ]; then break; fi
+      #       workflow_ids=$(gh run list --workflow="${{ github.workflow }}" --branch="$branch" --json databaseId --limit 10 --jq '[.[] | .databaseId]')
+      #       for workflow_id in $(echo "$workflow_ids" | jq -r '.[]' | tr -d '\r'); do
+      #         if [ "$success" != "true" ] && \
+      #            gh run download "$workflow_id" --name "$ARTIFACT_INSTALLED" && \
+      #            gh run download "$workflow_id" --name "$ARTIFACT_BUILDTREES"; then
+      #           echo "Successfully downloaded artifacts from workflow $workflow_id on branch $branch."
+      #           success=true
+      #         elif [ "$success" == "true" ] && [ "$delete_artifacts" = "true" ]; then # Delete artifacts from this older workflow
+      #           echo "Deleting artifacts with matching names from older workflow $workflow_id on branch $branch"
+      #           artifact_ids=$(gh api repos/${{ github.repository }}/actions/runs/$workflow_id/artifacts --jq '.artifacts[] | select(.name == "'"$ARTIFACT_INSTALLED"'" or .name == "'"$ARTIFACT_BUILDTREES"'") | .id')
+      #           for id in $artifact_ids; do
+      #             echo "- Deleting artifact $id"
+      #             gh api -X DELETE repos/${{ github.repository }}/actions/artifacts/$id || true
+      #           done
+      #         else
+      #           echo "Failed to download artifacts from workflow $workflow_id on branch $branch, trying next..."
+      #         fi
+      #       done
+      #       delete_artifacts=false # Disable deletion for subsequent branches (fallback)
+      #     done
+      #     if [ "$success" != "true" ]; then
+      #       echo "::warning ::Failed to download and extract previous vcpkg installed artifacts from any of the last 10 workflows on current branch or main branch, skipping cache..."
+      #     fi
       - uses: Mozilla-Actions/sccache-action@v0.0.9
         with:
           disable_annotations: true
