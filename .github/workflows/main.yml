@@ -149,7 +149,7 @@ jobs:
           SCCACHE_CACHE_SIZE=2G && echo "SCCACHE_CACHE_SIZE=$SCCACHE_CACHE_SIZE" >> $GITHUB_ENV
           _M_SCCACHE_BIN_DIR=$(dirname $(which sccache))
           if [ "${{ matrix.target.os }}" == "windows-2025" ]; then
-            _M_SCCACHE_BIN_DIR=$(echo $_M_SCCACHE_BIN_DIR | sed 's|^/c/|C:/|')
+          _M_SCCACHE_BIN_DIR=$(echo $_M_SCCACHE_BIN_DIR | sed 's|^/\([a-z]\)/|\U\1:/|')
           fi
           echo "cmake_extra_args=${{ env.cmake_extra_args }} -DCMAKE_PROGRAM_PATH=$_M_SCCACHE_BIN_DIR" >> $GITHUB_ENV
           which sccache

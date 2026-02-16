@@ -1,12 +1,23 @@
-MESSAGE(STATUS "Using toolchain file: "
-    "${CMAKE_TOOLCHAIN_FILE}")
 cmake_minimum_required(VERSION 3.14)
+
+message(STATUS "Using toolchain file: " "${CMAKE_TOOLCHAIN_FILE}")
+
+# Auto-enable sccache if available since we are rebuilding godot-cpp and the bindings frequently
+# If sccache is found, use it as the CMAKE_{C,CXX}_COMPILER_LAUNCHER
+set(CMAKE_FIND_DEBUG_MODE TRUE)
+find_program(SCCACHE_EXECUTABLE sccache)
+set(CMAKE_FIND_DEBUG_MODE FALSE)
+if(SCCACHE_EXECUTABLE)
+    message(STATUS "Using sccache as compiler launcher: ${SCCACHE_EXECUTABLE}")
+    set(CMAKE_C_COMPILER_LAUNCHER ${SCCACHE_EXECUTABLE})
+    set(CMAKE_CXX_COMPILER_LAUNCHER ${SCCACHE_EXECUTABLE})
+else()
+    message(STATUS "sccache not found, not using a compiler launcher")
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 project(sqlite3.gd CXX)
-
-
 
 # Syntax-only mode for fast builds (only checks syntax, does not link or
 # install)
@@ -29,19 +40,6 @@ if (NOT GODOTCPP_TARGET STREQUAL "template_release" AND
 endif ()
 message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}, "
     "GODOTCPP_TARGET: ${GODOTCPP_TARGET}")
-
-# Auto-enable sccache if available since we are rebuilding godot-cpp and the bindings frequently
-# If sccache is found, use it as the CMAKE_{C,CXX}_COMPILER_LAUNCHER
-set(CMAKE_FIND_DEBUG_MODE TRUE)
-find_program(SCCACHE_EXECUTABLE sccache)
-set(CMAKE_FIND_DEBUG_MODE FALSE)
-if(SCCACHE_EXECUTABLE)
-    message(STATUS "Using sccache as compiler launcher: ${SCCACHE_EXECUTABLE}")
-    set(CMAKE_C_COMPILER_LAUNCHER ${SCCACHE_EXECUTABLE})
-    set(CMAKE_CXX_COMPILER_LAUNCHER ${SCCACHE_EXECUTABLE})
-else()
-    message(STATUS "sccache not found, not using a compiler launcher")
-endif()
 
 # Auto-force full LTO in release builds if available
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
