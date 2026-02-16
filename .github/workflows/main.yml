@@ -168,7 +168,7 @@ jobs:
           _M_SCCACHE_BIN_DIR=$(dirname $(which sccache))
           cmake_extra_args=${{ env.cmake_extra_args }}
           if [ "${{ matrix.target.os }}" == "windows-2025" ]; then
-            cmake_extra_args="$cmake_extra_args -G Ninja"
+            cmake_extra_args="$cmake_extra_args -G Ninja -UCMAKE_GENERATOR_PLATFORM"
             _M_SCCACHE_BIN_DIR=$(echo $_M_SCCACHE_BIN_DIR | sed 's|^/\([a-z]\)/|\U\1:/|')
           fi
           cmake_extra_args="$cmake_extra_args -DCMAKE_PROGRAM_PATH=$_M_SCCACHE_BIN_DIR"
