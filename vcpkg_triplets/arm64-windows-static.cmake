@@ -6,3 +6,5 @@ if(PORT STREQUAL "libpng")
         -DPNG_ARM_NEON=off  # Disable PNG_ARM_NEON (avoids build error and supports more devices)
     )
 endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/_allow-multiple-definition.cmake")

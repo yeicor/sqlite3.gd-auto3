@@ -141,13 +141,12 @@ jobs:
       - shell: "bash"
         run: | # Check and warn
           set -ex
-          SCCACHE_DIR="${{ github.workspace }}/.cache/sccache" && echo "SCCACHE_DIR=$SCCACHE_DIR" >> $GITHUB_ENV
-          SCCACHE_CACHE_SIZE=2G && echo "SCCACHE_CACHE_SIZE=$SCCACHE_CACHE_SIZE" >> $GITHUB_ENV
-          which sccache
-          sccache --version
+          export SCCACHE_DIR="$(sccache --show-stats | grep "Cache location" | cut -d '"' -f2 | sed 's/\\\\/\\/g')" && echo "SCCACHE_DIR=$SCCACHE_DIR" >> $GITHUB_ENV
+          export SCCACHE_CACHE_SIZE=2G && echo "SCCACHE_CACHE_SIZE=$SCCACHE_CACHE_SIZE" >> $GITHUB_ENV  # Ignored??
+          sccache --show-stats # Check location?
           sccache --zero-stats
           [ -d vcpkg/installed/ ] || echo "::warning ::vcpkg/installed/ directory not found (no cache available)"
-          [ -d "$SCCACHE_DIR" ] || echo "::warning ::$SCCACHE_DIR directory not found (no cache available)"
+          [ -d "$HOME/.cache/sccache" ] || echo "::warning ::$$HOME/.cache/sccache directory not found (no cache available)"
       # </Cache restore>
       #
       # <Install and build>
@@ -170,7 +169,10 @@ jobs:
         shell: "bash" # For some unknown reason, cmake + windows does not install the dll to the proper folder, do it here...
         run: find vcpkg/buildtrees/sqlite3-gd -name "*.dll" -print -exec cp {} "demo/addons/sqlite3.gd/" \;
       - shell: "bash"
-        run: sccache --show-stats
+        run: | # Clean the cache by removing unaccessed files during this build.
+          sccache --show-stats
+          find "$SCCACHE_DIR" -type f ! -anewer README.md -delete -print | wc -l
+          sccache --show-stats
       # </Install and build>
       #
       # <Cache save and export artifacts>
