@@ -243,7 +243,7 @@ jobs:
 
       - name: Clean and determine cache directories
         shell: bash
-        if: always() && ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')
+        if: always()
         run: |
           set -e
           ccache --show-stats || sccache --show-stats
@@ -274,7 +274,6 @@ jobs:
 
       - name: Upload addon artifact
         uses: actions/upload-artifact@v6
-        if: "! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')"
         with:
           name: gdext-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}
           path: |
@@ -283,7 +282,7 @@ jobs:
 
       - name: Upload vcpkg installed artifact
         uses: actions/upload-artifact@v6
-        if: always() && ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')
+        if: always()
         with:
           name: vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}
           path: | # /tmp/ forces consistant root directory to /
@@ -294,7 +293,7 @@ jobs:
 
       - name: Upload vcpkg buildtrees artifact
         uses: actions/upload-artifact@v6
-        if: always() && ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')
+        if: always()
         with:
           name: vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}
           path: | # /tmp/ forces consistant root directory to /
