@@ -226,6 +226,7 @@ jobs:
 
       - name: Clean and determine cache directories
         shell: bash
+        if: always() && ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')
         run: |
           set -e
           ccache --show-stats || sccache --show-stats
