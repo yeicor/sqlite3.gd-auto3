@@ -130,7 +130,6 @@ jobs:
         with:
           ndk-version: r23c # Same as https://github.com/godotengine/godot/blob/<GODOT_VERSION>/platform/android/detect.py
           link-to-sdk: true
-
       - name: Restore vcpkg cache
         shell: bash
         run: |
@@ -145,10 +144,10 @@ jobs:
             local artifact_url
             artifact_url=$(gh api "repos/${{ github.repository }}/actions/runs/$workflow_id/artifacts" --jq ".artifacts[] | select(.name == \"$artifact_name\") | .archive_download_url")
             if [ -z "$artifact_url" ]; then
-              echo "Artifact $artifact_name not found for workflow $workflow_id"
+              echo "- Artifact $artifact_name not found for workflow $workflow_id"
               return 1
             fi
-            echo "Downloading $artifact_name from $artifact_url"
+            echo "- Downloading $artifact_name from $artifact_url..."
             curl -L "$artifact_url" -o "$dir/$artifact_name.zip" --fail --silent --show-error
             unzip -o "$dir/$artifact_name.zip" -d "$dir"
             rm "$dir/$artifact_name.zip"
@@ -169,15 +168,6 @@ jobs:
                 echo "Successfully downloaded artifacts from workflow $workflow_id on branch $branch."
                 success=true
               elif [ "$success" == "true" ] && [ "$delete_artifacts" = "true" ]; then
-                echo "Deleting artifacts with matching names from older workflow $workflow_id on branch $branch"
-                artifact_ids=$(gh api repos/${{ github.repository }}/actions/runs/$workflow_id/artifacts --jq '.artifacts[] | select(.name == "'"$ARTIFACT_INSTALLED"'" or .name == "'"$ARTIFACT_BUILDTREES"'") | .id')
-                for id in $artifact_ids; do
-                  echo "- Deleting artifact $id"
-                  gh api -X DELETE repos/${{ github.repository }}/actions/artifacts/$id || true
-                done
-              else
-                echo "Failed to download artifacts from workflow $workflow_id on branch $branch, trying next..."
-              fi
                 echo "Deleting artifacts with matching names from older workflow $workflow_id on branch $branch"
                 artifact_ids=$(gh api repos/${{ github.repository }}/actions/runs/$workflow_id/artifacts --jq '.artifacts[] | select(.name == "'"$ARTIFACT_INSTALLED"'" or .name == "'"$ARTIFACT_BUILDTREES"'") | .id')
                 for id in $artifact_ids; do
