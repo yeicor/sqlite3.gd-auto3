@@ -216,7 +216,6 @@ jobs:
 
       - name: Install and build with vcpkg
         shell: bash
-        if: "! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')"
         run: |
           set -e
           echo "$GD_CMAKE_ARGS" >__GD_CMAKE_ARGS
@@ -230,12 +229,17 @@ jobs:
           VCPKG_OVERLAY_PORTS: vcpkg_ports
           GD_CMAKE_ARGS: -DGODOTCPP_TARGET=${{ matrix.target-type }} -DGODOTCPP_PRECISION=${{ matrix.float-precision }} ${{ env.cmake_extra_args }}
 
-      - name: Copy DLLs (Windows MinGW)
-        if: matrix.target.os == 'windows-2025' && ! (contains(matrix.target.vcpkg_triplet, '-windows-static') && github.ref_type != 'tag')
+      - name: Copy DLLs (Windows)
+        if: matrix.target.os == 'windows-2025'
         shell: bash
         run: |
           set -e
-          find vcpkg/buildtrees/gdext -name "*.dll" -print -exec cp {} demo/addons/*/ \;
+          output=$(find demo/addons/*/ -name "*.dll" -print)
+          if [ -z "$output" ]; then
+            find vcpkg/buildtrees/gdext -name "*.dll" -print -exec cp {} demo/addons/*/ \;
+          else
+            echo "::warning ::This step is useless now, remove it!"
+          fi
 
       - name: Clean and determine cache directories
         shell: bash
