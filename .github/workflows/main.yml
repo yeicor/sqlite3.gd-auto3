@@ -259,8 +259,8 @@ jobs:
           name: vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}
           path: | # /tmp/ forces consistant root directory to /
             vcpkg/installed/
-            ${{ env.CCACHE_DIR }}/
-            ${{ env.SCCACHE_DIR }}/
+            ${{ env.CCACHE_DIR }}
+            ${{ env.SCCACHE_DIR }}
             /.fake-path-to-force-root-directory
 
       - name: Upload vcpkg buildtrees artifact
