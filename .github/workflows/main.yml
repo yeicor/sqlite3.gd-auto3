@@ -157,7 +157,7 @@ jobs:
               if [ "$success" != "true" ]; then
                 temp_dir=$(mktemp -d)
                 if gh run download "$workflow_id" --name "$ARTIFACT_INSTALLED" --name "$ARTIFACT_BUILDTREES" -D "$temp_dir"; then
-                  cp -r "$temp_dir"/* /  # gh run download does not support overwriting files, so this is the workaround
+                  cp -r "$temp_dir"/*/ /  # gh run download does not support overwriting files, so this is the workaround
                   echo "Successfully downloaded and extracted artifacts from workflow $workflow_id on branch $branch."
                   success=true
                 else
