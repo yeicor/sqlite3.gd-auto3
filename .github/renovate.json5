@@ -23,8 +23,7 @@
       "customType": "regex",
       "description": "Update OS versions in GitHub Actions matrix",
       "managerFilePatterns": [
-        ".github/workflows/*.yml",
-        ".github/workflows/*.yaml"
+        ".github/workflows/*.yml"
       ],
       "matchStrings": [
         "os:\\s*\"?(?<depName>ubuntu|windows|macos)-(?<currentValue>[^\"} ]*)"
@@ -36,13 +35,25 @@
       "customType": "regex",
       "description": "Update ccache version",
       "managerFilePatterns": [
-        ".github/workflows/*.yml",
-        ".github/workflows/*.yaml"
+        ".github/workflows/*.yml"
       ],
       "matchStrings": [
         "CCACHE_VERSION=(?<currentValue>[^\\s]+)"
       ],
       "depName": "ccache/ccache",
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "description": "Update Godot version",
+      "managerFilePatterns": [
+        ".github/workflows/*.yml"
+      ],
+      "matchStrings": [
+        "godot_versions=.*\"(?<currentValue>[0-9.]*)\".*"
+      ],
+      "depName": "godotengine/godot",
       "datasourceTemplate": "github-releases",
       "versioningTemplate": "semver"
     }
