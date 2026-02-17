@@ -261,10 +261,12 @@ jobs:
           ccache --evict-older-than ${elapsed}s --verbose 2>&1
           if command -v ccache >/dev/null 2>&1; then
             CCACHE_DIR=$(ccache --show-config | grep 'cache_dir' | cut -d ' ' -f 4)
+            CCACHE_DIR=$(echo "$CCACHE_DIR" | sed 's|\\|/|g; s|^([a-zA-Z]):|/\\L\1|')
             echo "CCACHE_DIR=$CCACHE_DIR" | tee -a $GITHUB_ENV
           fi
           if command -v sccache >/dev/null 2>&1; then
             SCCACHE_DIR=$(sccache --show-stats | grep "Cache location" | cut -d '"' -f2)
+            SCCACHE_DIR=$(echo "$SCCACHE_DIR" | sed 's|\\|/|g; s|^([A-Z]):|/\\L\1|')
             echo "SCCACHE_DIR=$SCCACHE_DIR" | tee -a $GITHUB_ENV
           fi
 
