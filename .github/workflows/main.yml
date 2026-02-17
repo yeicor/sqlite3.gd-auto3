@@ -195,23 +195,20 @@ jobs:
         shell: bash
         run: |
           set -e
+          if [ "$RUNNER_OS" = "macOS" ]; then brew install jq; fi
           CCACHE_VERSION=$(curl -s https://api.github.com/repos/ccache/ccache/releases/latest | jq -r .tag_name | sed 's/^v//')
           echo "CCACHE_VERSION=$CCACHE_VERSION" >> $GITHUB_ENV
           echo "CCACHE_VERSION is $CCACHE_VERSION"
           if [ "$RUNNER_OS" = "Linux" ]; then
             if [ "$RUNNER_ARCH" = "ARM64" ]; then
-              ASSET="ccache-${CCACHE_VERSION}-linux-arm64.tar.xz"
+              ASSET="ccache-${CCACHE_VERSION}-linux-aarch64.tar.xz"
             else
               ASSET="ccache-${CCACHE_VERSION}-linux-x86_64.tar.xz"
             fi
           elif [ "$RUNNER_OS" = "macOS" ]; then
-            if [ "$RUNNER_ARCH" = "ARM64" ]; then
-              ASSET="ccache-${CCACHE_VERSION}-darwin-arm64.tar.xz"
-            else
-              ASSET="ccache-${CCACHE_VERSION}-darwin-x86_64.tar.xz"
-            fi
+              ASSET="ccache-${CCACHE_VERSION}-darwin.tar.xz" # Universal (aarch64 + x86_64)
           elif [ "$RUNNER_OS" = "Windows" ]; then
-            ASSET="ccache-${CCACHE_VERSION}-windows-x86_64.zip"
+            ASSET="ccache-${CCACHE_VERSION}-windows-i686.zip"
           fi
           echo "ASSET is $ASSET"
           curl -L "https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/${ASSET}" -o ccache-archive
@@ -225,7 +222,7 @@ jobs:
             mv ccache-${CCACHE_VERSION}-* ccache
           fi
           echo "PATH=$PWD/ccache:$PATH" >> $GITHUB_ENV
-          $PWD/ccache --set-config max_size 2G
+          $PWD/ccache/ccache --set-config max_size 2G
 
       - name: Install and build with vcpkg
         shell: bash
