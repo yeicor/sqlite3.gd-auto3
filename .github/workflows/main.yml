@@ -124,12 +124,19 @@ jobs:
           echo "cmake_extra_args='-DGODOTCPP_THREADS=OFF'" >> $GITHUB_ENV
 
       - name: Setup Android NDK
-        if: contains(matrix.target.vcpkg_triplet, '-android')
+        if: matrix.export_target.export_name == 'Android'
         uses: nttld/setup-ndk@v1
         id: setup-ndk
         with:
           ndk-version: r23c # Same as https://github.com/godotengine/godot/blob/<GODOT_VERSION>/platform/android/detect.py
-          link-to-sdk: true
+
+      - name: Set Android NDK path
+        if: matrix.export_target.export_name == 'Android'
+        shell: bash
+        run: |
+          set -e
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+
       - name: Restore vcpkg cache
         shell: bash
         run: |
@@ -217,7 +224,7 @@ jobs:
           set -e
           find vcpkg/buildtrees/gdext -name "*.dll" -print -exec cp {} demo/addons/*/ \;
 
-      - name: Print ccache stats
+      - name: Clean and determine cache directories
         shell: bash
         run: |
           set -e
@@ -225,8 +232,15 @@ jobs:
           start_time=$(date -r vcpkg/vcpkg +%s 2>/dev/null || date +%s)
           current_time=$(date +%s)
           elapsed=$((current_time - start_time))
-          ccache --evict-older-than ${elapsed}s
-          ccache --show-stats || sccache --show-stats
+          ccache --evict-older-than ${elapsed}s --verbose 2>&1
+          if command -v ccache >/dev/null 2>&1; then
+            CCACHE_DIR=$(ccache --show-config | grep 'cache_dir' | cut -d ' ' -f 4)
+            echo "CCACHE_DIR=$CCACHE_DIR" | tee /dev/stderr >> $GITHUB_ENV
+          fi
+          if command -v sccache >/dev/null 2>&1; then
+            SCCACHE_DIR=$(sccache --show-stats | grep "Cache location" | cut -d '"' -f2)
+            echo "SCCACHE_DIR=$SCCACHE_DIR" | tee /dev/stderr >> $GITHUB_ENV
+          fi
 
       - name: Upload addon artifact
         uses: actions/upload-artifact@v6
@@ -244,8 +258,8 @@ jobs:
           name: vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}
           path: | # /tmp/ forces consistant root directory to /
             vcpkg/installed/
-            .ccache/
-            .sccache/
+            ${{ env.CCACHE_DIR }}/
+            ${{ env.SCCACHE_DIR }}/
             /.fake-path-to-force-root-directory
 
       - name: Upload vcpkg buildtrees artifact
