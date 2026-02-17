@@ -194,9 +194,8 @@ jobs:
       - name: Install and configure ccache
         shell: bash
         run: |
-          set -e
-          if [ "$RUNNER_OS" = "macOS" ]; then brew install jq; fi
-          CCACHE_VERSION=$(curl -s https://api.github.com/repos/ccache/ccache/releases/latest | jq -r .tag_name | sed 's/^v//')
+          set -ex
+          CCACHE_VERSION=$(curl -s https://api.github.com/repos/ccache/ccache/releases/latest | grep '"tag_name"' | head -1 | sed 's/.*"tag_name": "\([^"]*\)".*/\1/' | sed 's/^v//')
           echo "CCACHE_VERSION=$CCACHE_VERSION" >> $GITHUB_ENV
           echo "CCACHE_VERSION is $CCACHE_VERSION"
           if [ "$RUNNER_OS" = "Linux" ]; then
