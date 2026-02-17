@@ -221,7 +221,7 @@ jobs:
           fi
           mv ccache-${CCACHE_VERSION}-* ccache
           echo "PATH=$PWD/ccache:$PATH" >> $GITHUB_ENV
-          $PWD/ccache/ccache --set-config max_size 2G
+          $PWD/ccache/ccache --set-config max_size=2G
 
       - name: Install and build with vcpkg
         shell: bash
