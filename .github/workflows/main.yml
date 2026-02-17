@@ -216,11 +216,10 @@ jobs:
           echo "File type: $(file ccache-archive 2>/dev/null || echo 'file command not available')"
           if [ "$RUNNER_OS" = "Windows" ]; then
             unzip ccache-archive
-            mv ccache-${CCACHE_VERSION}-windows-x86_64 ccache
           else
             tar -xf ccache-archive
-            mv ccache-${CCACHE_VERSION}-* ccache
           fi
+          mv ccache-${CCACHE_VERSION}-* ccache
           echo "PATH=$PWD/ccache:$PATH" >> $GITHUB_ENV
           $PWD/ccache/ccache --set-config max_size 2G
 
