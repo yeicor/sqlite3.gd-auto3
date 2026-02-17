@@ -62,9 +62,8 @@ jobs:
       - name: Cache Godot API dump
         id: cache
         uses: actions/cache@v4
-        with:
-          path: |
-            godot-cpp/gdextension/extension_api.json
+        with: &godot-api-dump-cache
+          path: godot-cpp/gdextension/extension_api.json
           key: godot-api-dump-${{ needs.read-versions.outputs.godot_min_version }}-${{ matrix.float-precision }}
 
       - name: Dump Godot extension API for godot-cpp
@@ -93,26 +92,26 @@ jobs:
         target: [
             # https://docs.godotengine.org/en/stable/about/system_requirements.html
             { vcpkg_triplet: x64-linux, os: ubuntu-24.04 },
-            # { vcpkg_triplet: x86-linux, os: ubuntu-24.04 },
-            # { vcpkg_triplet: arm64-linux, os: ubuntu-24.04-arm },
-            # { vcpkg_triplet: arm-linux, os: ubuntu-24.04-arm },
-            # { vcpkg_triplet: x64-mingw-static, os: windows-2025 },
-            # { vcpkg_triplet: x86-mingw-static, os: windows-2025 },
-            # { vcpkg_triplet: arm64-mingw-static, os: windows-2025 },
-            # { vcpkg_triplet: x64-windows-static, os: windows-2025 }, # MSVC instead of mingw
-            # { vcpkg_triplet: x86-windows-static, os: windows-2025 }, # MSVC instead of mingw
-            # { vcpkg_triplet: arm64-windows-static, os: windows-2025 }, # MSVC instead of mingw
-            # { vcpkg_triplet: arm64-osx, os: macos-15 },
-            # { vcpkg_triplet: x64-osx, os: macos-15 },
-            # { vcpkg_triplet: wasm32-emscripten, os: ubuntu-24.04 },
-            # { vcpkg_triplet: x64-android, os: ubuntu-24.04 },
-            # { vcpkg_triplet: x86-android, os: ubuntu-24.04 },
-            # { vcpkg_triplet: arm64-android, os: ubuntu-24.04 },
-            # { vcpkg_triplet: arm-neon-android, os: ubuntu-24.04 },
-            # { vcpkg_triplet: arm64-ios, os: macos-15 },
+            { vcpkg_triplet: x86-linux, os: ubuntu-24.04 },
+            { vcpkg_triplet: arm64-linux, os: ubuntu-24.04-arm },
+            { vcpkg_triplet: arm-linux, os: ubuntu-24.04-arm },
+            { vcpkg_triplet: x64-mingw-static, os: windows-2025 },
+            { vcpkg_triplet: x86-mingw-static, os: windows-2025 },
+            { vcpkg_triplet: arm64-mingw-static, os: windows-2025 },
+            { vcpkg_triplet: x64-windows-static, os: windows-2025 }, # MSVC instead of mingw
+            { vcpkg_triplet: x86-windows-static, os: windows-2025 }, # MSVC instead of mingw
+            { vcpkg_triplet: arm64-windows-static, os: windows-2025 }, # MSVC instead of mingw
+            { vcpkg_triplet: arm64-osx, os: macos-15 },
+            { vcpkg_triplet: x64-osx, os: macos-15 },
+            { vcpkg_triplet: wasm32-emscripten, os: ubuntu-24.04 },
+            { vcpkg_triplet: x64-android, os: ubuntu-24.04 },
+            { vcpkg_triplet: x86-android, os: ubuntu-24.04 },
+            { vcpkg_triplet: arm64-android, os: ubuntu-24.04 },
+            { vcpkg_triplet: arm-neon-android, os: ubuntu-24.04 },
+            { vcpkg_triplet: arm64-ios, os: macos-15 },
           ]
         # Note: vcpkg forces building both Debug and Release on a single run. This is not the same as the templates!
-        target-type: [template_debug] # , template_release
+        target-type: [template_debug, template_release]
         float-precision: [single, double]
     runs-on: ${{ matrix.target.os }}
     permissions:
@@ -134,10 +133,7 @@ jobs:
 
       - name: Restore Godot API dump
         uses: actions/cache/restore@v5
-        with:
-          path: |
-            godot-cpp/gdextension/extension_api.json
-          key: godot-api-dump-${{ needs.read-versions.outputs.godot_min_version }}-${{ matrix.float-precision }}
+        with: *godot-api-dump-cache
 
       - name: Setup for x86 Linux
         if: matrix.target.vcpkg_triplet == 'x86-linux'
@@ -381,13 +377,13 @@ jobs:
         export_target: # Not all architectures are exported (this is just a demo)
           [
             { os: ubuntu-24.04, export_name: Linux },
-            # { os: ubuntu-24.04, export_name: Web },
-            # { os: ubuntu-24.04, export_name: Android },
-            # { os: windows-2025, export_name: "Windows Desktop" },
-            # { os: macos-15, export_name: macOS },
-            # { os: ubuntu-24.04, export_name: iOS }, # I do not have a developer account (which is required to actually build the app on macos), instead use ubuntu and just export the code to compile.
+            { os: ubuntu-24.04, export_name: Web },
+            { os: ubuntu-24.04, export_name: Android },
+            { os: windows-2025, export_name: "Windows Desktop" },
+            { os: macos-15, export_name: macOS },
+            { os: ubuntu-24.04, export_name: iOS }, # I do not have a developer account (which is required to actually build the app on macos), instead use ubuntu and just export the code to compile.
           ]
-        mode: [debug] #, release
+        mode: [debug, release]
         godot-version: ${{ fromJson(needs.read-versions.outputs.godot_versions) }}
     runs-on: ${{ matrix.export_target.os }}
     steps:
