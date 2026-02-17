@@ -206,7 +206,7 @@ jobs:
               ASSET="ccache-${CCACHE_VERSION}-linux-x86_64.tar.xz"
             fi
           elif [ "$RUNNER_OS" = "macOS" ]; then
-              ASSET="ccache-${CCACHE_VERSION}-darwin.tar.xz" # Universal (aarch64 + x86_64)
+              ASSET="ccache-${CCACHE_VERSION}-darwin.tar.gz" # Universal (aarch64 + x86_64)
           elif [ "$RUNNER_OS" = "Windows" ]; then
             ASSET="ccache-${CCACHE_VERSION}-windows-i686.zip"
           fi
