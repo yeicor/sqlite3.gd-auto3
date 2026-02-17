@@ -220,7 +220,7 @@ jobs:
           fi
           mv ccache-${CCACHE_VERSION}-* ccache
           if [ "$RUNNER_OS" = "Windows" ]; then
-            echo "PATH=$PWD/ccache;$PATH" >> $GITHUB_ENV
+            echo "cmake_extra_args=-DCMAKE_PROGRAM_PATH=$PWD/ccache ${{ env.cmake_extra_args }}" >> $GITHUB_ENV  # Otherwise breaks powershell
           else
             echo "PATH=$PWD/ccache:$PATH" >> $GITHUB_ENV
           fi
