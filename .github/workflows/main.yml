@@ -318,7 +318,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        export_target: # TODO: All architectures (although this is just a demo)
+        export_target: # Not all architectures are exported (this is just a demo)
           [
             { os: ubuntu-24.04, export_name: Linux },
             { os: ubuntu-24.04, export_name: Web },
@@ -328,6 +328,7 @@ jobs:
             { os: ubuntu-24.04, export_name: iOS }, # I do not have a developer account (which is required to actually build the app on macos), instead use ubuntu and just export the code to compile.
           ]
         mode: [debug, release]
+        # Double builds are not exported (this is just a demo)
     runs-on: ${{ matrix.export_target.os }}
     needs: build
     steps:
