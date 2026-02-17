@@ -94,6 +94,7 @@ jobs:
           git clone --depth 1 --branch ${{ env.GODOT_MIN_VERSION }} https://github.com/godotengine/godot.git godot-repo
           cd godot-repo
           # Build Godot with appropriate precision
+          python -m pip install scons
           scons ${{ matrix.float-precision == 'double' && 'precision=double' || '' }}
           # Move back and use built Godot to dump APIs
           cd ..
