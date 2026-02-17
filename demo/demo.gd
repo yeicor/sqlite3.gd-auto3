@@ -35,7 +35,7 @@ func _ready():
 	db.close()
 	_log("Database closed", "END")
 	var duration = float(Time.get_ticks_usec() - start_time) / 1000000.0
-	_log("Demo finished successfully in %.3f seconds!" % duration, "END")
+	_log("Demo finished successfully in %.3f seconds!" % duration, "END")  # DO-NOT-EDIT: Checked by CI
 
 func run_test_script(script_path: String, db: SQLite3Database):
 	_log("Loading test script: " + script_path, "LOAD")
