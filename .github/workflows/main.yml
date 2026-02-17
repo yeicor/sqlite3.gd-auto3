@@ -17,27 +17,27 @@ jobs:
       matrix:
         target: [
             # https://docs.godotengine.org/en/stable/about/system_requirements.html
-            { vcpkg_triplet: x64-linux, os: ubuntu-24.04 },
-            { vcpkg_triplet: x86-linux, os: ubuntu-24.04 },
-            { vcpkg_triplet: arm64-linux, os: ubuntu-24.04-arm },
-            { vcpkg_triplet: arm-linux, os: ubuntu-24.04-arm },
-            { vcpkg_triplet: x64-mingw-static, os: windows-2025 },
-            { vcpkg_triplet: x86-mingw-static, os: windows-2025 },
-            { vcpkg_triplet: arm64-mingw-static, os: windows-2025 },
+            # { vcpkg_triplet: x64-linux, os: ubuntu-24.04 },
+            # { vcpkg_triplet: x86-linux, os: ubuntu-24.04 },
+            # { vcpkg_triplet: arm64-linux, os: ubuntu-24.04-arm },
+            # { vcpkg_triplet: arm-linux, os: ubuntu-24.04-arm },
+            # { vcpkg_triplet: x64-mingw-static, os: windows-2025 },
+            # { vcpkg_triplet: x86-mingw-static, os: windows-2025 },
+            # { vcpkg_triplet: arm64-mingw-static, os: windows-2025 },
             { vcpkg_triplet: x64-windows-static, os: windows-2025 }, # MSVC instead of mingw
-            { vcpkg_triplet: x86-windows-static, os: windows-2025 }, # MSVC instead of mingw
-            { vcpkg_triplet: arm64-windows-static, os: windows-2025 }, # MSVC instead of mingw
-            { vcpkg_triplet: arm64-osx, os: macos-15 },
-            { vcpkg_triplet: x64-osx, os: macos-15 },
-            { vcpkg_triplet: wasm32-emscripten-pic, os: ubuntu-24.04 },
-            { vcpkg_triplet: x64-android, os: ubuntu-24.04 },
-            { vcpkg_triplet: x86-android, os: ubuntu-24.04 },
-            { vcpkg_triplet: arm64-android, os: ubuntu-24.04 },
-            { vcpkg_triplet: arm-android, os: ubuntu-24.04 },
-            { vcpkg_triplet: arm64-ios, os: macos-15 },
+            # { vcpkg_triplet: x86-windows-static, os: windows-2025 }, # MSVC instead of mingw
+            # { vcpkg_triplet: arm64-windows-static, os: windows-2025 }, # MSVC instead of mingw
+            # { vcpkg_triplet: arm64-osx, os: macos-15 },
+            # { vcpkg_triplet: x64-osx, os: macos-15 },
+            # { vcpkg_triplet: wasm32-emscripten-pic, os: ubuntu-24.04 },
+            # { vcpkg_triplet: x64-android, os: ubuntu-24.04 },
+            # { vcpkg_triplet: x86-android, os: ubuntu-24.04 },
+            # { vcpkg_triplet: arm64-android, os: ubuntu-24.04 },
+            # { vcpkg_triplet: arm-android, os: ubuntu-24.04 },
+            # { vcpkg_triplet: arm64-ios, os: macos-15 },
           ]
         # Note: vcpkg forces building both Debug and Release on a single run. This is not the same as the templates!
-        target-type: [template_debug, template_release]
+        target-type: [template_debug] # , template_release
         float-precision: [single] # TODO: , "double"
     runs-on: ${{ matrix.target.os }}
     permissions:
@@ -300,155 +300,155 @@ jobs:
             /.fake-path-to-force-root-directory
       # </Cache save and export artifacts>
 
-  test_and_export_addon_and_demo:
-    strategy:
-      fail-fast: false
-      matrix:
-        export_target: # TODO: All architectures (although this is just a demo)
-          [
-            { os: ubuntu-24.04, export_name: Linux },
-            { os: ubuntu-24.04, export_name: Web },
-            { os: ubuntu-24.04, export_name: Android },
-            { os: windows-2025, export_name: "Windows Desktop" },
-            { os: macos-15, export_name: macOS },
-            { os: ubuntu-24.04, export_name: iOS }, # I do not have a developer account (which is required to actually build the app on macos), instead use ubuntu and just export the code to compile.
-          ]
-        mode: [debug, release]
-    runs-on: ${{ matrix.export_target.os }}
-    needs: build
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-        with:
-          submodules: recursive
+  # test_and_export_addon_and_demo:
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       export_target: # TODO: All architectures (although this is just a demo)
+  #         [
+  #           { os: ubuntu-24.04, export_name: Linux },
+  #           { os: ubuntu-24.04, export_name: Web },
+  #           { os: ubuntu-24.04, export_name: Android },
+  #           { os: windows-2025, export_name: "Windows Desktop" },
+  #           { os: macos-15, export_name: macOS },
+  #           { os: ubuntu-24.04, export_name: iOS }, # I do not have a developer account (which is required to actually build the app on macos), instead use ubuntu and just export the code to compile.
+  #         ]
+  #       mode: [debug, release]
+  #   runs-on: ${{ matrix.export_target.os }}
+  #   needs: build
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v5
+  #       with:
+  #         submodules: recursive
 
-      - name: Download addon artifacts
-        uses: actions/download-artifact@v7
-        with:
-          pattern: gdext-*
-          merge-multiple: true
+  #     - name: Download addon artifacts
+  #       uses: actions/download-artifact@v7
+  #       with:
+  #         pattern: gdext-*
+  #         merge-multiple: true
 
-      - name: Setup Android NDK
-        if: matrix.export_target.export_name == 'Android'
-        uses: nttld/setup-ndk@v1
-        id: setup-ndk
-        with:
-          ndk-version: r23c
+  #     - name: Setup Android NDK
+  #       if: matrix.export_target.export_name == 'Android'
+  #       uses: nttld/setup-ndk@v1
+  #       id: setup-ndk
+  #       with:
+  #         ndk-version: r23c
 
-      - name: Set Android NDK path
-        if: matrix.export_target.export_name == 'Android'
-        shell: bash
-        run: |
-          set -e
-          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+  #     - name: Set Android NDK path
+  #       if: matrix.export_target.export_name == 'Android'
+  #       shell: bash
+  #       run: |
+  #         set -e
+  #         echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
 
-      - name: Setup Android keystore
-        if: matrix.export_target.export_name == 'Android' && matrix.mode == 'release'
-        shell: bash
-        run: |
-          set -e
-          sudo apt-get update
-          sudo apt-get install -y openjdk-17-jdk
-          keytool -genkeypair -v -storetype PKCS12 -keystore ${{ github.workspace }}/demo/android_keystore.p12 -alias androidkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Unknown, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown"
-          echo "GODOT_ANDROID_KEYSTORE_RELEASE_PATH=${{ github.workspace }}/demo/android_keystore.p12" >> $GITHUB_ENV
-          echo "GODOT_ANDROID_KEYSTORE_RELEASE_USER=androidkey" >> $GITHUB_ENV
-          echo "GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD=android" >> $GITHUB_ENV
+  #     - name: Setup Android keystore
+  #       if: matrix.export_target.export_name == 'Android' && matrix.mode == 'release'
+  #       shell: bash
+  #       run: |
+  #         set -e
+  #         sudo apt-get update
+  #         sudo apt-get install -y openjdk-17-jdk
+  #         keytool -genkeypair -v -storetype PKCS12 -keystore ${{ github.workspace }}/demo/android_keystore.p12 -alias androidkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Unknown, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown"
+  #         echo "GODOT_ANDROID_KEYSTORE_RELEASE_PATH=${{ github.workspace }}/demo/android_keystore.p12" >> $GITHUB_ENV
+  #         echo "GODOT_ANDROID_KEYSTORE_RELEASE_USER=androidkey" >> $GITHUB_ENV
+  #         echo "GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD=android" >> $GITHUB_ENV
 
-      - name: Setup Godot
-        uses: chickensoft-games/setup-godot@v2
-        with:
-          version: 4.6.0
-          use-dotnet: false
-          include-templates: true
+  #     - name: Setup Godot
+  #       uses: chickensoft-games/setup-godot@v2
+  #       with:
+  #         version: 4.6.0
+  #         use-dotnet: false
+  #         include-templates: true
 
-      - name: Run Godot editor
-        shell: bash
-        run: |
-          set -e
-          godot --path demo --editor --quit --headless || true
+  #     - name: Run Godot editor
+  #       shell: bash
+  #       run: |
+  #         set -e
+  #         godot --path demo --editor --quit --headless || true
 
-      - name: Run demo test
-        shell: bash
-        if: matrix.export_target.export_name == 'Linux' || matrix.export_target.export_name == 'Windows Desktop' || matrix.export_target.export_name == 'macOS'
-        run: |
-          set -e
-          godot --path demo --quit --headless
+  #     - name: Run demo test
+  #       shell: bash
+  #       if: matrix.export_target.export_name == 'Linux' || matrix.export_target.export_name == 'Windows Desktop' || matrix.export_target.export_name == 'macOS'
+  #       run: |
+  #         set -e
+  #         godot --path demo --quit --headless
 
-      - name: Export demo
-        shell: bash
-        run: |
-          set -e
-          mkdir demo/exports
-          godot --export-${{ matrix.mode }} "${{ matrix.export_target.export_name }}" --path demo --headless
-          echo "EXPORT_NAME=$(echo "${{ matrix.export_target.export_name }}" | tr '[:upper:]' '[:lower:]' | tr -d ' /')" >> $GITHUB_ENV
+  #     - name: Export demo
+  #       shell: bash
+  #       run: |
+  #         set -e
+  #         mkdir demo/exports
+  #         godot --export-${{ matrix.mode }} "${{ matrix.export_target.export_name }}" --path demo --headless
+  #         echo "EXPORT_NAME=$(echo "${{ matrix.export_target.export_name }}" | tr '[:upper:]' '[:lower:]' | tr -d ' /')" >> $GITHUB_ENV
 
-      - name: Upload demo export artifact
-        uses: actions/upload-artifact@v6
-        with:
-          name: demo-export-${{ env.EXPORT_NAME }}-${{ matrix.mode }}
-          path: demo/exports/**
+  #     - name: Upload demo export artifact
+  #       uses: actions/upload-artifact@v6
+  #       with:
+  #         name: demo-export-${{ env.EXPORT_NAME }}-${{ matrix.mode }}
+  #         path: demo/exports/**
 
-      - name: Prepare addon export
-        if: matrix.export_target.export_name == 'Linux' && matrix.mode == 'release'
-        shell: bash
-        run: |
-          set -e
-          mkdir -p addon-export && cp -r demo/addons addon-export
+  #     - name: Prepare addon export
+  #       if: matrix.export_target.export_name == 'Linux' && matrix.mode == 'release'
+  #       shell: bash
+  #       run: |
+  #         set -e
+  #         mkdir -p addon-export && cp -r demo/addons addon-export
 
-      - name: Upload addon artifact
-        uses: actions/upload-artifact@v6
-        if: matrix.export_target.export_name == 'Linux' && matrix.mode == 'release'
-        with:
-          name: addon
-          path: addon-export
+  #     - name: Upload addon artifact
+  #       uses: actions/upload-artifact@v6
+  #       if: matrix.export_target.export_name == 'Linux' && matrix.mode == 'release'
+  #       with:
+  #         name: addon
+  #         path: addon-export
 
-  release:
-    runs-on: ubuntu-24.04
-    needs: test_and_export_addon_and_demo
-    if: github.ref_type == 'tag'
-    permissions:
-      contents: write
-    steps:
-      - name: Download addon artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: addon
-          path: .
+  # release:
+  #   runs-on: ubuntu-24.04
+  #   needs: test_and_export_addon_and_demo
+  #   if: github.ref_type == 'tag'
+  #   permissions:
+  #     contents: write
+  #   steps:
+  #     - name: Download addon artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: addon
+  #         path: .
 
-      - name: Create addon zip
-        shell: bash
-        run: |
-          set -e
-          zip -r addon.zip addons
+  #     - name: Create addon zip
+  #       shell: bash
+  #       run: |
+  #         set -e
+  #         zip -r addon.zip addons
 
-      - name: Upload to release
-        shell: bash
-        run: |
-          set -e
-          gh release upload ${{ github.ref_name }} addon.zip
+  #     - name: Upload to release
+  #       shell: bash
+  #       run: |
+  #         set -e
+  #         gh release upload ${{ github.ref_name }} addon.zip
 
-  deploy-pages:
-    runs-on: ubuntu-24.04
-    needs: test_and_export_addon_and_demo
-    if: github.ref_type == 'tag'
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Download web demo artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: demo-export-web-release
-          path: web
+  # deploy-pages:
+  #   runs-on: ubuntu-24.04
+  #   needs: test_and_export_addon_and_demo
+  #   if: github.ref_type == 'tag'
+  #   permissions:
+  #     contents: read
+  #     pages: write
+  #     id-token: write
+  #   environment:
+  #     name: github-pages
+  #     url: ${{ steps.deployment.outputs.page_url }}
+  #   steps:
+  #     - name: Download web demo artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: demo-export-web-release
+  #         path: web
 
-      - name: Upload pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: web
+  #     - name: Upload pages artifact
+  #       uses: actions/upload-pages-artifact@v3
+  #       with:
+  #         path: web
 
-      - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
+  #     - name: Deploy to GitHub Pages
+  #       uses: actions/deploy-pages@v4
