@@ -191,15 +191,37 @@ jobs:
             echo "::warning ::Failed to download and extract previous vcpkg installed artifacts from any of the last 10 workflows on current branch or main branch, skipping cache..."
           fi
 
-      - name: Setup ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          variant: ccache # sccache also supported and may be better on some platforms.
-          max-size: 2G
-          save: false
-          restore: false
-          create-symlink: false
-          job-summary: ""
+      - name: Install and configure ccache
+        shell: bash
+        run: |
+          set -e
+          CCACHE_VERSION=$(curl -s https://api.github.com/repos/ccache/ccache/releases/latest | jq -r .tag_name | sed 's/^v//')
+          echo "CCACHE_VERSION=$CCACHE_VERSION" >> $GITHUB_ENV
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            if [ "$RUNNER_ARCH" = "ARM64" ]; then
+              ASSET="ccache-${CCACHE_VERSION}-linux-arm64.tar.xz"
+            else
+              ASSET="ccache-${CCACHE_VERSION}-linux-x86_64.tar.xz"
+            fi
+          elif [ "$RUNNER_OS" = "macOS" ]; then
+            if [ "$RUNNER_ARCH" = "ARM64" ]; then
+              ASSET="ccache-${CCACHE_VERSION}-darwin-arm64.tar.xz"
+            else
+              ASSET="ccache-${CCACHE_VERSION}-darwin-x86_64.tar.xz"
+            fi
+          elif [ "$RUNNER_OS" = "Windows" ]; then
+            ASSET="ccache-${CCACHE_VERSION}-windows-x86_64.zip"
+          fi
+          curl -L "https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/${ASSET}" -o ccache-archive
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            unzip ccache-archive
+            mv ccache-${CCACHE_VERSION}-windows-x86_64 ccache
+          else
+            tar -xf ccache-archive
+            mv ccache-${CCACHE_VERSION}-* ccache
+          fi
+          echo "PATH=$PWD/ccache:$PATH" >> $GITHUB_ENV
+          ccache --set-config max_size 2G
 
       - name: Install and build with vcpkg
         shell: bash
