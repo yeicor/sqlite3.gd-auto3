@@ -17,11 +17,11 @@ jobs:
       matrix:
         target: [
             # https://docs.godotengine.org/en/stable/about/system_requirements.html
-            # { vcpkg_triplet: x64-linux, os: ubuntu-24.04 },
+            { vcpkg_triplet: x64-linux, os: ubuntu-24.04 },
             # { vcpkg_triplet: x86-linux, os: ubuntu-24.04 },
             # { vcpkg_triplet: arm64-linux, os: ubuntu-24.04-arm },
             # { vcpkg_triplet: arm-linux, os: ubuntu-24.04-arm },
-            # { vcpkg_triplet: x64-mingw-static, os: windows-2025 },
+            { vcpkg_triplet: x64-mingw-static, os: windows-2025 },
             # { vcpkg_triplet: x86-mingw-static, os: windows-2025 },
             # { vcpkg_triplet: arm64-mingw-static, os: windows-2025 },
             { vcpkg_triplet: x64-windows-static, os: windows-2025 }, # MSVC instead of mingw
@@ -97,6 +97,7 @@ jobs:
           version: 12.2.0 # It seems like newer versions are broken (follow godot-cpp)
 
       - name: Setup MSVC (Windows)
+        if: matrix.target.os == 'windows-2025' && contains(matrix.target.vcpkg_triplet, '-windows')
         uses: microsoft/setup-msbuild@v2
         with:
           msbuild-architecture: ${{ contains(matrix.target.vcpkg_triplet, 'x64-') && 'x64' || contains(matrix.target.vcpkg_triplet, 'x86-') && 'x86' || 'arm64' }}

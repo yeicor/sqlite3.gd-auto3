@@ -1,4 +1,4 @@
-include("triplets/community/arm64-mingw-static.cmake")
+include("${VCPKG_ROOT_DIR}/triplets/community/arm64-mingw-static.cmake")
 
 # CUSTOM:
 if(PORT STREQUAL "libpng")

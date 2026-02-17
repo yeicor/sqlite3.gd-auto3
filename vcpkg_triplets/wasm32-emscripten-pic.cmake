@@ -1,4 +1,4 @@
-include("triplets/community/wasm32-emscripten.cmake")
+include("${VCPKG_ROOT_DIR}/triplets/community/wasm32-emscripten.cmake")
 
 # CUSTOM: (hopefully all dependencies use cmake...)
 set(VCPKG_CMAKE_CONFIGURE_OPTIONS ${VCPKG_CMAKE_CONFIGURE_OPTIONS}
