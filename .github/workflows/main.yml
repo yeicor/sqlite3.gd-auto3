@@ -18,23 +18,23 @@ jobs:
         target: [
             # https://docs.godotengine.org/en/stable/about/system_requirements.html
             { vcpkg_triplet: x64-linux, os: ubuntu-24.04 },
-            # { vcpkg_triplet: x86-linux, os: ubuntu-24.04 },
-            # { vcpkg_triplet: arm64-linux, os: ubuntu-24.04-arm },
-            # { vcpkg_triplet: arm-linux, os: ubuntu-24.04-arm },
-            # { vcpkg_triplet: x64-mingw-static, os: windows-2025 },
-            # { vcpkg_triplet: x86-mingw-static, os: windows-2025 },
-            # { vcpkg_triplet: arm64-mingw-static, os: windows-2025 },
+            { vcpkg_triplet: x86-linux, os: ubuntu-24.04 },
+            { vcpkg_triplet: arm64-linux, os: ubuntu-24.04-arm },
+            { vcpkg_triplet: arm-linux, os: ubuntu-24.04-arm },
+            { vcpkg_triplet: x64-mingw-static, os: windows-2025 },
+            { vcpkg_triplet: x86-mingw-static, os: windows-2025 },
+            { vcpkg_triplet: arm64-mingw-static, os: windows-2025 },
             { vcpkg_triplet: x64-windows-static, os: windows-2025 }, # MSVC instead of mingw
-            # { vcpkg_triplet: x86-windows-static, os: windows-2025 }, # MSVC instead of mingw
-            # { vcpkg_triplet: arm64-windows-static, os: windows-2025 }, # MSVC instead of mingw
-            # { vcpkg_triplet: arm64-osx, os: macos-15 },
-            # { vcpkg_triplet: x64-osx, os: macos-15 },
-            # { vcpkg_triplet: wasm32-emscripten-pic, os: ubuntu-24.04 },
-            # { vcpkg_triplet: x64-android, os: ubuntu-24.04 },
-            # { vcpkg_triplet: x86-android, os: ubuntu-24.04 },
-            # { vcpkg_triplet: arm64-android, os: ubuntu-24.04 },
-            # { vcpkg_triplet: arm-android, os: ubuntu-24.04 },
-            # { vcpkg_triplet: arm64-ios, os: macos-15 },
+            { vcpkg_triplet: x86-windows-static, os: windows-2025 }, # MSVC instead of mingw
+            { vcpkg_triplet: arm64-windows-static, os: windows-2025 }, # MSVC instead of mingw
+            { vcpkg_triplet: arm64-osx, os: macos-15 },
+            { vcpkg_triplet: x64-osx, os: macos-15 },
+            { vcpkg_triplet: wasm32-emscripten-pic, os: ubuntu-24.04 },
+            { vcpkg_triplet: x64-android, os: ubuntu-24.04 },
+            { vcpkg_triplet: x86-android, os: ubuntu-24.04 },
+            { vcpkg_triplet: arm64-android, os: ubuntu-24.04 },
+            { vcpkg_triplet: arm-neon-android, os: ubuntu-24.04 },
+            { vcpkg_triplet: arm64-ios, os: macos-15 },
           ]
         # Note: vcpkg forces building both Debug and Release on a single run. This is not the same as the templates!
         target-type: [template_debug] # , template_release
@@ -56,6 +56,17 @@ jobs:
         uses: actions/checkout@v5
         with:
           submodules: recursive
+
+      - name: Read version defaults from godot-cpp's action.yml
+        shell: bash
+        run: |
+          set -e
+          EM_VERSION=$(grep -A1 'em-version:' godot-cpp/.github/actions/setup-godot-cpp/action.yml | grep 'default:' | sed 's/.*default: //' | tr -d ' ')
+          MINGW_VERSION=$(grep -A1 'mingw-version:' godot-cpp/.github/actions/setup-godot-cpp/action.yml | grep 'default:' | sed 's/.*default: //' | tr -d ' ')
+          NDK_VERSION=$(grep -A1 'ndk-version:' godot-cpp/.github/actions/setup-godot-cpp/action.yml | grep 'default:' | sed 's/.*default: //' | tr -d ' ')
+          echo "EM_VERSION=$EM_VERSION" >> $GITHUB_ENV
+          echo "MINGW_VERSION=$MINGW_VERSION" >> $GITHUB_ENV
+          echo "NDK_VERSION=$NDK_VERSION" >> $GITHUB_ENV
 
       - name: Setup for x86 Linux
         if: matrix.target.vcpkg_triplet == 'x86-linux'
@@ -90,17 +101,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y "libx11-dev${arch_selector}" "libgl1-mesa-dev${arch_selector}" "libfontconfig-dev${arch_selector}"
 
-      - name: Setup MinGW (Windows)
+      - name: Setup MinGW (Windows) # MSVC is already set up by default
         if: matrix.target.os == 'windows-2025' && contains(matrix.target.vcpkg_triplet, '-mingw')
         uses: egor-tensin/setup-mingw@v2
         with:
-          version: 12.2.0 # It seems like newer versions are broken (follow godot-cpp)
-
-      - name: Setup MSVC (Windows)
-        if: matrix.target.os == 'windows-2025' && contains(matrix.target.vcpkg_triplet, '-windows')
-        uses: microsoft/setup-msbuild@v2
-        with:
-          msbuild-architecture: ${{ contains(matrix.target.vcpkg_triplet, 'x64-') && 'x64' || contains(matrix.target.vcpkg_triplet, 'x86-') && 'x86' || 'arm64' }}
+          version: ${{ env.MINGW_VERSION }}
 
       - name: Install build tools (macOS)
         if: matrix.target.os == 'macos-15'
@@ -113,7 +118,7 @@ jobs:
         if: matrix.target.vcpkg_triplet == 'wasm32-emscripten-pic'
         uses: mymindstorm/setup-emsdk@v14
         with:
-          version: 4.0.12 # More recent than Godot's default, since we need allow-multiple-definition support
+          version: ${{ env.EM_VERSION }}
 
       - name: Configure Emscripten CMake args
         if: matrix.target.vcpkg_triplet == 'wasm32-emscripten-pic'
@@ -124,10 +129,10 @@ jobs:
 
       - name: Setup Android NDK
         if: contains(matrix.target.vcpkg_triplet, '-android')
-        uses: nttld/setup-ndk@v1
         id: setup-ndk
+        uses: nttld/setup-ndk@v1
         with:
-          ndk-version: r23c # Same as https://github.com/godotengine/godot/blob/<GODOT_VERSION>/platform/android/detect.py
+          ndk-version: ${{ env.NDK_VERSION }}
 
       - name: Set Android NDK path
         if: contains(matrix.target.vcpkg_triplet, '-android')

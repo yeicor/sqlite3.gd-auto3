@@ -24,13 +24,27 @@
       "description": "Update OS versions in GitHub Actions matrix",
       "managerFilePatterns": [
         ".github/workflows/*.yml",
-        ".github/workflows/*.yaml",
+        ".github/workflows/*.yaml"
       ],
       "matchStrings": [
         "os:\\s*\"?(?<depName>ubuntu|windows|macos)-(?<currentValue>[^\"} ]*)"
       ],
       "datasourceTemplate": "github-runners",
       "versioningTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "description": "Update ccache version",
+      "managerFilePatterns": [
+        ".github/workflows/*.yml",
+        ".github/workflows/*.yaml"
+      ],
+      "matchStrings": [
+        "CCACHE_VERSION=(?<currentValue>[^\\s]+)"
+      ],
+      "depName": "ccache/ccache",
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "semver"
     }
   ]
 }
