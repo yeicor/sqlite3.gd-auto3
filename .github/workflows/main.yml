@@ -96,6 +96,11 @@ jobs:
         with:
           version: 12.2.0 # It seems like newer versions are broken (follow godot-cpp)
 
+      - name: Setup MSVC (Windows)
+        uses: microsoft/setup-msbuild@v2
+        with:
+          msbuild-architecture: ${{ contains(matrix.target.vcpkg_triplet, 'x64-') && 'x64' || contains(matrix.target.vcpkg_triplet, 'x86-') && 'x86' || 'arm64' }}
+
       - name: Install build tools (macOS)
         if: matrix.target.os == 'macos-15'
         shell: bash
