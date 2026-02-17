@@ -195,13 +195,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          while [ "$CCACHE_VERSION" = "null" ] || [ -z "$CCACHE_VERSION" ]; do
-            CCACHE_VERSION=$(curl -s https://api.github.com/repos/ccache/ccache/releases/latest | jq -r .tag_name | sed 's/^v//')
-            if [ "$CCACHE_VERSION" = "null" ] || [ -z "$CCACHE_VERSION" ]; then
-              echo "Got null version, retrying in 1 second"
-              sleep 1
-            fi
-          done
+          CCACHE_VERSION=4.12.3  # TODO: Enable renovate updates
           echo "CCACHE_VERSION=$CCACHE_VERSION" >> $GITHUB_ENV
           echo "CCACHE_VERSION is $CCACHE_VERSION"
           if [ "$RUNNER_OS" = "Linux" ]; then
