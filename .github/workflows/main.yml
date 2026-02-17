@@ -197,6 +197,7 @@ jobs:
           set -e
           CCACHE_VERSION=$(curl -s https://api.github.com/repos/ccache/ccache/releases/latest | jq -r .tag_name | sed 's/^v//')
           echo "CCACHE_VERSION=$CCACHE_VERSION" >> $GITHUB_ENV
+          echo "CCACHE_VERSION is $CCACHE_VERSION"
           if [ "$RUNNER_OS" = "Linux" ]; then
             if [ "$RUNNER_ARCH" = "ARM64" ]; then
               ASSET="ccache-${CCACHE_VERSION}-linux-arm64.tar.xz"
@@ -212,7 +213,10 @@ jobs:
           elif [ "$RUNNER_OS" = "Windows" ]; then
             ASSET="ccache-${CCACHE_VERSION}-windows-x86_64.zip"
           fi
+          echo "ASSET is $ASSET"
           curl -L "https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/${ASSET}" -o ccache-archive
+          echo "Downloaded ccache-archive, size: $(ls -lh ccache-archive | awk '{print $5}')"
+          echo "File type: $(file ccache-archive 2>/dev/null || echo 'file command not available')"
           if [ "$RUNNER_OS" = "Windows" ]; then
             unzip ccache-archive
             mv ccache-${CCACHE_VERSION}-windows-x86_64 ccache
