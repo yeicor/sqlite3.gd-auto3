@@ -124,14 +124,14 @@ jobs:
           echo "cmake_extra_args='-DGODOTCPP_THREADS=OFF'" >> $GITHUB_ENV
 
       - name: Setup Android NDK
-        if: matrix.export_target.export_name == 'Android'
+        if: contains(matrix.target.vcpkg_triplet, '-android')
         uses: nttld/setup-ndk@v1
         id: setup-ndk
         with:
           ndk-version: r23c # Same as https://github.com/godotengine/godot/blob/<GODOT_VERSION>/platform/android/detect.py
 
       - name: Set Android NDK path
-        if: matrix.export_target.export_name == 'Android'
+        if: contains(matrix.target.vcpkg_triplet, '-android')
         shell: bash
         run: |
           set -e
