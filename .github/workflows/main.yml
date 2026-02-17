@@ -225,7 +225,11 @@ jobs:
             tar -xf ccache-archive
           fi
           mv ccache-${CCACHE_VERSION}-* ccache
-          echo "PATH=$PWD/ccache:$PATH" >> $GITHUB_ENV
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            echo "PATH=$PWD/ccache;$PATH" >> $GITHUB_ENV
+          else
+            echo "PATH=$PWD/ccache:$PATH" >> $GITHUB_ENV
+          fi
           $PWD/ccache/ccache --set-config max_size=2G
 
       - name: Install and build with vcpkg
