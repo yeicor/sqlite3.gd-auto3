@@ -94,7 +94,7 @@ jobs:
           git clone --depth 1 --branch ${{ env.GODOT_MIN_VERSION }} https://github.com/godotengine/godot.git godot-repo
           cd godot-repo
           # Build Godot with appropriate precision
-          scons ${{ matrix.float-precision == "double" && "precision=double" || "" }}
+          scons ${{ matrix.float-precision == 'double' && 'precision=double' || '' }}
           # Move back and use built Godot to dump APIs
           cd ..
           ./godot-repo/bin/godot.linux.x86_64 --dump-extension-api --headless
