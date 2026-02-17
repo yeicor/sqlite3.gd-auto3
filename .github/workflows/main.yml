@@ -98,11 +98,11 @@ jobs:
           scons ${{ matrix.float-precision == 'double' && 'precision=double' || '' }}
           # Move back and use built Godot to dump APIs
           cd ..
-          ./godot-repo/bin/godot.linux.x86_64 --dump-extension-api --headless
-          ./godot-repo/bin/godot.linux.x86_64 --dump-gdextension-interface-json --headless
+          ./godot-repo/bin/godot.* --dump-extension-api --headless
+          ./godot-repo/bin/godot.* --dump-gdextension-interface-json --headless
+          rm -rf godot-repo
           mv extension_api.json godot-cpp/gdextension/
           mv gdextension_interface.json godot-cpp/gdextension/
-          rm godot-repo
 
       - name: Setup for x86 Linux
         if: matrix.target.vcpkg_triplet == 'x86-linux'
