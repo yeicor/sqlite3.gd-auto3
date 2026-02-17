@@ -72,7 +72,7 @@ jobs:
           set -e
           sudo apt-get update
           sudo apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
-          echo "cmake_extra_args='-DCMAKE_C_COMPILER=arm-linux-gnueabihf-gcc', '-DCMAKE_CXX_COMPILER=arm-linux-gnueabihf-g++'" >> $GITHUB_ENV
+          echo "cmake_extra_args=-DCMAKE_C_COMPILER=arm-linux-gnueabihf-gcc -DCMAKE_CXX_COMPILER=arm-linux-gnueabihf-g++ ${{ env.cmake_extra_args }}" >> $GITHUB_ENV
 
       - name: Install system dependencies (Ubuntu)
         if: matrix.target.os == 'ubuntu-24.04' || matrix.target.os == 'ubuntu-24.04-arm'
@@ -96,13 +96,6 @@ jobs:
         with:
           version: 12.2.0 # It seems like newer versions are broken (follow godot-cpp)
 
-      - name: Set LDFLAGS (Windows)
-        if: matrix.target.os == 'windows-2025'
-        shell: bash
-        run: |
-          set -e
-          echo 'LDFLAGS=-Wl,-allow-multiple-definition' >> $GITHUB_ENV
-
       - name: Install build tools (macOS)
         if: matrix.target.os == 'macos-15'
         shell: bash
@@ -121,7 +114,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          echo "cmake_extra_args='-DGODOTCPP_THREADS=OFF'" >> $GITHUB_ENV
+          echo "cmake_extra_args=-DGODOTCPP_THREADS=OFF ${{ env.cmake_extra_args }}" >> $GITHUB_ENV
 
       - name: Setup Android NDK
         if: contains(matrix.target.vcpkg_triplet, '-android')
