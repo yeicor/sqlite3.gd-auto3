@@ -29,7 +29,7 @@ jobs:
             { vcpkg_triplet: arm64-windows-static, os: windows-2025 }, # MSVC instead of mingw
             { vcpkg_triplet: arm64-osx, os: macos-15 },
             { vcpkg_triplet: x64-osx, os: macos-15 },
-            { vcpkg_triplet: wasm32-emscripten-pic, os: ubuntu-24.04 },
+            { vcpkg_triplet: wasm32-emscripten, os: ubuntu-24.04 },
             { vcpkg_triplet: x64-android, os: ubuntu-24.04 },
             { vcpkg_triplet: x86-android, os: ubuntu-24.04 },
             { vcpkg_triplet: arm64-android, os: ubuntu-24.04 },
@@ -37,8 +37,8 @@ jobs:
             { vcpkg_triplet: arm64-ios, os: macos-15 },
           ]
         # Note: vcpkg forces building both Debug and Release on a single run. This is not the same as the templates!
-        target-type: [template_debug] # , template_release
-        float-precision: [single] # TODO: , "double"
+        target-type: [template_debug, template_release]
+        float-precision: [single, double]
     runs-on: ${{ matrix.target.os }}
     permissions:
       actions: write
