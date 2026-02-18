@@ -339,7 +339,8 @@ jobs:
             echo "No library files found"
             exit 1
           fi
-          cp $files demo/addons/*/
+          echo -e "Copying the following files to the addon folder...\n$files"
+          cp -f $files demo/addons/*/
 
       - name: Clean and determine cache directories
         shell: bash
