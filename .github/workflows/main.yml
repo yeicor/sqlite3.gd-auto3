@@ -332,8 +332,11 @@ jobs:
           set -e
           echo "$GD_CMAKE_ARGS" >__GD_CMAKE_ARGS
           "vcpkg/bootstrap-vcpkg${{ matrix.target.os == 'windows-2025' && '.bat' || '.sh' }}"
-          vcpkg/vcpkg${{ matrix.target.os == 'windows-2025' && '.exe' || '' }} remove $(vcpkg/vcpkg${{ matrix.target.os == 'windows-2025' && '.exe' || '' }} list | awk '{print $1}' | sed 's/\[[^]]*\]//g')
-          vcpkg/vcpkg${{ matrix.target.os == 'windows-2025' && '.exe' || '' }} install gdext
+          vcpkg_exe="vcpkg/vcpkg${{ matrix.target.os == 'windows-2025' && '.exe' || '' }}"
+          if ! $vcpkg_exe list 2>&1 | grep -q "No packages are installed"; then
+            $vcpkg_exe remove $($vcpkg_exe list | awk '{print $1}' | sed 's/\[[^]]*\]//g' | tr '\n' ' ')
+          fi
+          $vcpkg_exe install gdext
         env:
           VCPKG_DISABLE_METRICS: 1
           VCPKG_DEFAULT_TRIPLET: ${{ matrix.target.vcpkg_triplet }}
