@@ -118,5 +118,11 @@ else()
 endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE godot-cpp unofficial::sqlite3::sqlite3)
 
-# You still need to copy the .so/.dll to the addon directory (done in workflow for caching purposes)
-install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION .)
+# Install the complete bindings to the demo project with the correct suffix
+get_target_property(GODOTCPP_SUFFIX godot-cpp GODOTCPP_SUFFIX)
+set(OUTPUT_NAME "gdext${GODOTCPP_SUFFIX}")
+set(INSTALL_FOLDER "${CMAKE_CURRENT_SOURCE_DIR}/demo/addons/${PROJECT_NAME}")
+message("Will install shared library to: ${INSTALL_FOLDER}")
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${OUTPUT_NAME}")
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION "${INSTALL_FOLDER}")
+# FIXME: Try harder to install to the proper directory on windows???
