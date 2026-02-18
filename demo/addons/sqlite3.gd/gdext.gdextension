@@ -50,10 +50,15 @@ macos.arm64.double.debug = "./libgdext.macos.template_debug.debug.arm64.double.d
 macos.arm64.single.release = "./libgdext.macos.template_release.release.arm64.dylib"
 macos.arm64.double.release = "./libgdext.macos.template_release.release.arm64.double.dylib"
 
-web.wasm32.single.debug = "./libgdext.web.template_debug.debug.wasm32.nothreads.so"
-web.wasm32.double.debug = "./libgdext.web.template_debug.debug.wasm32.double.nothreads.so"
-web.wasm32.single.release = "./libgdext.web.template_release.release.wasm32.nothreads.so"
-web.wasm32.double.release = "./libgdext.web.template_release.release.wasm32.double.nothreads.so"
+web.wasm32.single.nothreads.debug = "./libgdext.web.template_debug.debug.wasm32.nothreads.so"
+web.wasm32.double.nothreads.debug = "./libgdext.web.template_debug.debug.wasm32.double.nothreads.so"
+web.wasm32.single.nothreads.release = "./libgdext.web.template_release.release.wasm32.nothreads.so"
+web.wasm32.double.nothreads.release = "./libgdext.web.template_release.release.wasm32.double.nothreads.so"
+
+web.wasm32.single.threads.debug = "./libgdext.web.template_debug.debug.wasm32.so"
+web.wasm32.double.threads.debug = "./libgdext.web.template_debug.debug.wasm32.double.so"
+web.wasm32.single.threads.release = "./libgdext.web.template_release.release.wasm32.so"
+web.wasm32.double.threads.release = "./libgdext.web.template_release.release.wasm32.double.so"
 
 android.x86_64.single.debug = "./libgdext.android.template_debug.debug.x86_64.so"
 android.x86_64.double.debug = "./libgdext.android.template_debug.debug.x86_64.double.so"

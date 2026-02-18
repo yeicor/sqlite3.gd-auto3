@@ -109,6 +109,7 @@ jobs:
             { vcpkg_triplet: arm64-osx, os: macos-15 },
             { vcpkg_triplet: x64-osx, os: macos-15 },
             { vcpkg_triplet: wasm32-emscripten, os: ubuntu-24.04 },
+            { vcpkg_triplet: wasm32-emscripten-threads, os: ubuntu-24.04 },
             { vcpkg_triplet: x64-android, os: ubuntu-24.04 },
             { vcpkg_triplet: x86-android, os: ubuntu-24.04 },
             { vcpkg_triplet: arm64-android, os: ubuntu-24.04 },
@@ -195,11 +196,9 @@ jobs:
           version: ${{ needs.read-versions.outputs.em_version }}
 
       - name: Configure Emscripten CMake args
-        if: matrix.target.vcpkg_triplet == 'wasm32-emscripten'
+        if: contains(matrix.target.vcpkg_triplet, 'wasm32-emscripten')
         shell: bash
-        run: |
-          set -e
-          echo "cmake_extra_args=-DGODOTCPP_THREADS=OFF ${{ env.cmake_extra_args }}" >> $GITHUB_ENV
+        run: echo "cmake_extra_args=-DGODOTCPP_THREADS=${{ matrix.target.vcpkg_triplet == 'wasm32-emscripten-threads' && 'ON' || 'OFF' }} ${{ env.cmake_extra_args }}" >> $GITHUB_ENV
 
       - name: Setup Android NDK
         if: contains(matrix.target.vcpkg_triplet, '-android')
@@ -212,9 +211,7 @@ jobs:
         name: Set Android NDK path
         if: contains(matrix.target.vcpkg_triplet, '-android')
         shell: bash
-        run: |
-          set -e
-          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+        run: echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
 
       - name: Restore vcpkg cache
         shell: bash
@@ -306,8 +303,8 @@ jobs:
           set -e
           echo "$GD_CMAKE_ARGS" >__GD_CMAKE_ARGS
           "vcpkg/bootstrap-vcpkg${{matrix.target.os == 'windows-2025' && '.bat' || '.sh'}}"
-          "vcpkg/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" remove gdext --classic || true
-          "vcpkg/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" install gdext --classic
+          "vcpkg/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" remove gdext || true
+          "vcpkg/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" install gdext
         env:
           VCPKG_DISABLE_METRICS: 1
           VCPKG_DEFAULT_TRIPLET: ${{ matrix.target.vcpkg_triplet }}

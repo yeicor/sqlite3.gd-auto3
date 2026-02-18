@@ -12,5 +12,6 @@ To start a new project based on this template:
 
 1. Rename the project: Update `project(sqlite3.gd CXX)` in `CMakeLists.txt`, and rename `demo/addons/sqlite3.gd/` to match it.
 2. Update dependencies: Modify `vcpkg_ports/gdext/vcpkg.json`, and follow their instructions to link them in `CMakeLists.txt`.
-3. Implement your bindings in `src/`, write docs in `doc_classes/`, and write tests/demo in `demo/` (see examples from this project).
-4. Update this README with your project's description and links.
+3. You may need to edit `vcpkg_ports/` and `vcpkg_triplets/` to fix the builds.
+4. Implement your bindings in `src/`, write docs in `doc_classes/`, and write tests/demo in `demo/` (see examples from this project).
+5. Update this README with your project's description and links.
