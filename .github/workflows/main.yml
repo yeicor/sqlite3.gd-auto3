@@ -48,8 +48,20 @@ jobs:
             echo "Error: Your" demo/addons/*/gdext.gdextension "(compatibility_minimum=$GODOT_MIN_VERSION) is not in godot-cpp/tools/godotcpp.py (supported_api_versions=$SUPPORTED_VERSIONS_JSON). Please update it."
             exit 1
           fi
+          VERSIONS=$(echo "$SUPPORTED_VERSIONS_JSON" | jq -r '.[]')
+          FULL_VERSIONS=()
+          for version in $VERSIONS; do
+            LATEST=$(curl -s https://api.github.com/repos/godotengine/godot/releases | jq -r ".[] | select(.tag_name | startswith(\"$version.\")) | .tag_name" | sort -V | tail -1)
+            if [ -z "$LATEST" ]; then
+              echo "Warning: No release found for $version, assuming .0 patch version"
+              FULL_VERSIONS+=("$version.0")
+            else
+              FULL_VERSIONS+=("$LATEST")
+            fi
+          done
+          GODOT_VERSIONS_JSON=$(printf '%s\n' "${FULL_VERSIONS[@]}" | jq -R -s -c 'split("\n") | map(select(. != ""))')
           echo "godot_min_version=$GODOT_MIN_VERSION" >> $GITHUB_OUTPUT
-          echo "godot_versions=$SUPPORTED_VERSIONS_JSON" >> $GITHUB_OUTPUT
+          echo "godot_versions=$GODOT_VERSIONS_JSON" >> $GITHUB_OUTPUT
 
   prepare-api:
     needs: read-versions
@@ -239,6 +251,13 @@ jobs:
                   fi
                   echo "Successfully downloaded and extracted artifacts from workflow $workflow_id on branch $branch."
                   success=true
+                  COMMIT_SHA=$(gh run view "$workflow_id" --json headSha -q .headSha)
+                  if git diff --quiet "$COMMIT_SHA"..HEAD -- src/ doc_classes/ CMakeLists.txt godot-cpp/ vcpkg*/; then
+                    echo "VCPKG_CACHE_VALID=true" >> $GITHUB_ENV
+                    echo "No relevant source changes since $COMMIT_SHA, reusing vcpkg installed."
+                  else
+                    echo "Source changes detected since $COMMIT_SHA, will rebuild."
+                  fi
                 else
                   echo "Failed to download artifacts from workflow $workflow_id on branch $branch, trying next..."
                 fi
@@ -295,14 +314,15 @@ jobs:
           $PWD/ccache/ccache --set-config max_size=2G
           $PWD/ccache/ccache --zero-stats
 
-      - name: Install and build with vcpkg
+      - name: Build with vcpkg
+        if: env.VCPKG_CACHE_VALID != 'true'
         shell: bash
         run: |
           set -e
           echo "$GD_CMAKE_ARGS" >__GD_CMAKE_ARGS
-          "vcpkg/bootstrap-vcpkg${{matrix.target.os == 'windows-2025' && '.bat' || '.sh'}}"
-          "vcpkg/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" remove gdext sqlite3 || true
-          "vcpkg/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" install gdext
+          "vcpkg/bootstrap-vcpkg${{ matrix.target.os == 'windows-2025' && '.bat' || '.sh' }}"
+          "vcpkg/vcpkg${{ matrix.target.os == 'windows-2025' && '.exe' || '' }}" remove gdext || true  # WARNING: Changing dependency configs may require deleting caches
+          "vcpkg/vcpkg${{ matrix.target.os == 'windows-2025' && '.exe' || '' }}" install gdext
         env:
           VCPKG_DISABLE_METRICS: 1
           VCPKG_DEFAULT_TRIPLET: ${{ matrix.target.vcpkg_triplet }}
@@ -310,17 +330,16 @@ jobs:
           VCPKG_OVERLAY_PORTS: vcpkg_ports
           GD_CMAKE_ARGS: -DGODOTCPP_TARGET=${{ matrix.target-type }} -DGODOTCPP_PRECISION=${{ matrix.float-precision }} ${{ env.cmake_extra_args }}
 
-      - name: Copy DLLs (Windows)
-        if: matrix.target.os == 'windows-2025'
+      - name: Copy to addon folder
         shell: bash
         run: |
           set -e
-          output=$(find demo/addons/*/ -name "*.dll" -print)
-          if [ -z "$output" ]; then
-            find vcpkg/buildtrees/gdext -name "*.dll" -print -exec cp {} demo/addons/*/ \;
-          else
-            echo "::warning ::This step is useless now, remove it!"
+          files=$(find vcpkg/buildtrees/gdext -name "*.so" -o -name "*.dll" -o -name "*.dylib")
+          if [ -z "$files" ]; then
+            echo "No library files found"
+            exit 1
           fi
+          cp $files demo/addons/*/
 
       - name: Clean and determine cache directories
         shell: bash
