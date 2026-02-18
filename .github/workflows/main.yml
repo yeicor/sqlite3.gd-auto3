@@ -17,8 +17,9 @@ jobs:
       em_version: ${{ steps.read-versions.outputs.em_version }}
       mingw_version: ${{ steps.read-versions.outputs.mingw_version }}
       ndk_version: ${{ steps.read-versions.outputs.ndk_version }}
-      godot_min_version: ${{ steps.godot.outputs.godot_min_version }}
+      godot_min_version_tag: ${{ steps.godot.outputs.godot_min_version_tag }}
       godot_versions: ${{ steps.godot.outputs.godot_versions }}
+      godot_max_version: ${{ steps.godot.outputs.godot_max_version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -42,26 +43,31 @@ jobs:
         shell: bash
         run: |
           set -e
-          GODOT_MIN_VERSION=$(grep 'compatibility_minimum' demo/addons/*/gdext.gdextension | sed 's/.*= "\(.*\)"/\1/')
+          COMPAT_MIN=$(grep 'compatibility_minimum' demo/addons/*/gdext.gdextension | sed 's/.*= "\(.*\)"/\1/')
           SUPPORTED_VERSIONS_JSON=$(grep '^supported_api_versions' godot-cpp/tools/godotcpp.py | sed 's/.*= //' | head -n 1)
-          if ! echo "$SUPPORTED_VERSIONS_JSON" | grep -q "\"$GODOT_MIN_VERSION\""; then
-            echo "Error: Your" demo/addons/*/gdext.gdextension "(compatibility_minimum=$GODOT_MIN_VERSION) is not in godot-cpp/tools/godotcpp.py (supported_api_versions=$SUPPORTED_VERSIONS_JSON). Please update it."
+          if ! echo "$SUPPORTED_VERSIONS_JSON" | grep -q "\"$COMPAT_MIN\""; then
+            echo "Error: Your" demo/addons/*/gdext.gdextension "(compatibility_minimum=$COMPAT_MIN) is not in godot-cpp/tools/godotcpp.py (supported_api_versions=$SUPPORTED_VERSIONS_JSON). Please update it."
             exit 1
           fi
+          # Grab patch versions for compatibility with chickensoft-games/setup-godot@v2
           VERSIONS=$(echo "$SUPPORTED_VERSIONS_JSON" | jq -r '.[]')
           FULL_VERSIONS=()
           for version in $VERSIONS; do
-            LATEST=$(curl -s https://api.github.com/repos/godotengine/godot/releases | jq -r ".[] | select(.tag_name | startswith(\"$version.\")) | .tag_name" | sort -V | tail -1)
-            if [ -z "$LATEST" ]; then
-              echo "Warning: No release found for $version, assuming .0 patch version"
-              FULL_VERSIONS+=("$version.0")
-            else
-              FULL_VERSIONS+=("$LATEST")
+            if [[ "$(printf '%s\n' "$version" "$COMPAT_MIN" | sort -V | head -n1)" == "$COMPAT_MIN" ]]; then
+              LATEST=$(curl -s https://api.github.com/repos/godotengine/godot/releases | jq -r ".[] | select(.tag_name | startswith(\"$version.\")) | .tag_name" | sort -V | tail -1)
+              if [ -z "$LATEST" ]; then
+                echo "Warning: No release found for $version, assuming .0 patch version"
+                FULL_VERSIONS+=("$version.0-stable")
+              else
+                FULL_VERSIONS+=("$LATEST")
+              fi
             fi
           done
           GODOT_VERSIONS_JSON=$(printf '%s\n' "${FULL_VERSIONS[@]}" | jq -R -s -c 'split("\n") | map(select(. != ""))')
-          echo "godot_min_version=$GODOT_MIN_VERSION" >> $GITHUB_OUTPUT
+          GODOT_MAX_VERSION=${FULL_VERSIONS[${#FULL_VERSIONS[@]}-1]}
+          echo "godot_min_version_tag=$COMPAT_MIN-stable" >> $GITHUB_OUTPUT
           echo "godot_versions=$GODOT_VERSIONS_JSON" >> $GITHUB_OUTPUT
+          echo "godot_max_version=$GODOT_MAX_VERSION" >> $GITHUB_OUTPUT
 
   prepare-api:
     needs: read-versions
@@ -80,7 +86,7 @@ jobs:
         uses: actions/cache@v4
         with: &cache-godot-api-dump-with
           path: godot-cpp/gdextension/extension_api.json
-          key: godot-api-dump-${{ needs.read-versions.outputs.godot_min_version }}-${{ matrix.float-precision }}
+          key: godot-api-dump-${{ needs.read-versions.outputs.godot_min_version_tag }}-${{ matrix.float-precision }}
           enableCrossOsArchive: true
 
       - name: Dump Godot extension API for godot-cpp
@@ -88,9 +94,9 @@ jobs:
         shell: bash
         run: |
           set -e
-          echo "Minimum Godot version: ${{ needs.read-versions.outputs.godot_min_version }}"
+          echo "Minimum Godot version: ${{ needs.read-versions.outputs.godot_min_version_tag }}"
           # Clone Godot repo at the minimum version branch
-          git clone --depth 1 --branch ${{ needs.read-versions.outputs.godot_min_version }} https://github.com/godotengine/godot.git godot-repo
+          git clone --depth 1 --branch ${{ needs.read-versions.outputs.godot_min_version_tag }} https://github.com/godotengine/godot.git godot-repo
           cd godot-repo
           # Build Godot with appropriate precision
           python -m pip install scons
@@ -208,7 +214,9 @@ jobs:
       - name: Configure Emscripten CMake args
         if: contains(matrix.target.vcpkg_triplet, 'wasm32-emscripten')
         shell: bash
-        run: echo "cmake_extra_args=-DGODOTCPP_THREADS=${{ matrix.target.threads }} ${{ env.cmake_extra_args }}" >> $GITHUB_ENV
+        run: |
+          set -e
+          echo "cmake_extra_args=-DGODOTCPP_THREADS=${{ matrix.target.threads }} ${{ env.cmake_extra_args }}" >> $GITHUB_ENV
 
       - name: Setup Android NDK
         if: contains(matrix.target.vcpkg_triplet, '-android')
@@ -221,7 +229,9 @@ jobs:
         name: Set Android NDK path
         if: contains(matrix.target.vcpkg_triplet, '-android')
         shell: bash
-        run: echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+        run: |
+          set -e
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
 
       - name: Restore vcpkg cache
         shell: bash
@@ -449,6 +459,10 @@ jobs:
           echo "GODOT_ANDROID_KEYSTORE_RELEASE_USER=androidkey" >> $GITHUB_ENV
           echo "GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD=android" >> $GITHUB_ENV
 
+      - name: Setup windows development environment (required to avoid error 126 in debug mode)
+        if: matrix.export_target.export_name == 'Windows Desktop'
+        uses: ilammy/msvc-dev-cmd@v1
+
       - name: Setup Godot
         uses: chickensoft-games/setup-godot@v2
         with:
@@ -471,7 +485,7 @@ jobs:
           grep -q "Demo finished successfully" output.log
 
       - name: Export demo
-        if: matrix.godot-version != needs.read-versions.outputs.godot_min_version
+        if: matrix.godot-version == needs.read-versions.outputs.godot_max_version
         shell: bash
         run: |
           set -e
@@ -480,21 +494,21 @@ jobs:
           echo "EXPORT_NAME=$(echo "${{ matrix.export_target.export_name }}" | tr '[:upper:]' '[:lower:]' | tr -d ' /')" >> $GITHUB_ENV
 
       - name: Upload demo export artifact
-        if: matrix.godot-version != needs.read-versions.outputs.godot_min_version
+        if: matrix.godot-version == needs.read-versions.outputs.godot_max_version
         uses: actions/upload-artifact@v6
         with:
           name: demo-export-${{ env.EXPORT_NAME }}-${{ matrix.mode }}
           path: demo/exports/**
 
       - name: Prepare addon export
-        if: matrix.export_target.export_name == 'Linux' && matrix.mode == 'release' && matrix.godot-version != needs.read-versions.outputs.godot_min_version
+        if: matrix.export_target.export_name == 'Linux' && matrix.mode == 'release' && matrix.godot-version == needs.read-versions.outputs.godot_max_version
         shell: bash
         run: |
           set -e
           mkdir -p addon-export && cp -r demo/addons addon-export
 
       - name: Upload addon artifact
-        if: matrix.export_target.export_name == 'Linux' && matrix.mode == 'release' && matrix.godot-version != needs.read-versions.outputs.godot_min_version
+        if: matrix.export_target.export_name == 'Linux' && matrix.mode == 'release' && matrix.godot-version == needs.read-versions.outputs.godot_max_version
         uses: actions/upload-artifact@v6
         with:
           name: addon
