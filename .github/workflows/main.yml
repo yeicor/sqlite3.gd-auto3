@@ -66,7 +66,7 @@ jobs:
       - name: Cache Godot API dump
         id: cache
         uses: actions/cache@v4
-        with:
+        with: &cache-godot-api-dump-with
           path: godot-cpp/gdextension/extension_api.json
           key: godot-api-dump-${{ needs.read-versions.outputs.godot_min_version }}-${{ matrix.float-precision }}
           enableCrossOsArchive: true
@@ -139,9 +139,7 @@ jobs:
 
       - name: Restore Godot API dump
         uses: actions/cache/restore@v5
-        with:
-          path: godot-cpp/gdextension/extension_api.json
-          key: godot-api-dump-${{ needs.read-versions.outputs.godot_min_version }}-${{ matrix.float-precision }}
+        with: *cache-godot-api-dump-with
 
       - name: Setup for x86 Linux
         if: matrix.target.vcpkg_triplet == 'x86-linux'
@@ -190,7 +188,7 @@ jobs:
           brew install autoconf automake autoconf-archive
 
       - name: Setup Emscripten
-        if: matrix.target.vcpkg_triplet == 'wasm32-emscripten'
+        if: contains(matrix.target.vcpkg_triplet, 'wasm32-emscripten')
         uses: mymindstorm/setup-emsdk@v14
         with:
           version: ${{ needs.read-versions.outputs.em_version }}

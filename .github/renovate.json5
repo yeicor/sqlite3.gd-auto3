@@ -40,7 +40,7 @@
       "matchStrings": [
         "CCACHE_VERSION=(?<currentValue>[^\\s]+)"
       ],
-      "depName": "ccache/ccache",
+      "depNameTemplate": "ccache/ccache",
       "datasourceTemplate": "github-releases",
       "versioningTemplate": "semver"
     }

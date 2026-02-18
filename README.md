@@ -1,17 +1,27 @@
 # SQLite3.gd
 
-A cross-platform (desktop, mobile, web) Godot GDExtension for SQLite3 database integration. 
- 
-See [demo/demo.gd](demo/demo.gd) for examples of use.
+SQLite3 for Godot via GDExtension.
 
-You can download prebuilt versions from the [Releases](https://github.com/yeicor/sqlite3.gd-auto3/releases) section or from the [Actions](https://github.com/yeicor/sqlite3.gd-auto3/actions) tab.
+## ✨ Features
 
-## Using this as a Template
+- **Cross-Platform Support**: Runs on desktop (Windows, macOS, Linux), mobile (Android, iOS), and web (HTML5) platforms.
+- **Demo Project**: includes [demo scene](demo/) to get you started quickly, with a [web version](https://yeicor.github.io/sqlite3.gd-auto3/demo/) available.
+- **Comprehensive Documentation**: includes [class references](doc_classes/) for seamless Godot editor integration.
+- **High Performance**: leverages C++ for optimized performance and low-level access.
+- **Easy Integration**: drop-in [GDExtension](https://docs.godotengine.org/en/stable/tutorials/scripting/gdextension/index.html) with simple Godot API bindings.
+- **Automated Builds**: uses GitHub Actions for continuous integration including tests and prebuilt binaries.
+- **Dependency Management**: integrated [VCPKG](https://github.com/microsoft/vcpkg) for hassle-free library management.
 
-To start a new project based on this template:
+## 🚀 Quick Start
 
-1. Rename the project: Update `project(sqlite3.gd CXX)` in `CMakeLists.txt`, and rename `demo/addons/sqlite3.gd/` to match it.
-2. Update dependencies: Modify `vcpkg_ports/gdext/vcpkg.json`, and follow their instructions to link them in `CMakeLists.txt`.
-3. You may need to edit `vcpkg_ports/` and `vcpkg_triplets/` to fix the builds.
-4. Implement your bindings in `src/`, write docs in `doc_classes/`, and write tests/demo in `demo/` (see examples from this project).
-5. Update this README with your project's description and links.
+1. **Download**: [latest release](https://github.com/yeicor/sqlite3.gd-auto3/releases) or [nightly builds](https://github.com/yeicor/sqlite3.gd-auto3/actions) (look for `addon.zip`).
+2. **Extract**: the downloaded `addon.zip` into your project's root.
+3. **Profit**: see [demo/demo.gd](demo/demo.gd) for a complete example.
+
+## 🧩 Using this project as a template for other GDExtensions
+
+1. **Rename the Project**: update `project({old-name} CXX)` in [CMakeLists.txt](CMakeLists.txt), and rename [demo/addons/{old-name}/](demo/addons/sqlite3.gd/) to match your new addon name.
+2. **Update Dependencies**: modify [vcpkg_ports/gdext/vcpkg.json](vcpkg_ports/gdext/vcpkg.json) to include your required libraries, and link them in [CMakeLists.txt](CMakeLists.txt) following VCPKG instructions.
+3. **Customize Builds**: edit [vcpkg_ports/](vcpkg_ports/) and [vcpkg_triplets/](vcpkg_triplets/) as needed to ensure compatibility across platforms.
+4. **Implement Your Logic**: add your C++ bindings in [src/](src/), document classes in [doc_classes/](doc_classes/), and create tests/demos in [demo/](demo/) (refer to existing examples).
+5. **Update Metadata**: replace placeholders in this README (e.g., [Your Project Name], [YourGitHubUsername]) with your project's details and links.

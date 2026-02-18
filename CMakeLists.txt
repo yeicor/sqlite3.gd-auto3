@@ -118,28 +118,6 @@ else()
 endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE godot-cpp unofficial::sqlite3::sqlite3)
 
-# Emscripten-specific flags
-if(EMSCRIPTEN)
-    if(GODOTCPP_THREADS)
-        target_compile_options(${PROJECT_NAME} PRIVATE -mbulk-memory -matomics)
-        target_link_options(${PROJECT_NAME} PRIVATE
-            -mbulk-memory
-            -matomics
-            -sUSE_PTHREADS=1
-            -sALLOW_MEMORY_GROWTH=1
-            -pthread
-        )
-    else()
-        target_compile_options(${PROJECT_NAME} PRIVATE -mbulk-memory)
-        target_link_options(${PROJECT_NAME} PRIVATE
-            -mbulk-memory
-            -sUSE_PTHREADS=0
-            -sALLOW_MEMORY_GROWTH=1
-            -DSQLITE_THREADSAFE=0  # Explicitly tell SQLite no mutexes needed
-        )
-    endif()
-endif()
-
 # Install the complete bindings to the demo project with the correct suffix
 get_target_property(GODOTCPP_SUFFIX godot-cpp GODOTCPP_SUFFIX)
 set(OUTPUT_NAME "gdext${GODOTCPP_SUFFIX}")
