@@ -301,7 +301,7 @@ jobs:
           set -e
           echo "$GD_CMAKE_ARGS" >__GD_CMAKE_ARGS
           "vcpkg/bootstrap-vcpkg${{matrix.target.os == 'windows-2025' && '.bat' || '.sh'}}"
-          "vcpkg/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" remove gdext || true
+          "vcpkg/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" remove gdext sqlite3 || true
           "vcpkg/vcpkg${{matrix.target.os == 'windows-2025' && '.exe' || ''}}" install gdext
         env:
           VCPKG_DISABLE_METRICS: 1
@@ -371,7 +371,7 @@ jobs:
             /.fake-path-to-force-root-directory
       # </Cache save and export artifacts>
 
-  test_and_export_addon_and_demo:
+  test:
     needs: [read-versions, build]
     strategy:
       fail-fast: false
@@ -474,7 +474,7 @@ jobs:
 
   release:
     runs-on: ubuntu-24.04
-    needs: test_and_export_addon_and_demo
+    needs: test
     if: github.ref_type == 'tag'
     permissions:
       contents: write
@@ -499,7 +499,7 @@ jobs:
 
   deploy-pages:
     runs-on: ubuntu-24.04
-    needs: test_and_export_addon_and_demo
+    needs: test
     if: github.ref_type == 'tag'
     permissions:
       contents: read
