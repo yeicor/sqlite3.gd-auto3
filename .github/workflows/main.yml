@@ -120,8 +120,8 @@ jobs:
             { vcpkg_triplet: arm64-windows-static, os: windows-2025 }, # MSVC instead of mingw
             { vcpkg_triplet: arm64-osx, os: macos-15 },
             { vcpkg_triplet: x64-osx, os: macos-15 },
-            { vcpkg_triplet: wasm32-emscripten, os: ubuntu-24.04 },
-            { vcpkg_triplet: wasm32-emscripten-threads, os: ubuntu-24.04 },
+            { vcpkg_triplet: wasm32-emscripten, os: ubuntu-24.04, threads: off },
+            { vcpkg_triplet: wasm32-emscripten, os: ubuntu-24.04, threads: on },
             { vcpkg_triplet: x64-android, os: ubuntu-24.04 },
             { vcpkg_triplet: x86-android, os: ubuntu-24.04 },
             { vcpkg_triplet: arm64-android, os: ubuntu-24.04 },
@@ -208,7 +208,7 @@ jobs:
       - name: Configure Emscripten CMake args
         if: contains(matrix.target.vcpkg_triplet, 'wasm32-emscripten')
         shell: bash
-        run: echo "cmake_extra_args=-DGODOTCPP_THREADS=${{ matrix.target.vcpkg_triplet == 'wasm32-emscripten-threads' && 'ON' || 'OFF' }} ${{ env.cmake_extra_args }}" >> $GITHUB_ENV
+        run: echo "cmake_extra_args=-DGODOTCPP_THREADS=${{ matrix.target.threads }} ${{ env.cmake_extra_args }}" >> $GITHUB_ENV
 
       - name: Setup Android NDK
         if: contains(matrix.target.vcpkg_triplet, '-android')
@@ -227,8 +227,8 @@ jobs:
         shell: bash
         run: |
           set -e
-          ARTIFACT_INSTALLED="vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
-          ARTIFACT_BUILDTREES="vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}"
+          ARTIFACT_INSTALLED="vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}-${{ matrix.target.threads || '' }}"
+          ARTIFACT_BUILDTREES="vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}-${{ matrix.target.threads || '' }}"
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
           gh auth status
           success=false
@@ -363,7 +363,7 @@ jobs:
       - name: Upload addon artifact
         uses: actions/upload-artifact@v6
         with:
-          name: gdext-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}
+          name: gdext-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}-${{ matrix.target.threads || '' }}
           path: |
             demo/addons/*/*
             .fake-path-to-force-root-directory
@@ -372,7 +372,7 @@ jobs:
         uses: actions/upload-artifact@v6
         if: always()
         with:
-          name: vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}
+          name: vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}-${{ matrix.target.threads || '' }}
           path: | # /tmp/ forces consistant root directory to /
             vcpkg/installed/
             ${{ env.CCACHE_DIR }}
@@ -382,7 +382,7 @@ jobs:
         uses: actions/upload-artifact@v6
         if: always()
         with:
-          name: vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}
+          name: vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}-${{ matrix.target.threads || '' }}
           path: | # /tmp/ forces consistant root directory to /
             vcpkg/buildtrees/
             vcpkg/packages/

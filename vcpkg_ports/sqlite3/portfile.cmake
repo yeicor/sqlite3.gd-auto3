@@ -1,4 +1,4 @@
-# Need access to some port files...
+# Need access to some port files
 file(COPY "${VCPKG_ROOT_DIR}/ports/sqlite3/" DESTINATION "${CMAKE_CURRENT_LIST_DIR}" PATTERN "portfile.cmake" EXCLUDE)
 
 # XXX: Enable required emscripten args for threads mode

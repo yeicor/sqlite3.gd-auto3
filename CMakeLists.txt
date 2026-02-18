@@ -119,3 +119,4 @@ endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE godot-cpp unofficial::sqlite3::sqlite3)
 
 # You still need to copy the .so/.dll to the addon directory (done in workflow for caching purposes)
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION .)
