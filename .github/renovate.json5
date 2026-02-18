@@ -43,19 +43,6 @@
       "depName": "ccache/ccache",
       "datasourceTemplate": "github-releases",
       "versioningTemplate": "semver"
-    },
-    {
-      "customType": "regex",
-      "description": "Update Godot version",
-      "managerFilePatterns": [
-        ".github/workflows/*.yml"
-      ],
-      "matchStrings": [
-        "godot_versions=.*\"(?<currentValue>[0-9.]*)\".*"
-      ],
-      "depName": "godotengine/godot",
-      "datasourceTemplate": "github-releases",
-      "versioningTemplate": "semver"
     }
   ]
 }

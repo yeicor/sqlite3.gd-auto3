@@ -43,9 +43,13 @@ jobs:
         run: |
           set -e
           GODOT_MIN_VERSION=$(grep 'compatibility_minimum' demo/addons/*/gdext.gdextension | sed 's/.*= "\(.*\)"/\1/')
+          SUPPORTED_VERSIONS_JSON=$(grep 'supported_api_versions' godot-cpp/tools/godotcpp.py | sed 's/.*= //' | head -n 1)
+          if ! echo "$SUPPORTED_VERSIONS" | grep -q "\b$GODOT_MIN_VERSION\b"; then
+            echo "Error: Your " demo/addons/*/gdext.gdextension " (compatibility_minimum) $GODOT_MIN_VERSION is not in godot-cpp/tools/godotcpp.py (supported_api_versions). Please update it."
+            exit 1
+          fi
           echo "godot_min_version=$GODOT_MIN_VERSION" >> $GITHUB_OUTPUT
-          godot_versions='["'"$GODOT_MIN_VERSION"'", "4.6"]' # DO-NOT-EDIT this line due to renovate.json5
-          echo "godot_versions=$godot_versions" >> $GITHUB_OUTPUT
+          echo "godot_versions=$SUPPORTED_VERSIONS_JSON" >> $GITHUB_OUTPUT
 
   prepare-api:
     needs: read-versions
