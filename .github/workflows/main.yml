@@ -43,11 +43,9 @@ jobs:
         run: |
           set -e
           GODOT_MIN_VERSION=$(grep 'compatibility_minimum' demo/addons/*/gdext.gdextension | sed 's/.*= "\(.*\)"/\1/')
-          SUPPORTED_VERSIONS_JSON=$(python3 -c "import re; content = open('godot-cpp/tools/godotcpp.py').read(); match = re.search(r'supported_api_versions\s*=\s*(.+)', content); print(match.group(1).strip())")
-          if ! echo "$SUPPORTED_VERSIONS" | grep -q "\"$GODOT_MIN_VERSION\""; then
-            echo "Error: Your" demo/addons/*/gdext.gdextension "(compatibility_minimum=$GODOT_MIN_VERSION) is not in godot-cpp/tools/godotcpp.py (supported_api_versions=$SUPPORTED_VERSIONS). Please update it."
-            cat godot-cpp/tools/godotcpp.py
-            echo "godot-cpp commit: $(git rev-parse HEAD:godot-cpp)"
+          SUPPORTED_VERSIONS_JSON=$(grep '^supported_api_versions' godot-cpp/tools/godotcpp.py | sed 's/.*= //' | head -n 1)
+          if ! echo "$SUPPORTED_VERSIONS_JSON" | grep -q "\"$GODOT_MIN_VERSION\""; then
+            echo "Error: Your" demo/addons/*/gdext.gdextension "(compatibility_minimum=$GODOT_MIN_VERSION) is not in godot-cpp/tools/godotcpp.py (supported_api_versions=$SUPPORTED_VERSIONS_JSON). Please update it."
             exit 1
           fi
           echo "godot_min_version=$GODOT_MIN_VERSION" >> $GITHUB_OUTPUT
