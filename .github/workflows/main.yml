@@ -66,9 +66,10 @@ jobs:
       - name: Cache Godot API dump
         id: cache
         uses: actions/cache@v4
-        with: &godot-api-dump-cache
+        with:
           path: godot-cpp/gdextension/extension_api.json
           key: godot-api-dump-${{ needs.read-versions.outputs.godot_min_version }}-${{ matrix.float-precision }}
+          enableCrossOsArchive: true
 
       - name: Dump Godot extension API for godot-cpp
         if: steps.cache.outputs.cache-hit != 'true'
@@ -137,7 +138,9 @@ jobs:
 
       - name: Restore Godot API dump
         uses: actions/cache/restore@v5
-        with: *godot-api-dump-cache
+        with:
+          path: godot-cpp/gdextension/extension_api.json
+          key: godot-api-dump-${{ needs.read-versions.outputs.godot_min_version }}-${{ matrix.float-precision }}
 
       - name: Setup for x86 Linux
         if: matrix.target.vcpkg_triplet == 'x86-linux'
