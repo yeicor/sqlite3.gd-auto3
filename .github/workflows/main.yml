@@ -312,6 +312,7 @@ jobs:
             echo "PATH=$PWD/ccache:$PATH" >> $GITHUB_ENV
           fi
           $PWD/ccache/ccache --set-config max_size=2G
+          $PWD/ccache/ccache --set-config compiler_check=content
           $PWD/ccache/ccache --zero-stats
 
       - name: Build with vcpkg
@@ -321,8 +322,8 @@ jobs:
           set -e
           echo "$GD_CMAKE_ARGS" >__GD_CMAKE_ARGS
           "vcpkg/bootstrap-vcpkg${{ matrix.target.os == 'windows-2025' && '.bat' || '.sh' }}"
-          "vcpkg/vcpkg${{ matrix.target.os == 'windows-2025' && '.exe' || '' }}" remove gdext || true  # WARNING: Changing dependency configs may require deleting caches
-          "vcpkg/vcpkg${{ matrix.target.os == 'windows-2025' && '.exe' || '' }}" install gdext
+          vcpkg/vcpkg${{ matrix.target.os == 'windows-2025' && '.exe' || '' }} remove $(vcpkg/vcpkg${{ matrix.target.os == 'windows-2025' && '.exe' || '' }} list | awk '{print $1}' | sed 's/\[[^]]*\]//g')
+          vcpkg/vcpkg${{ matrix.target.os == 'windows-2025' && '.exe' || '' }} install gdext
         env:
           VCPKG_DISABLE_METRICS: 1
           VCPKG_DEFAULT_TRIPLET: ${{ matrix.target.vcpkg_triplet }}
@@ -347,11 +348,18 @@ jobs:
         if: always()
         run: |
           set -e
-          ccache --show-stats
+          ccache -vv --show-stats
           start_time=$(date -r vcpkg/vcpkg +%s 2>/dev/null || date +%s)
           current_time=$(date +%s)
           elapsed=$((current_time - start_time))
+          stats_before=$(ccache -vv --show-stats 2>/dev/null)
           ccache --evict-older-than ${elapsed}s --verbose 2>&1
+          stats_after=$(ccache -vv --show-stats 2>/dev/null)
+          if [ "$stats_before" != "$stats_after" ]; then
+            ccache -vv --show-stats
+          fi
+
+          # Figure out cache dir for uploading artifact
           CCACHE_DIR=$(ccache --show-config | grep 'cache_dir' | cut -d ' ' -f 4)
           CCACHE_DIR=$(echo "$CCACHE_DIR" | sed 's|\\|/|g')
           if [[ $CCACHE_DIR =~ ^([a-zA-Z]):(.*) ]]; then
