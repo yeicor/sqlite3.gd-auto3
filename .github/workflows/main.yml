@@ -333,9 +333,8 @@ jobs:
           echo "$GD_CMAKE_ARGS" >__GD_CMAKE_ARGS
           "vcpkg/bootstrap-vcpkg${{ matrix.target.os == 'windows-2025' && '.bat' || '.sh' }}"
           vcpkg_exe="vcpkg/vcpkg${{ matrix.target.os == 'windows-2025' && '.exe' || '' }}"
-          if ! $vcpkg_exe list 2>&1 | grep -q "No packages are installed"; then
-            $vcpkg_exe remove $($vcpkg_exe list | awk '{print $1}' | sed 's/\[[^]]*\]//g' | tr '\n' ' ')
-          fi
+          # Force rebuild relying on ccache, as vcpkg's cache is sometimes too aggressive (designed for external deps)
+          $vcpkg_exe remove $($vcpkg_exe list | awk '{print $1}' | sed 's/\[[^]]*\]//g' | tr '\n' ' ') || true
           $vcpkg_exe install gdext
         env:
           VCPKG_DISABLE_METRICS: 1
