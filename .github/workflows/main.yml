@@ -186,13 +186,13 @@ jobs:
           brew install autoconf automake autoconf-archive
 
       - name: Setup Emscripten
-        if: matrix.target.vcpkg_triplet == 'wasm32-emscripten-pic'
+        if: matrix.target.vcpkg_triplet == 'wasm32-emscripten'
         uses: mymindstorm/setup-emsdk@v14
         with:
           version: ${{ needs.read-versions.outputs.em_version }}
 
       - name: Configure Emscripten CMake args
-        if: matrix.target.vcpkg_triplet == 'wasm32-emscripten-pic'
+        if: matrix.target.vcpkg_triplet == 'wasm32-emscripten'
         shell: bash
         run: |
           set -e
