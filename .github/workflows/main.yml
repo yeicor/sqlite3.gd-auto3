@@ -452,9 +452,11 @@ jobs:
           echo "GODOT_ANDROID_KEYSTORE_RELEASE_USER=androidkey" >> $GITHUB_ENV
           echo "GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD=android" >> $GITHUB_ENV
 
-      - name: Setup windows development environment (required to avoid error 126 in debug mode)
-        if: matrix.export_target.export_name == 'Windows Desktop'
-        uses: ilammy/msvc-dev-cmd@v1
+      - name: Setup MinGW (Windows) # MSVC needs no extra runtime? But mingw does?
+        if: matrix.target.os == 'windows-2025'
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          version: ${{ needs.read-versions.outputs.mingw_version }}
 
       - name: Setup Godot
         uses: chickensoft-games/setup-godot@v2
