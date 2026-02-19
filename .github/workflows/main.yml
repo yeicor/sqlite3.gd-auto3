@@ -527,6 +527,8 @@ jobs:
         shell: bash
         run: |
           set -e
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+          gh auth status
           gh release upload ${{ github.ref_name }} addon.zip
 
   deploy-pages:
