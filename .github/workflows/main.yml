@@ -495,15 +495,15 @@ jobs:
         shell: bash
         run: |
           set -e
-          mkdir -p addon-export/${{ github.event.repository.name }}-${{ github.ref_name }}
-          cp -r demo/addons addon-export/${{ github.event.repository.name }}-${{ github.ref_name }}
-          cp LICENSE addon-export/${{ github.event.repository.name }}-${{ github.ref_name }}/
+          mkdir -p "addon-export/${{ github.event.repository.name }}-${{ github.ref_name }}"
+          cp -r demo/addons "addon-export/${{ github.event.repository.name }}-${{ github.ref_name }}"
+          cp LICENSE "addon-export/${{ github.event.repository.name }}-${{ github.ref_name }}/addons/"*
 
       - name: Upload addon artifact
         if: matrix.target.export_name == 'Linux' && matrix.mode == 'release' && matrix.godot-version == needs.read-versions.outputs.godot_max_version
         uses: actions/upload-artifact@v6
         with:
-          name: addon
+          name: ${{ github.event.repository.name }}-${{ github.ref_name }}-addon
           path: addon-export
 
   release:
@@ -519,14 +519,14 @@ jobs:
       - name: Download addon artifact
         uses: actions/download-artifact@v4
         with:
-          name: addon
+          name: ${{ github.event.repository.name }}-${{ github.ref_name }}-addon
           path: .addon
 
       - name: Recreate addon zip
         shell: bash
         run: |
           set -e
-          zip -r addon.zip .addon
+          zip -r "${{ github.event.repository.name }}-${{ github.ref_name }}-addon.zip" .addon
 
       - name: Upload to release
         shell: bash
@@ -534,7 +534,7 @@ jobs:
           set -e
           echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
           gh auth status
-          gh release upload ${{ github.ref_name }} addon.zip
+          gh release upload ${{ github.ref_name }} "${{ github.event.repository.name }}-${{ github.ref_name }}-addon.zip"
 
   deploy-pages:
     runs-on: ubuntu-24.04
