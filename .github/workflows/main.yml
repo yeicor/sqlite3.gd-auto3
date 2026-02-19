@@ -260,6 +260,7 @@ jobs:
                     cp -r "$temp_dir"/*/ /
                   fi
                   echo "Successfully downloaded and extracted artifacts from workflow $workflow_id on branch $branch."
+                  success=true
                 else
                   echo "Failed to download artifacts from workflow $workflow_id on branch $branch, trying next..."
                 fi
