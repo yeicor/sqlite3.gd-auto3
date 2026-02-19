@@ -408,7 +408,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        export_target: # Not all architectures are exported (this is just a demo)
+        target: # Not all architectures are exported (this is just a demo)
           [
             { os: ubuntu-24.04, export_name: Linux },
             { os: ubuntu-24.04, export_name: Web },
@@ -419,7 +419,7 @@ jobs:
           ]
         mode: [debug, release]
         godot-version: ${{ fromJson(needs.read-versions.outputs.godot_versions) }}
-    runs-on: ${{ matrix.export_target.os }}
+    runs-on: ${{ matrix.target.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -433,7 +433,7 @@ jobs:
           merge-multiple: true
 
       - name: Setup Android NDK # Different if than before and merge entries not supported by github actions :(
-        if: matrix.export_target.export_name == 'Android'
+        if: matrix.target.export_name == 'Android'
         id: setup-ndk
         uses: nttld/setup-ndk@v1
         with:
@@ -442,7 +442,7 @@ jobs:
       - *set_android_ndk_path
 
       - name: Setup Android keystore
-        if: matrix.export_target.export_name == 'Android' && matrix.mode == 'release'
+        if: matrix.target.export_name == 'Android' && matrix.mode == 'release'
         shell: bash
         run: |
           set -e
@@ -452,12 +452,6 @@ jobs:
           echo "GODOT_ANDROID_KEYSTORE_RELEASE_PATH=${{ github.workspace }}/demo/android_keystore.p12" >> $GITHUB_ENV
           echo "GODOT_ANDROID_KEYSTORE_RELEASE_USER=androidkey" >> $GITHUB_ENV
           echo "GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD=android" >> $GITHUB_ENV
-
-      - name: Setup MinGW (Windows) # MSVC needs no extra runtime? But mingw does?
-        if: matrix.target.os == 'windows-2025'
-        uses: egor-tensin/setup-mingw@v2
-        with:
-          version: ${{ needs.read-versions.outputs.mingw_version }}
 
       - name: Setup Godot
         uses: chickensoft-games/setup-godot@v2
@@ -474,7 +468,7 @@ jobs:
 
       - name: Run demo test
         shell: bash
-        if: matrix.export_target.export_name == 'Linux' || matrix.export_target.export_name == 'Windows Desktop' || matrix.export_target.export_name == 'macOS'
+        if: matrix.target.export_name == 'Linux' || matrix.target.export_name == 'Windows Desktop' || matrix.target.export_name == 'macOS'
         run: |
           set -e
           godot --path demo --quit --headless | tee output.log
@@ -486,8 +480,8 @@ jobs:
         run: |
           set -e
           mkdir demo/exports
-          godot --export-${{ matrix.mode }} "${{ matrix.export_target.export_name }}" --path demo --headless
-          echo "EXPORT_NAME=$(echo "${{ matrix.export_target.export_name }}" | tr '[:upper:]' '[:lower:]' | tr -d ' /')" >> $GITHUB_ENV
+          godot --export-${{ matrix.mode }} "${{ matrix.target.export_name }}" --path demo --headless
+          echo "EXPORT_NAME=$(echo "${{ matrix.target.export_name }}" | tr '[:upper:]' '[:lower:]' | tr -d ' /')" >> $GITHUB_ENV
 
       - name: Upload demo export artifact
         if: matrix.godot-version == needs.read-versions.outputs.godot_max_version
@@ -497,14 +491,14 @@ jobs:
           path: demo/exports/**
 
       - name: Prepare addon export
-        if: matrix.export_target.export_name == 'Linux' && matrix.mode == 'release' && matrix.godot-version == needs.read-versions.outputs.godot_max_version
+        if: matrix.target.export_name == 'Linux' && matrix.mode == 'release' && matrix.godot-version == needs.read-versions.outputs.godot_max_version
         shell: bash
         run: |
           set -e
           mkdir -p addon-export && cp -r demo/addons addon-export
 
       - name: Upload addon artifact
-        if: matrix.export_target.export_name == 'Linux' && matrix.mode == 'release' && matrix.godot-version == needs.read-versions.outputs.godot_max_version
+        if: matrix.target.export_name == 'Linux' && matrix.mode == 'release' && matrix.godot-version == needs.read-versions.outputs.godot_max_version
         uses: actions/upload-artifact@v6
         with:
           name: addon

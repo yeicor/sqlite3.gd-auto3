@@ -133,6 +133,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE godot-cpp unofficial::sqlite3::sql
 # Install the complete bindings to the demo project with the correct suffix
 get_target_property(GODOTCPP_SUFFIX godot-cpp GODOTCPP_SUFFIX)
 set(OUTPUT_NAME "gdext${GODOTCPP_SUFFIX}")
+if (MINGW) # Avoid name collision for both supported windows compilers (msvc and mingw)
+    set(OUTPUT_NAME "gdext${GODOTCPP_SUFFIX}.mingw")
+endif()
 set(INSTALL_FOLDER "${CMAKE_CURRENT_SOURCE_DIR}/demo/addons/${PROJECT_NAME}")
 message("Will install shared library to: ${INSTALL_FOLDER}")
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${OUTPUT_NAME}")
