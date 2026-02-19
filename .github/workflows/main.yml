@@ -497,6 +497,7 @@ jobs:
           set -e
           mkdir -p addon-export/${{ github.event.repository.name }}-${{ github.ref_name }}
           cp -r demo/addons addon-export/${{ github.event.repository.name }}-${{ github.ref_name }}
+          cp LICENSE addon-export/${{ github.event.repository.name }}-${{ github.ref_name }}/
 
       - name: Upload addon artifact
         if: matrix.target.export_name == 'Linux' && matrix.mode == 'release' && matrix.godot-version == needs.read-versions.outputs.godot_max_version
