@@ -14,8 +14,8 @@ SQLite3 for Godot via GDExtension.
 
 ## 🚀 Quick Start
 
-1. **Download**: [latest release](https://github.com/yeicor/sqlite3.gd-auto3/releases) or [nightly builds](https://github.com/yeicor/sqlite3.gd-auto3/actions) (look for `addon.zip`).
-2. **Extract**: the downloaded `addon.zip` into your project's root.
+1. **Download**: [latest release](https://github.com/yeicor/sqlite3.gd-auto3/releases) or [nightly builds](https://github.com/yeicor/sqlite3.gd-auto3/actions) (look for `...-addon.zip`).
+2. **Extract**: the downloaded `...-addon.zip` into your project's root.
 3. **Profit**: see [demo/demo.gd](demo/demo.gd) for a complete example.
 
 ## 🧩 Using this project as a template for other GDExtensions
