@@ -526,7 +526,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          zip -r "${{ github.event.repository.name }}-${{ github.ref_name }}-addon.zip" .addon
+          zip -r "${{ github.event.repository.name }}-${{ github.ref_name }}-addon.zip" .addon/*
 
       - name: Upload to release
         shell: bash
