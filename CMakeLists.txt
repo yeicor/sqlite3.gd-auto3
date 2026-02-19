@@ -22,6 +22,22 @@ else()
     message(STATUS "Neither sccache nor ccache found, not using a compiler launcher")
 endif()
 
+# Auto-force full LTO in release builds if available
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT IPO_SUPPORTED OUTPUT IPO_SUPPORT_OUTPUT)
+    if(IPO_SUPPORTED)
+        message(STATUS "IPO (LTO) is supported, enabling it for Release builds")
+        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+    else()
+        message(WARNING "IPO (LTO) is not supported: "
+            "${IPO_SUPPORT_OUTPUT}")
+    endif()
+else()
+    message(STATUS "IPO (LTO) is not enabled for Debug "
+        "builds")
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -42,22 +58,18 @@ endif ()
 message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}, "
     "GODOTCPP_TARGET: ${GODOTCPP_TARGET}")
 
-# Auto-force full LTO in release builds if available
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    include(CheckIPOSupported)
-    check_ipo_supported(RESULT IPO_SUPPORTED OUTPUT IPO_SUPPORT_OUTPUT)
-    if(IPO_SUPPORTED)
-        message(STATUS "IPO (LTO) is supported, enabling it for Release builds")
-        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-    else()
-        message(WARNING "IPO (LTO) is not supported: "
-            "${IPO_SUPPORT_OUTPUT}")
-    endif()
-else()
-    message(STATUS "IPO (LTO) is not enabled for Debug "
-        "builds")
-endif()
-
+# No-op when CMAKE_BUILD_TYPE does not match the GODOTCPP_TARGET
+# (it can make sense, but it is rare enough to not be worth building them by default)
+if (CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT GODOTCPP_TARGET STREQUAL "template_release")
+    message(WARNING "CMAKE_BUILD_TYPE is 'Release' but GODOTCPP_TARGET is not 'template_release'. Ignoring this build to speed up the build process.")
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/README.md" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/") # No-op installation
+    return()
+endif ()
+if (CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT GODOTCPP_TARGET STREQUAL "template_debug")
+    message(WARNING "CMAKE_BUILD_TYPE is 'Debug' but GODOTCPP_TARGET is not 'template_debug'. Ignoring this build to speed up the build process.")
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/README.md" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/") # No-op installation
+    return()
+endif ()
 
 # Fix CMAKE_OSX_SYSROOT for iOS to use full SDK path (overriden incorrectly by godot-cpp due to env SDKROOT)
 set(ENV{SDKROOT} "${CMAKE_OSX_SYSROOT}")

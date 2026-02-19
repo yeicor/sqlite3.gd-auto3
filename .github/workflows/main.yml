@@ -260,14 +260,6 @@ jobs:
                     cp -r "$temp_dir"/*/ /
                   fi
                   echo "Successfully downloaded and extracted artifacts from workflow $workflow_id on branch $branch."
-                  success=true
-                  COMMIT_SHA=$(gh run view "$workflow_id" --json headSha -q .headSha)
-                  if git diff --quiet "$COMMIT_SHA"..HEAD -- src/ doc_classes/ CMakeLists.txt godot-cpp/ vcpkg*/; then
-                    echo "VCPKG_CACHE_VALID=true" >> $GITHUB_ENV
-                    echo "No relevant source changes since $COMMIT_SHA, reusing vcpkg installed."
-                  else
-                    echo "Source changes detected since $COMMIT_SHA, will rebuild."
-                  fi
                 else
                   echo "Failed to download artifacts from workflow $workflow_id on branch $branch, trying next..."
                 fi
@@ -326,7 +318,6 @@ jobs:
           $PWD/ccache/ccache --zero-stats
 
       - name: Build with vcpkg
-        if: env.VCPKG_CACHE_VALID != 'true'
         shell: bash
         run: |
           set -e
