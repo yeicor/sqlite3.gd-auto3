@@ -495,9 +495,9 @@ jobs:
         shell: bash
         run: |
           set -e
-          mkdir -p "addon-export/${{ github.event.repository.name }}-${{ github.ref_name }}"
-          cp -r demo/addons "addon-export/${{ github.event.repository.name }}-${{ github.ref_name }}"
-          cp LICENSE "addon-export/${{ github.event.repository.name }}-${{ github.ref_name }}/addons/"*
+          mkdir -p addon-export
+          cp -r demo/addons addon-export/
+          cp LICENSE addon-export/addons/*
 
       - name: Upload addon artifact
         if: matrix.target.export_name == 'Linux' && matrix.mode == 'release' && matrix.godot-version == needs.read-versions.outputs.godot_max_version
@@ -526,7 +526,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          zip -r "${{ github.event.repository.name }}-${{ github.ref_name }}-addon.zip" .addon/*
+          zip -r "${{ github.event.repository.name }}-${{ github.ref_name }}-addon.zip" .addon/addons
 
       - name: Upload to release
         shell: bash
