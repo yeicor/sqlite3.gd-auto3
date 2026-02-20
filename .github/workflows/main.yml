@@ -513,20 +513,20 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
       - name: Download addon artifact
         uses: actions/download-artifact@v4
         with:
           name: ${{ github.event.repository.name }}-${{ github.ref_name }}-addon
-          path: .addon
+          path: .
 
       - name: Recreate addon zip
         shell: bash
         run: |
           set -e
-          zip -r "${{ github.event.repository.name }}-${{ github.ref_name }}-addon.zip" .addon/addons
+          zip -r "${{ github.event.repository.name }}-${{ github.ref_name }}-addon.zip" addons
+
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
       - name: Upload to release
         shell: bash
