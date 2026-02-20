@@ -559,3 +559,17 @@ jobs:
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
+
+  # Certain jobs may fail due to rate limits or compiler bugs; automatically retry failed jobs up to 3 times with some delay
+  retry-on-failure: # https://medium.com/@aarne.laur/retry-failed-github-actions-8661e7601c66
+    if: failure() && fromJSON(github.run_attempt) < 3
+    needs: [test]
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          sleep 10m
+          gh workflow run retry-workflow.yml -F run_id=${{ github.run_id }}
