@@ -525,16 +525,14 @@ jobs:
           set -e
           zip -r "${{ github.event.repository.name }}-${{ github.ref_name }}-addon.zip" addons
 
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
       - name: Upload to release
         shell: bash
         run: |
           set -e
-          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
           gh auth status
           gh release upload ${{ github.ref_name }} "${{ github.event.repository.name }}-${{ github.ref_name }}-addon.zip"
+        env:
+          GH_TOKEN: ${{ github.token }}
 
   deploy-pages:
     runs-on: ubuntu-24.04
