@@ -533,6 +533,7 @@ jobs:
           gh release upload ${{ github.ref_name }} "${{ github.event.repository.name }}-${{ github.ref_name }}-addon.zip"
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
 
   deploy-pages:
     runs-on: ubuntu-24.04
@@ -567,8 +568,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - env:
-          GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           set -e
           sleep 10m
