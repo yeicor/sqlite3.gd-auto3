@@ -563,10 +563,18 @@ jobs:
         uses: actions/deploy-pages@v4
 
   # Certain jobs may fail due to rate limits or compiler bugs; automatically retry failed jobs up to 3 times with some delay
-  retry-on-failure: # https://medium.com/@aarne.laur/retry-failed-github-actions-8661e7601c66
-    if: failure() && fromJSON(github.run_attempt) < 3
-    needs: [test]
+  retry-on-failure:
+    needs:
+      - read-versions
+      - prepare-api
+      - build
+      - test
+      - release
+      - deploy-pages
+    if: always() && contains(needs.*.result, 'failure') && fromJSON(github.run_attempt) < 5
     runs-on: ubuntu-24.04
+    permissions:
+      actions: write
     steps:
       - env:
           GH_TOKEN: ${{ github.token }}
