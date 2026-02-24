@@ -84,7 +84,7 @@ jobs:
 
       - name: Cache Godot API dump
         id: cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with: &cache-godot-api-dump-with
           path: godot-cpp/gdextension/extension_api.json
           key: godot-api-dump-${{ needs.read-versions.outputs.godot_min_version_tag }}-${{ matrix.float-precision }}
