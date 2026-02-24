@@ -127,11 +127,7 @@ jobs:
             { vcpkg_triplet: arm64-windows-static, os: windows-2025 }, # MSVC instead of mingw
             { vcpkg_triplet: arm64-osx, os: macos-15 },
             { vcpkg_triplet: x64-osx, os: macos-15 },
-            {
-              vcpkg_triplet: wasm32-emscripten,
-              os: ubuntu-24.04,
-              threads: off,
-            },
+            { vcpkg_triplet: wasm32-emscripten, os: ubuntu-24.04, threads: off },
             { vcpkg_triplet: wasm32-emscripten, os: ubuntu-24.04, threads: on },
             { vcpkg_triplet: x64-android, os: ubuntu-24.04 },
             { vcpkg_triplet: x86-android, os: ubuntu-24.04 },
@@ -589,3 +585,10 @@ jobs:
           set -ex
           sleep $((RANDOM % 30 + 1))m
           gh workflow run retry-workflow.yml -F run_id=${{ github.run_id }}
+
+  success: # No-op success job for github ruleset detection
+    runs-on: ubuntu-24.04
+    needs: retry-on-failure
+    steps:
+      - name: CI success marker
+        run: echo "CI completed successfully (no-op success job for github ruleset detection)"

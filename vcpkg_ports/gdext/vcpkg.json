@@ -1,5 +1,27 @@
 {
   "name": "gdext",
   "version": "0.0.1",
-  "dependencies": ["sqlite3", "gtest"]
+  "dependencies": [
+    {
+      "name": "sqlite3",
+      "features": [
+        "dbpage-vtab",
+        "dbstat",
+        "fts3",
+        "fts4",
+        "fts5",
+        "geopoly",
+        "json1",
+        "limit",
+        "math",
+        "memsys3",
+        "memsys5",
+        "rtree",
+        "session",
+        "snapshot",
+        "soundex",
+        "unicode"
+      ]
+    }
+  ]
 }
