@@ -521,7 +521,7 @@ jobs:
       contents: write
     steps:
       - name: Download addon artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: ${{ github.event.repository.name }}-${{ github.ref_name }}-addon
           path: .
@@ -555,7 +555,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Download web demo artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: demo-export-web-release
           path: web
