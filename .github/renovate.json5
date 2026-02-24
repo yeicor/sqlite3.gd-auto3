@@ -26,7 +26,7 @@
         ".github/workflows/*.yml"
       ],
       "matchStrings": [
-        "os:\\s*\"?(?<depName>ubuntu|windows|macos)-(?<currentValue>[^\"} ]*)"
+        "os:\\s*\"?(?<depName>ubuntu|windows|macos)-(?<currentValue>[^\",} ]*)"
       ],
       "datasourceTemplate": "github-runners",
       "versioningTemplate": "docker"
