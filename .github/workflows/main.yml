@@ -199,7 +199,7 @@ jobs:
 
       - name: Setup MinGW (Windows) # MSVC is already set up by default
         if: matrix.target.os == 'windows-2025' && contains(matrix.target.vcpkg_triplet, '-mingw')
-        uses: egor-tensin/setup-mingw@v2
+        uses: egor-tensin/setup-mingw@v3
         with:
           version: ${{ needs.read-versions.outputs.mingw_version }}
 
