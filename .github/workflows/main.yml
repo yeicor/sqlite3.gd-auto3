@@ -111,7 +111,7 @@ jobs:
   build:
     needs: [prepare-api, read-versions]
     strategy:
-      #fail-fast: false
+      fail-fast: false
       matrix:
         target: [
             # https://docs.godotengine.org/en/stable/about/system_requirements.html
@@ -406,7 +406,7 @@ jobs:
   test:
     needs: [read-versions, build]
     strategy:
-      #fail-fast: false
+      fail-fast: false
       matrix:
         target: # Not all architectures are exported (this is just a demo)
           [
