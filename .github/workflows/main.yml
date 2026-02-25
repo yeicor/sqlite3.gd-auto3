@@ -234,7 +234,7 @@ jobs:
           echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
 
       - name: Prepare sccache for caching compiler outputs
-        uses: mozilla-actions/sccache-action
+        uses: mozilla-actions/sccache-action@v0.0.9
         with:
           disable_annotations: true
 
