@@ -1,13 +1,10 @@
-# XXX: Enable required emscripten args for threads mode
-set(content_to_add "if(EMSCRIPTEN)\ntarget_compile_options(sqlite3 PRIVATE -matomics -mbulk-memory -fPIC)\nendif()")
-set(file_to_edit "${VCPKG_ROOT_DIR}/ports/sqlite3/CMakeLists.txt")
-file(READ "${file_to_edit}" content)
-string(FIND "${content}" "${content_to_add}" index_of_content)
-if(index_of_content EQUAL -1)
-    file(APPEND "${file_to_edit}" "\n${content_to_add}\n")
-endif()
-
-# Need access to some port files
+# Copy upstream port files except portfile.cmake
 file(COPY "${VCPKG_ROOT_DIR}/ports/sqlite3/" DESTINATION "${CMAKE_CURRENT_LIST_DIR}" PATTERN "portfile.cmake" EXCLUDE)
 
+# Patch upstream CMakeLists.txt to add emscripten args for threads mode
+file(READ "${VCPKG_ROOT_DIR}/ports/sqlite3/CMakeLists.txt" upstream_content)
+string(APPEND upstream_content "if(EMSCRIPTEN)\ntarget_compile_options(sqlite3 PRIVATE -matomics -mbulk-memory -fPIC)\nendif()")
+file(WRITE "${CMAKE_CURRENT_LIST_DIR}/CMakeLists.txt" "${modified_content}")
+
+# Include the upstream portfile.cmake
 include("${VCPKG_ROOT_DIR}/ports/sqlite3/portfile.cmake")

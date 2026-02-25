@@ -75,22 +75,6 @@ endif ()
 set(ENV{SDKROOT} "${CMAKE_OSX_SYSROOT}")
 set(GODOTCPP_DISABLE_EXCEPTIONS OFF)
 
-# Patch godot-cpp/cmake/godotcpp.cmake to include CMAKE_BUILD_TYPE in the suffix if not already patched
-file(READ "${CMAKE_CURRENT_SOURCE_DIR}/godot-cpp/cmake/godotcpp.cmake" GODOTCPP_CMAKE_CONTENT)
-message(STATUS "Checking if godot-cpp/cmake/godotcpp.cmake already includes CMAKE_BUILD_TYPE in suffix...")
-if(NOT GODOTCPP_CMAKE_CONTENT MATCHES "\\$<LOWER_CASE:\\$\\{CMAKE_BUILD_TYPE\\}>")
-    message(STATUS "CMAKE_BUILD_TYPE not found in suffix, applying patch...")
-    string(REPLACE
-        "\"\$<1:.\${GODOTCPP_TARGET}>\""
-        "\"\$<1:.\${GODOTCPP_TARGET}>\"\n        \"\$<1:.\$<LOWER_CASE:\${CMAKE_BUILD_TYPE}>>\""
-        GODOTCPP_CMAKE_CONTENT "${GODOTCPP_CMAKE_CONTENT}"
-    )
-    file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/godot-cpp/cmake/godotcpp.cmake" "${GODOTCPP_CMAKE_CONTENT}")
-    message(STATUS "Patch applied successfully.")
-else()
-    message(STATUS "godot-cpp/cmake/godotcpp.cmake already patched.")
-endif()
-
 # Godot C++ bindings
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/godot-cpp")
 
@@ -132,6 +116,15 @@ target_link_libraries(${PROJECT_NAME} PRIVATE godot-cpp unofficial::sqlite3::sql
 
 # Install the complete bindings to the demo project with the correct suffix
 get_target_property(GODOTCPP_SUFFIX godot-cpp GODOTCPP_SUFFIX)
+string(TOLOWER "${CMAKE_BUILD_TYPE}" BUILD_TYPE_LOWER)
+string(FIND "${GODOTCPP_SUFFIX}" "${GODOTCPP_TARGET}" _target_pos)
+if(_target_pos EQUAL -1)
+    message(FATAL_ERROR "GODOTCPP_TARGET '${GODOTCPP_TARGET}' not found in GODOTCPP_SUFFIX '${GODOTCPP_SUFFIX}'")
+endif()
+math(EXPR _insert_pos "${_target_pos} + string(LENGTH \"${GODOTCPP_TARGET}\")")
+string(SUBSTRING "${GODOTCPP_SUFFIX}" 0 ${_insert_pos} _prefix)
+string(SUBSTRING "${GODOTCPP_SUFFIX}" ${_insert_pos} -1 _suffix)
+set(GODOTCPP_SUFFIX "${_prefix}.${BUILD_TYPE_LOWER}${_suffix}")
 set(OUTPUT_NAME "gdext${GODOTCPP_SUFFIX}")
 if (MINGW) # Avoid name collision for both supported windows compilers (msvc and mingw)
     set(OUTPUT_NAME "gdext${GODOTCPP_SUFFIX}.mingw")
