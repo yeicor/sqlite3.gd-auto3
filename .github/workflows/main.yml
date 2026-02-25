@@ -175,7 +175,6 @@ jobs:
           set -e
           sudo apt-get update
           sudo apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
-          echo "gdext_cmake_args=-DCMAKE_C_COMPILER=arm-linux-gnueabihf-gcc -DCMAKE_CXX_COMPILER=arm-linux-gnueabihf-g++ ${{ env.gdext_cmake_args }}" >> $GITHUB_ENV
 
       - name: Install system dependencies (Ubuntu)
         if: matrix.target.os == 'ubuntu-24.04' || matrix.target.os == 'ubuntu-24.04-arm'
@@ -234,90 +233,17 @@ jobs:
           set -e
           echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
 
-      - name: Restore vcpkg cache
-        shell: bash
-        run: |
-          set -e
-          ARTIFACT_INSTALLED="vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}-${{ matrix.target.threads || '' }}"
-          ARTIFACT_BUILDTREES="vcpkg-buildtrees-packages-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}-${{ matrix.target.threads || '' }}"
-          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
-          gh auth status
-          success=false
-          delete_artifacts=true
-          branches=("${{ github.ref_name }}")
-          if [ "${{ github.ref_name }}" != "main" ]; then
-            branches+=("main")
-          fi
-          for branch in "${branches[@]}"; do
-            if [ "$success" = "true" ]; then break; fi
-            workflow_ids=$(gh run list --workflow="${{ github.workflow }}" --branch="$branch" --json databaseId --limit 10 --jq '[.[] | .databaseId]')
-            for workflow_id in $(echo "$workflow_ids" | jq -r '.[]' | tr -d '\r'); do
-              if [ "$success" != "true" ]; then
-                temp_dir=$(mktemp -d)
-                if gh run download "$workflow_id" --name "$ARTIFACT_INSTALLED" --name "$ARTIFACT_BUILDTREES" -D "$temp_dir"; then
-                  if [ "${{ matrix.target.os }}" == "ubuntu-24.04" ] || [ "${{ matrix.target.os }}" == "ubuntu-24.04-arm" ]; then
-                    cp -r "$temp_dir"/*/* /
-                  else
-                    cp -r "$temp_dir"/*/ /
-                  fi
-                  echo "Successfully downloaded and extracted artifacts from workflow $workflow_id on branch $branch."
-                  success=true
-                else
-                  echo "Failed to download artifacts from workflow $workflow_id on branch $branch, trying next..."
-                fi
-                rm -rf "$temp_dir"
-              fi
-              if [ "$success" == "true" ] && [ "$delete_artifacts" = "true" ]; then
-                echo "Deleting artifacts with matching names from older workflow $workflow_id on branch $branch"
-                artifact_ids=$(gh api repos/${{ github.repository }}/actions/runs/$workflow_id/artifacts --jq '.artifacts[] | select(.name == "'"$ARTIFACT_INSTALLED"'" or .name == "'"$ARTIFACT_BUILDTREES"'") | .id')
-                for id in $artifact_ids; do
-                  echo "- Deleting artifact $id"
-                  gh api -X DELETE repos/${{ github.repository }}/actions/artifacts/$id || true
-                done
-              fi
-            done
-            delete_artifacts=false
-          done
-          if [ "$success" != "true" ]; then
-            echo "::warning ::Failed to download and extract previous vcpkg installed artifacts from any of the last 10 workflows on current branch or main branch, skipping cache..."
-          fi
+      - name: Prepare sccache for caching compiler outputs
+        uses: mozilla-actions/sccache-action
+        with:
+          disable_annotations: true
 
-      - name: Install and configure ccache
+      - name: Configure sccache
         shell: bash
         run: |
           set -e
-          CCACHE_VERSION=4.12.3  # TODO: Enable renovate updates
-          echo "CCACHE_VERSION=$CCACHE_VERSION" >> $GITHUB_ENV
-          echo "CCACHE_VERSION is $CCACHE_VERSION"
-          if [ "$RUNNER_OS" = "Linux" ]; then
-            if [ "$RUNNER_ARCH" = "ARM64" ]; then
-              ASSET="ccache-${CCACHE_VERSION}-linux-aarch64.tar.xz"
-            else
-              ASSET="ccache-${CCACHE_VERSION}-linux-x86_64.tar.xz"
-            fi
-          elif [ "$RUNNER_OS" = "macOS" ]; then
-              ASSET="ccache-${CCACHE_VERSION}-darwin.tar.gz" # Universal (aarch64 + x86_64)
-          elif [ "$RUNNER_OS" = "Windows" ]; then
-            ASSET="ccache-${CCACHE_VERSION}-windows-i686.zip"
-          fi
-          echo "ASSET is $ASSET"
-          curl -L "https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/${ASSET}" -o ccache-archive
-          echo "Downloaded ccache-archive, size: $(ls -lh ccache-archive | awk '{print $5}')"
-          echo "File type: $(file ccache-archive 2>/dev/null || echo 'file command not available')"
-          if [ "$RUNNER_OS" = "Windows" ]; then
-            unzip ccache-archive
-          else
-            tar -xf ccache-archive
-          fi
-          mv ccache-${CCACHE_VERSION}-* ccache
-          if [ "$RUNNER_OS" = "Windows" ]; then
-            echo "gdext_cmake_args=-DCMAKE_PROGRAM_PATH=$PWD/ccache ${{ env.gdext_cmake_args }}" >> $GITHUB_ENV  # Otherwise breaks powershell
-          else
-            echo "PATH=$PWD/ccache:$PATH" >> $GITHUB_ENV
-          fi
-          $PWD/ccache/ccache --set-config max_size=2G
-          $PWD/ccache/ccache --set-config compiler_check=content
-          $PWD/ccache/ccache --zero-stats
+          echo "SCCACHE_CACHE_SIZE=2G" >> $GITHUB_ENV
+          echo "SCCACHE_DIR=$(sccache --show-stats | grep 'Local disk:' | sed 's/.*: //' | tr -d '"')" | tee -a $GITHUB_ENV
 
       - name: Build with vcpkg
         shell: bash
@@ -335,6 +261,12 @@ jobs:
           VCPKG_OVERLAY_PORTS: vcpkg_ports
           GDEXT_CMAKE_ARGS: -DGODOTCPP_TARGET=${{ matrix.target-type }} -DGODOTCPP_PRECISION=${{ matrix.float-precision }} ${{ env.gdext_cmake_args }}
 
+      - name: Show sccache stats
+        shell: bash
+        run: |
+          set -e
+          sccache --show-stats
+
       - name: Copy to addon folder
         shell: bash
         run: |
@@ -346,32 +278,6 @@ jobs:
           fi
           echo -e "Copying the following files to the addon folder...\n$files"
           cp -f $files demo/addons/*/
-
-      - name: Clean and determine cache directories
-        shell: bash
-        if: always()
-        run: |
-          set -e
-          ccache -vv --show-stats
-          start_time=$(date -r vcpkg/vcpkg +%s 2>/dev/null || date +%s)
-          current_time=$(date +%s)
-          elapsed=$((current_time - start_time))
-          stats_before=$(ccache -vv --show-stats 2>/dev/null)
-          ccache --evict-older-than ${elapsed}s --verbose 2>&1
-          stats_after=$(ccache -vv --show-stats 2>/dev/null)
-          if [ "$stats_before" != "$stats_after" ]; then
-            ccache -vv --show-stats
-          fi
-
-          # Figure out cache dir for uploading artifact
-          CCACHE_DIR=$(ccache --show-config | grep 'cache_dir' | cut -d ' ' -f 4)
-          CCACHE_DIR=$(echo "$CCACHE_DIR" | sed 's|\\|/|g')
-          if [[ $CCACHE_DIR =~ ^([a-zA-Z]):(.*) ]]; then
-            drive=$(echo "${BASH_REMATCH[1]}" | tr 'A-Z' 'a-z')
-            rest="${BASH_REMATCH[2]}"
-            CCACHE_DIR="/$drive$rest"
-          fi
-          echo "CCACHE_DIR=$CCACHE_DIR" | tee -a $GITHUB_ENV
 
       - name: Upload addon artifact
         uses: actions/upload-artifact@v6
@@ -388,7 +294,7 @@ jobs:
           name: vcpkg-installed-${{ matrix.target.vcpkg_triplet }}-${{ matrix.target-type }}-${{ matrix.float-precision }}-${{ matrix.target.threads || '' }}
           path: | # /tmp/ forces consistant root directory to /
             vcpkg/installed/
-            ${{ env.CCACHE_DIR }}
+            ${{ env.SCCACHE_DIR }}
             /.fake-path-to-force-root-directory
 
       - name: Upload vcpkg buildtrees artifact

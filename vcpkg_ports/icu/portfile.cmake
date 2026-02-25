@@ -9,6 +9,10 @@ endif()
 if(VCPKG_TARGET_IS_MINGW)
     string(REPLACE "if(CMAKE_HOST_WIN32 AND VCPKG_TARGET_IS_MINGW AND NOT HOST_TRIPLET MATCHES \"mingw\")" "if(FALSE AND CMAKE_HOST_WIN32 AND VCPKG_TARGET_IS_MINGW AND NOT HOST_TRIPLET MATCHES \"mingw\")" upstream_content "${upstream_content}")
 endif()
+if(VCPKG_TARGET_IS_IOS)
+    string(REPLACE "vcpkg_list(SET CONFIGURE_OPTIONS)" "vcpkg_list(SET CONFIGURE_OPTIONS)\nvcpkg_list(APPEND CONFIGURE_OPTIONS \"--host=arm64-apple-darwin\")" upstream_content "${upstream_content}")
+endif()
+
 file(WRITE "${CMAKE_CURRENT_LIST_DIR}/portfile_upstream_patched.cmake" "${upstream_content}")
 
 # Include the patched portfile.cmake
