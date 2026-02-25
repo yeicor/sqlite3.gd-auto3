@@ -175,7 +175,7 @@ jobs:
           set -e
           sudo apt-get update
           sudo apt-get install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
-          echo "cmake_extra_args=-DCMAKE_C_COMPILER=arm-linux-gnueabihf-gcc -DCMAKE_CXX_COMPILER=arm-linux-gnueabihf-g++ ${{ env.cmake_extra_args }}" >> $GITHUB_ENV
+          echo "gdext_cmake_args=-DCMAKE_C_COMPILER=arm-linux-gnueabihf-gcc -DCMAKE_CXX_COMPILER=arm-linux-gnueabihf-g++ ${{ env.gdext_cmake_args }}" >> $GITHUB_ENV
 
       - name: Install system dependencies (Ubuntu)
         if: matrix.target.os == 'ubuntu-24.04' || matrix.target.os == 'ubuntu-24.04-arm'
@@ -217,7 +217,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          echo "cmake_extra_args=-DGODOTCPP_THREADS=${{ matrix.target.threads }} ${{ env.cmake_extra_args }}" >> $GITHUB_ENV
+          echo "gdext_cmake_args=-DGODOTCPP_THREADS=${{ matrix.target.threads }} ${{ env.gdext_cmake_args }}" >> $GITHUB_ENV
 
       - name: Setup Android NDK
         if: contains(matrix.target.vcpkg_triplet, '-android')
@@ -311,7 +311,7 @@ jobs:
           fi
           mv ccache-${CCACHE_VERSION}-* ccache
           if [ "$RUNNER_OS" = "Windows" ]; then
-            echo "cmake_extra_args=-DCMAKE_PROGRAM_PATH=$PWD/ccache ${{ env.cmake_extra_args }}" >> $GITHUB_ENV  # Otherwise breaks powershell
+            echo "gdext_cmake_args=-DCMAKE_PROGRAM_PATH=$PWD/ccache ${{ env.gdext_cmake_args }}" >> $GITHUB_ENV  # Otherwise breaks powershell
           else
             echo "PATH=$PWD/ccache:$PATH" >> $GITHUB_ENV
           fi
@@ -323,7 +323,6 @@ jobs:
         shell: bash
         run: |
           set -e
-          echo "$GD_CMAKE_ARGS" >__GD_CMAKE_ARGS
           "vcpkg/bootstrap-vcpkg${{ matrix.target.os == 'windows-2025' && '.bat' || '.sh' }}"
           vcpkg_exe="vcpkg/vcpkg${{ matrix.target.os == 'windows-2025' && '.exe' || '' }}"
           # Force rebuild relying on ccache, as vcpkg's cache is sometimes too aggressive (designed for external deps)
@@ -334,7 +333,7 @@ jobs:
           VCPKG_DEFAULT_TRIPLET: ${{ matrix.target.vcpkg_triplet }}
           VCPKG_OVERLAY_TRIPLETS: vcpkg_triplets
           VCPKG_OVERLAY_PORTS: vcpkg_ports
-          GD_CMAKE_ARGS: -DGODOTCPP_TARGET=${{ matrix.target-type }} -DGODOTCPP_PRECISION=${{ matrix.float-precision }} ${{ env.cmake_extra_args }}
+          GDEXT_CMAKE_ARGS: -DGODOTCPP_TARGET=${{ matrix.target-type }} -DGODOTCPP_PRECISION=${{ matrix.float-precision }} ${{ env.gdext_cmake_args }}
 
       - name: Copy to addon folder
         shell: bash
