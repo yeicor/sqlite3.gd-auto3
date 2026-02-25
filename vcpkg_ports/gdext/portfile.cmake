@@ -5,10 +5,12 @@
 
 set(SOURCE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../")
 
-if(DEFINED ENV{GDEXT_CMAKE_ARGS})
+if(EXISTS "${SOURCE_PATH}/__GDEXT_CMAKE_ARGS")
+    file(READ "${SOURCE_PATH}/__GDEXT_CMAKE_ARGS" GDEXT_CMAKE_ARGS)
+elseif(DEFINED ENV{GDEXT_CMAKE_ARGS})
     set(GDEXT_CMAKE_ARGS "$ENV{GDEXT_CMAKE_ARGS}")
 else()
-    message(FATAL_ERROR "GDEXT_CMAKE_ARGS environment variable not set.")
+    message(FATAL_ERROR "GDEXT_CMAKE_ARGS environment variable OR ${SOURCE_PATH}/__GDEXT_CMAKE_ARGS file not set.")
 endif()
 separate_arguments(GDEXT_CMAKE_ARGS UNIX_COMMAND "${GDEXT_CMAKE_ARGS}")
 vcpkg_configure_cmake(

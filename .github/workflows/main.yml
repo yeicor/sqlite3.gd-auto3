@@ -250,6 +250,7 @@ jobs:
         run: |
           set -e
           "vcpkg/bootstrap-vcpkg${{ matrix.target.os == 'windows-2025' && '.bat' || '.sh' }}"
+          echo "-DGODOTCPP_TARGET=${{ matrix.target-type }} -DGODOTCPP_PRECISION=${{ matrix.float-precision }} ${{ env.gdext_cmake_args }}" > __GDEXT_CMAKE_ARGS
           vcpkg_exe="vcpkg/vcpkg${{ matrix.target.os == 'windows-2025' && '.exe' || '' }}"
           # Force rebuild relying on ccache, as vcpkg's cache is sometimes too aggressive (designed for external deps)
           $vcpkg_exe remove $($vcpkg_exe list | awk '{print $1}' | sed 's/\[[^]]*\]//g' | tr '\n' ' ') || true
