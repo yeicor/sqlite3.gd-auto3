@@ -2,4 +2,3 @@
 !.gitignore
 !portfile.cmake
 !vcpkg.json
-!use-slash-in-pkgdata-for-mingw-cross.patch
