@@ -119,9 +119,9 @@ jobs:
             { vcpkg_triplet: x86-linux, os: ubuntu-24.04 },
             { vcpkg_triplet: arm64-linux, os: ubuntu-24.04-arm },
             { vcpkg_triplet: arm-linux, os: ubuntu-24.04-arm },
-            #{ vcpkg_triplet: x64-mingw-static, os: windows-2025 }, # Removed for simplicty: incompatible with the icu extension
-            #{ vcpkg_triplet: x86-mingw-static, os: windows-2025 },
-            #{ vcpkg_triplet: arm64-mingw-static, os: windows-2025 },
+            { vcpkg_triplet: x64-mingw-static, os: windows-2025 },
+            { vcpkg_triplet: x86-mingw-static, os: windows-2025 },
+            { vcpkg_triplet: arm64-mingw-static, os: windows-2025 },
             { vcpkg_triplet: x64-windows-static, os: windows-2025 }, # MSVC instead of mingw
             { vcpkg_triplet: x86-windows-static, os: windows-2025 }, # MSVC instead of mingw
             { vcpkg_triplet: arm64-windows-static, os: windows-2025 }, # MSVC instead of mingw

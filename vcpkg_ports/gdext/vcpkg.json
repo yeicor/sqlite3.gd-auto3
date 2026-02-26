@@ -19,8 +19,7 @@
         "rtree",
         "session",
         "snapshot",
-        "soundex",
-        "unicode"
+        "soundex"
       ]
     }
   ]
