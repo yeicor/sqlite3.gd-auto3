@@ -242,8 +242,9 @@ jobs:
         shell: bash
         run: |
           set -e
-          echo "SCCACHE_CACHE_SIZE=2G" >> $GITHUB_ENV
-          echo "SCCACHE_DIR=$(sccache --show-stats | grep 'Local disk:' | sed 's/.*: //' | tr -d '"')" | tee -a $GITHUB_ENV
+          echo "SCCACHE_CACHE_SIZE=2G" | tee -a $GITHUB_ENV
+          SCCACHE_DIR=$(sccache --show-stats | grep 'Local disk:' | sed 's/.*: //' | tr -d '"')
+          echo "SCCACHE_DIR=$(echo "$SCCACHE_DIR" | sed -E 's#^([A-Z]):#/\L\1#; s#\\#/#g')" | tee -a $GITHUB_ENV
 
       - name: Build with vcpkg
         shell: bash
