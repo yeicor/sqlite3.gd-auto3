@@ -1,6 +1,8 @@
 # SQLite3.gd
 
-SQLite3 for Godot via GDExtension.
+This project provides SQLite3 integration for the Godot Engine using GDExtension.
+
+It includes all standard SQLite extensions, except for Unicode (ICU) support. ICU is excluded because it would increase the final build size by more than 10×. If needed, ICU can still be loaded at runtime separately.
 
 ## ✨ Features
 
